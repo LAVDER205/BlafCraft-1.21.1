@@ -1,11 +1,21 @@
 {
   "item.blafcraft.bismuth": "Bismuth",
   "item.blafcraft.raw_bismuth": "Raw Bismuth",
+  "item.blafcraft.chisel": "Chisel",
+  "item.blafcraft.radish": "Radish",
+  "item.blafcraft.frostfire_ice": "Frostfire Ice",
+  "item.blafcraft.starlight_ashes": "Starlight Ashes",
 
   "block.blafcraft.bismuth_block": "Block of Bismuth",
   "block.blafcraft.bismuth_ore": "Bismuth Ore",
   "block.blafcraft.bismuth_deepsaalte_ore": "Bismuth Deepslate Ore",
+  "block.blafcraft.magic_block": "Magic Block",
 
   "creativetab.blafcraft.blafcraft_items": "BlafCraft Items",
-  "creativetab.blafcraft.blafcraft_blocks": "BlafCraft Blocks"
+  "creativetab.blafcraft.blafcraft_blocks": "BlafCraft Blocks",
+
+  "tooltip.blafcraft.magic_block.tooltip": "This block is very MaGiCal",
+  "tooltip.blafcraft.chisel.shift_down": "cool item lele",
+  "tooltip.blafcraft.chisel" : "Press Shift for more information",
+  "tooltip.blafcraft.radish.tooltip": "Yummy"
 }

@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "blafcraft:block/magic_block"
+    }
+  }
+}
