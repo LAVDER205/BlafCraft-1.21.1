@@ -1,0 +1,11 @@
+{
+  "item.blafcraft.bismuth": "Bismuth",
+  "item.blafcraft.raw_bismuth": "Raw Bismuth",
+
+  "block.blafcraft.bismuth_block": "Block of Bismuth",
+  "block.blafcraft.bismuth_ore": "Bismuth Ore",
+  "block.blafcraft.bismuth_deepsaalte_ore": "Bismuth Deepslate Ore",
+
+  "creativetab.blafcraft.blafcraft_items": "BlafCraft Items",
+  "creativetab.blafcraft.blafcraft_blocks": "BlafCraft Blocks"
+}
