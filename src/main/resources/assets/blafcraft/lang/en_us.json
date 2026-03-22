@@ -11,6 +11,16 @@
   "block.blafcraft.bismuth_deepsaalte_ore": "Bismuth Deepslate Ore",
   "block.blafcraft.magic_block": "Magic Block",
 
+  "block.blafcraft.bismuth_stairs": "Bismuth Stairs",
+  "block.blafcraft.bismuth_slab": "Bismuth Slab",
+  "block.blafcraft.bismuth_button": "Bismuth Button",
+  "block.blafcraft.bismuth_pressure_plate": "Bismuth Pressure Plate",
+  "block.blafcraft.bismuth_fence": "Bismuth Fence",
+  "block.blafcraft.bismuth_fence_gate": "Bismuth Fence Gate",
+  "block.blafcraft.bismuth_wall": "Bismuth Wall",
+  "block.blafcraft.bismuth_door": "Bismuth Door",
+  "block.blafcraft.bismuth_trapdoor": "Bismuth Trapdoor",
+
   "creativetab.blafcraft.blafcraft_items": "BlafCraft Items",
   "creativetab.blafcraft.blafcraft_blocks": "BlafCraft Blocks",
 
