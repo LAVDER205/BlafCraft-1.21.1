@@ -2,8 +2,11 @@ package net.blafteam.blafcraft.datagen;
 
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.block.ModBlocks;
+import net.blafteam.blafcraft.block.custom.BismuthLampBlock;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -40,6 +43,26 @@ public class ModBlockStateProvider extends BlockStateProvider {
         blockItem(ModBlocks.BISMUTH_PRESSURE_PLATE);
         blockItem(ModBlocks.BISMUTH_FENCE_GATE);
         blockItem(ModBlocks.BISMUTH_TRAPDOOR, "_bottom");
+
+        customLamp();
+
+
+        blockWithItem(ModBlocks.SCULK_ORE);
+    }
+
+    private void customLamp() {
+        getVariantBuilder(ModBlocks.BISMUTH_LAMP.get()).forAllStates(state -> {
+            if(state.getValue(BismuthLampBlock.CLICKED)) {
+                return new ConfiguredModel[]{new ConfiguredModel(models().cubeAll("bismuth_lamp_on",
+                        ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "block/" + "bismuth_lamp_on")))};
+            } else {
+                return new ConfiguredModel[]{new ConfiguredModel(models().cubeAll("bismuth_lamp_off",
+                        ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "block/" + "bismuth_lamp_off")))};
+            }
+        });
+
+        simpleBlockItem(ModBlocks.BISMUTH_LAMP.get(), models().cubeAll("bismuth_lamp_on",
+                ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "block/" + "bismuth_lamp_on")));
     }
 
     private void blockWithItem(DeferredBlock<?> deferredBlock) {

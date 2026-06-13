@@ -23,6 +23,9 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         List<ItemLike> BISMUTH_SMELTABLES = List.of(ModItems.RAW_BISMUTH,
                 ModBlocks.BISMUTH_ORE, ModBlocks.BISMUTH_DEEPSLATE_ORE);
 
+        List<ItemLike> SCULK_SMELTABLES = List.of(ModItems.RAW_SCULK,
+                ModBlocks.SCULK_ORE);
+
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.BISMUTH_BLOCK.get())
                 .pattern("BBB")
                 .pattern("BBB")
@@ -60,6 +63,10 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .unlockedBy("has_bismuth", has(ModItems.BISMUTH.get())).save(recipeOutput);
         trapdoorBuilder(ModBlocks.BISMUTH_TRAPDOOR.get(), Ingredient.of(ModItems.BISMUTH.get())).group("bismuth")
                 .unlockedBy("has_bismuth", has(ModItems.BISMUTH.get())).save(recipeOutput);
+
+
+        oreSmelting(recipeOutput, SCULK_SMELTABLES, RecipeCategory.MISC, ModItems.SCULK_INGOT.get(), 0.25f, 200, "sculk");
+        oreBlasting(recipeOutput, SCULK_SMELTABLES, RecipeCategory.MISC, ModItems.SCULK_INGOT.get(), 0.25f, 100, "sculk");
     }
 
     protected static void oreSmelting(RecipeOutput recipeOutput, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult,

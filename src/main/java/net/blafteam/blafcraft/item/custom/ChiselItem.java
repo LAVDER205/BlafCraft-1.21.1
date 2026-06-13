@@ -1,7 +1,9 @@
 package net.blafteam.blafcraft.item.custom;
 
 import net.blafteam.blafcraft.block.ModBlocks;
+import net.blafteam.blafcraft.component.ModDataComponents;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -11,7 +13,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -28,7 +29,7 @@ public class ChiselItem extends Item {
                     Blocks.DEEPSLATE, Blocks.DEEPSLATE_BRICKS,
                     Blocks.GOLD_BLOCK, Blocks.IRON_BLOCK,
                     Blocks.IRON_BLOCK, Blocks.STONE,
-                    Blocks.NETHERRACK, ModBlocks.BISMUTH_BLOCK.get() // for mod things
+                    Blocks.NETHERRACK, ModBlocks.BISMUTH_BLOCK.get()
             );
 
     public ChiselItem(Properties properties) {
@@ -41,13 +42,15 @@ public class ChiselItem extends Item {
         Block clickedBlock = level.getBlockState(context.getClickedPos()).getBlock();
 
         if(CHISEL_MAP.containsKey(clickedBlock)) {
-            if(!level.isClientSide()) { // server side
+            if(!level.isClientSide()) {
                 level.setBlockAndUpdate(context.getClickedPos(), CHISEL_MAP.get(clickedBlock).defaultBlockState());
 
                 context.getItemInHand().hurtAndBreak(1, ((ServerLevel) level), context.getPlayer(),
                         item -> context.getPlayer().onEquippedItemBroken(item, EquipmentSlot.MAINHAND));
 
                 level.playSound(null, context.getClickedPos(), SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS);
+
+                context.getItemInHand().set(ModDataComponents.COORDINATES, context.getClickedPos());
             }
         }
 
@@ -57,15 +60,20 @@ public class ChiselItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         if(Screen.hasShiftDown()) {
-            tooltipComponents.add(Component.translatable("tooltip.blafcraft.chisel.shift_down"));
+            tooltipComponents.add(Component.translatable("tooltip.tutorialmod.chisel.shift_down"));
+        } else {
+            tooltipComponents.add(Component.translatable("tooltip.tutorialmod.chisel"));
         }
-        else {
-            tooltipComponents.add(Component.translatable("tooltip.blafcraft.chisel"));
-        }
+
+//        if(stack.get(ModDataComponents.COORDINATES) != null) {
+//            tooltipComponents.add(Component.literal("Last Block changed at " + stack.get(ModDataComponents.COORDINATES)));
+//        }  // don't work for some reason
+
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
     }
+}
 //    @Override
 //    public UseAnim getUseAnimation(ItemStack stack) {
 //        return UseAnim.DRINK;
 //    }
-}
+

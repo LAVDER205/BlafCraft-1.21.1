@@ -6,6 +6,19 @@
   "item.blafcraft.frostfire_ice": "Frostfire Ice",
   "item.blafcraft.starlight_ashes": "Starlight Ashes",
 
+  "item.blafcraft.bismuth_sword": "Bismuth Sword",
+  "item.blafcraft.bismuth_pickaxe": "Bismuth Pickaxe",
+  "item.blafcraft.bismuth_shovel": "Bismuth Shovel",
+  "item.blafcraft.bismuth_axe": "Bismuth Axe",
+  "item.blafcraft.bismuth_hoe": "Bismuth Hoe",
+
+  "item.blafcraft.bismuth_hammer": "Bismuth Hammer",
+
+  "item.blafcraft.bismuth_helmet": "Bismuth Helmet",
+  "item.blafcraft.bismuth_chestplate": "Bismuth Chestplate",
+  "item.blafcraft.bismuth_leggings": "Bismuth Leggings",
+  "item.blafcraft.bismuth_boots": "Bismuth Boots",
+
   "block.blafcraft.bismuth_block": "Block of Bismuth",
   "block.blafcraft.bismuth_ore": "Bismuth Ore",
   "block.blafcraft.bismuth_deepsaalte_ore": "Bismuth Deepslate Ore",
@@ -21,11 +34,25 @@
   "block.blafcraft.bismuth_door": "Bismuth Door",
   "block.blafcraft.bismuth_trapdoor": "Bismuth Trapdoor",
 
+  "block.blafcraft.bismuth_lamp": "Bismuth Lamp",
+
   "creativetab.blafcraft.blafcraft_items": "BlafCraft Items",
   "creativetab.blafcraft.blafcraft_blocks": "BlafCraft Blocks",
 
   "tooltip.blafcraft.magic_block.tooltip": "This block is very MaGiCal",
   "tooltip.blafcraft.chisel.shift_down": "cool item lele",
   "tooltip.blafcraft.chisel" : "Press Shift for more information",
-  "tooltip.blafcraft.radish.tooltip": "Yummy"
+  "tooltip.blafcraft.radish.tooltip": "Yummy",
+
+
+
+
+  "item.blafcraft.sculk_ingot": "Sculk Ingot",
+  "item.blafcraft.raw_sculk": "Raw Sculk",
+
+  "item.blafcraft.sculk_sword": "Sculk Sword",
+  "item.blafcraft.sculk_axe": "Sculk Axe",
+
+  "block.blafcraft.sculk_ore": "Sculk Ore"
+
 }
