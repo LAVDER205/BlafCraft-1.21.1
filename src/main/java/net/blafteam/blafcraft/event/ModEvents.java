@@ -3,6 +3,7 @@ package net.blafteam.blafcraft.event;
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.item.custom.HammerItem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -14,9 +15,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+import org.lwjgl.glfw.GLFW;
 
+import java.awt.event.KeyEvent;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -65,7 +70,5 @@ public class ModEvents {
                 livingTarget.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 20, 0));
             }
         }
-
     }
-
 }
