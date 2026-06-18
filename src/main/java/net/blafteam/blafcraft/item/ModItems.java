@@ -5,6 +5,7 @@ import net.blafteam.blafcraft.item.custom.ChiselItem;
 import net.blafteam.blafcraft.item.custom.FuelItem;
 import net.blafteam.blafcraft.item.custom.HammerItem;
 import net.blafteam.blafcraft.item.custom.ModArmorItem;
+import net.blafteam.blafcraft.sound.ModSounds;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
 import net.neoforged.bus.api.IEventBus;
@@ -69,6 +70,8 @@ public class ModItems {
     public static final DeferredItem<ArmorItem> BISMUTH_BOOTS = ITEMS.register("bismuth_boots",
             () -> new ModArmorItem(ModArmorMaterials.BISMUTH_ARMOR_MATERIAL, ArmorItem.Type.BOOTS,
                     new Item.Properties().durability(ArmorItem.Type.BOOTS.getDurability(19))));
+    public static final DeferredItem<Item> REVENGE_MUSIC_DISC = ITEMS.register("revenge_music_disc",
+            () -> new Item(new Item.Properties().jukeboxPlayable(ModSounds.REVENGE_KEY).stacksTo(1)));
 
 // Actual mod
     public static final DeferredItem<Item> SCULK_INGOT = ITEMS.register("sculk_ingot",

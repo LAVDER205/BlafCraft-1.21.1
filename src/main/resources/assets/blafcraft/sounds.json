@@ -1,0 +1,46 @@
+{
+  "chisel_use": {
+    "subtitle": "sounds.blafcraft.chisel_use",
+    "sounds": [
+      "blafcraft:chisel_use"
+    ]
+  },
+  "magic_block_break": {
+    "subtitle": "sounds.blafcraft.magic_block_break",
+    "sounds": [
+      "blafcraft:magic_block_break"
+    ]
+  },
+  "magic_block_step": {
+    "subtitle": "sounds.blafcraft.magic_block_step",
+    "sounds": [
+      "blafcraft:magic_block_step"
+    ]
+  },
+  "magic_block_place": {
+    "subtitle": "sounds.blafcraft.magic_block_place",
+    "sounds": [
+      "blafcraft:magic_block_place"
+    ]
+  },
+  "magic_block_hit": {
+    "subtitle": "sounds.blafcraft.magic_block_hit",
+    "sounds": [
+      "blafcraft:magic_block_hit"
+    ]
+  },
+  "magic_block_fall": {
+    "subtitle": "sounds.blafcraft.magic_block_fall",
+    "sounds": [
+      "blafcraft:magic_block_fall"
+    ]
+  },
+  "revenge": {
+    "sounds": [
+      {
+      "name": "blafcraft:revenge",
+      "stream": true
+      }
+    ]
+  }
+}

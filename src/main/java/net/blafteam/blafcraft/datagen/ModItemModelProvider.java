@@ -67,6 +67,8 @@ public class ModItemModelProvider extends ItemModelProvider {
         trimmedArmorItem(ModItems.BISMUTH_LEGGINGS);
         trimmedArmorItem(ModItems.BISMUTH_BOOTS);
 
+        basicItem(ModItems.REVENGE_MUSIC_DISC.get());
+
         // Actual mod
 
         basicItem(ModItems.SCULK_INGOT.get());

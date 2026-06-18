@@ -3,6 +3,7 @@ package net.blafteam.blafcraft;
 import net.blafteam.blafcraft.block.ModBlocks;
 import net.blafteam.blafcraft.item.ModCreativeModeTabs;
 import net.blafteam.blafcraft.item.ModItems;
+import net.blafteam.blafcraft.sound.ModSounds;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -41,6 +42,8 @@ public class BlafCraft {
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
+
+        ModSounds.register(modEventBus);
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);

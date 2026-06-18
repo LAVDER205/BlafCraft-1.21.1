@@ -4,6 +4,7 @@ import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.block.custom.BismuthLampBlock;
 import net.blafteam.blafcraft.block.custom.MagicBlock;
 import net.blafteam.blafcraft.item.ModItems;
+import net.blafteam.blafcraft.sound.ModSounds;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -33,7 +34,7 @@ public class ModBlocks {
             () -> new DropExperienceBlock(UniformInt.of(3, 6),
                     BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE)));
     public static final DeferredBlock<Block> MAGIC_BLOCK = registerBlock("magic_block",
-            () -> new MagicBlock(BlockBehaviour.Properties.of().strength(2f).requiresCorrectToolForDrops()));
+            () -> new MagicBlock(BlockBehaviour.Properties.of().strength(2f).requiresCorrectToolForDrops().sound(ModSounds.MAGIC_BLOCK_SOUNDS)));
 
     public static final DeferredBlock<StairBlock> BISMUTH_STAIRS = registerBlock("bismuth_stairs",
             () -> new StairBlock(ModBlocks.BISMUTH_BLOCK.get().defaultBlockState(),

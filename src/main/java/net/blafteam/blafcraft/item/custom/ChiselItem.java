@@ -2,6 +2,7 @@ package net.blafteam.blafcraft.item.custom;
 
 import net.blafteam.blafcraft.block.ModBlocks;
 import net.blafteam.blafcraft.component.ModDataComponents;
+import net.blafteam.blafcraft.sound.ModSounds;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
@@ -48,7 +49,7 @@ public class ChiselItem extends Item {
                 context.getItemInHand().hurtAndBreak(1, ((ServerLevel) level), context.getPlayer(),
                         item -> context.getPlayer().onEquippedItemBroken(item, EquipmentSlot.MAINHAND));
 
-                level.playSound(null, context.getClickedPos(), SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS);
+                level.playSound(null, context.getClickedPos(), ModSounds.CHISEL_USE.get() , SoundSource.BLOCKS);
 
                 context.getItemInHand().set(ModDataComponents.COORDINATES, context.getClickedPos());
             }
