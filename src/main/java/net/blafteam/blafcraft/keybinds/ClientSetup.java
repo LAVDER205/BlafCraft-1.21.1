@@ -31,11 +31,11 @@ public class ClientSetup {
         if (Minecraft.getInstance().screen != null) return;
 
         if (event.getAction() == GLFW.GLFW_PRESS) {
-            if (event.getKey() == GLFW.GLFW_KEY_H) {
+            if (event.getKey() == GLFW.GLFW_KEY_Z) {
                 PacketDistributor.sendToServer(new ActionPacket(ActionType.SPEED));
-            } else if (event.getKey() == GLFW.GLFW_KEY_J) {
+            } else if (event.getKey() == GLFW.GLFW_KEY_X) {
                 PacketDistributor.sendToServer(new ActionPacket(ActionType.JUMP));
-            }  else if (event.getKey() == GLFW.GLFW_KEY_K) {
+            }  else if (event.getKey() == GLFW.GLFW_KEY_C) {
             PacketDistributor.sendToServer(new ActionPacket(ActionType.ARROW));
             }
         }
