@@ -10,6 +10,9 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.api.distmarker.Dist;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @EventBusSubscriber(modid = BlafCraft.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class ClientSetup {
 
@@ -29,15 +32,18 @@ public class ClientSetup {
     @SubscribeEvent
     public static void onKeyPress(InputEvent.Key event) {
         if (Minecraft.getInstance().screen != null) return;
+        if (event.getAction() != GLFW.GLFW_PRESS) return;
 
-        if (event.getAction() == GLFW.GLFW_PRESS) {
-            if (event.getKey() == GLFW.GLFW_KEY_Z) {
-                PacketDistributor.sendToServer(new ActionPacket(ActionType.SPEED));
-            } else if (event.getKey() == GLFW.GLFW_KEY_X) {
-                PacketDistributor.sendToServer(new ActionPacket(ActionType.JUMP));
-            }  else if (event.getKey() == GLFW.GLFW_KEY_C) {
-            PacketDistributor.sendToServer(new ActionPacket(ActionType.ARROW));
+        ActionType action = null;
+        if (event.getKey() == GLFW.GLFW_KEY_Z) action = ActionType.SPEED;
+        else if (event.getKey() == GLFW.GLFW_KEY_X) action = ActionType.JUMP;
+        else if (event.getKey() == GLFW.GLFW_KEY_C) action = ActionType.ARROW;
+
+        if (action != null) { // сработала какая-то способность
+            // Запускаем кулдаун на клиенте
+            ClientCooldowns.startCooldown(action);
+            // Отправляем пакет на сервер (сервер сам решит, можно ли выполнить)
+            PacketDistributor.sendToServer(new ActionPacket(action));
             }
         }
     }
-}
