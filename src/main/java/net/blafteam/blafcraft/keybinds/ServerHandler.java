@@ -52,9 +52,10 @@ public class ServerHandler {
                 Map<ActionType, Long> playerCooldowns = cooldowns.computeIfAbsent(playerId, k -> new HashMap<>());
                 long lastUsed = playerCooldowns.getOrDefault(action, 0L);
                 int cooldown = action.getCooldownTicks();
+                int price = action.getPrice();
 
                 // Если кулдаун не прошёл — просто выходим
-                if (currentTime - lastUsed < cooldown) {
+                if (currentTime - lastUsed < cooldown || player.experienceLevel < price) {
                     return; // можно также отправить сообщение игроку о необходимости подождать
                 }
 
@@ -63,7 +64,9 @@ public class ServerHandler {
 
                 // Выполняем действие
                 switch (action) {
-                    case SPEED -> player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200, 1));
+                    case SPEED -> {
+                        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200, 1));
+                    }
                     case JUMP -> player.addEffect(new MobEffectInstance(MobEffects.JUMP, 200, 1));
 
                     case ARROW -> {
@@ -79,6 +82,10 @@ public class ServerHandler {
                        shootSnowball(player);
                     }
                 }
+
+                player.setExperienceLevels(player.experienceLevel - price); // цена
+
+                ClientCooldowns.startCooldown(action);// кд
             }
         });
     }

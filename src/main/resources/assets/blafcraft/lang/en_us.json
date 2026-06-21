@@ -47,7 +47,8 @@
   "tooltip.blafcraft.chisel" : "Press Shift for more information",
   "tooltip.blafcraft.radish.tooltip": "Yummy",
 
-
+  "effect.blafcraft.slimey": "Slimey",
+  "effect.blafcraft.creation_step": "Creation Step",
 
 
   "item.blafcraft.sculk_ingot": "Sculk Ingot",

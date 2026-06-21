@@ -1,6 +1,7 @@
 package net.blafteam.blafcraft;
 
 import net.blafteam.blafcraft.block.ModBlocks;
+import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.item.ModCreativeModeTabs;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.sound.ModSounds;
@@ -44,6 +45,7 @@ public class BlafCraft {
         ModBlocks.register(modEventBus);
 
         ModSounds.register(modEventBus);
+        ModEffects.register(modEventBus);
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);

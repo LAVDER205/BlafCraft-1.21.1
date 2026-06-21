@@ -1,6 +1,7 @@
 package net.blafteam.blafcraft.event;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.item.custom.HammerItem;
 import net.minecraft.client.Minecraft;
@@ -13,11 +14,14 @@ import net.minecraft.world.entity.EntityEvent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
@@ -70,5 +74,59 @@ public class ModEvents {
                 livingTarget.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 20, 0));
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerTick(PlayerTickEvent.Pre event) {
+        Player player = event.getEntity();
+
+        if (player.hasEffect(ModEffects.CREATION_STEP_EFFECT)) {
+            handleAirWalking(player);
+        }
+    }
+
+    private static void handleAirWalking(Player player) {
+        player.fallDistance = 0f;
+        if (player.level().isClientSide && !player.onGround()) {
+            handleMidAirFlight(player);
+        }
+    }
+
+    private static void handleMidAirFlight(Player player) {
+        Vec3 delta = player.getDeltaMovement();
+
+        if (delta.y >= 0f) {
+            return;
+        }
+
+        double yPos = player.getY();
+        double fractionalY = yPos - Math.floor(yPos);
+
+        BlockPos posBelow = player.blockPosition().below();
+        BlockState stateBelow = player.level().getBlockState(posBelow);
+        boolean hasSolidGroundBelow = stateBelow.getCollisionShape(player.level(), posBelow).isEmpty(); // torch or grass included
+
+        if (player.isCrouching()) {
+            // Manual Descend
+            player.setDeltaMovement(delta.x, -0.15, delta.z);
+        } else if (fractionalY > 0.85) {
+            // Walked of a ledge
+            player.setPos(player.getX(), Math.ceil(yPos) + 0.08, player.getZ());
+            setEntityHovering(player, delta);
+        } else if (fractionalY > 0.04) {
+            // Soft Sink
+            player.setDeltaMovement(delta.x, -0.04, delta.z);
+        } else if (hasSolidGroundBelow && fractionalY > 0.0) {
+            // Ground Snap
+            player.setDeltaMovement(delta.x, -0.04, delta.z);
+        } else {
+            // Grid Hover
+            setEntityHovering(player, delta);
+        }
+    }
+
+    private static void setEntityHovering(Player player, Vec3 delta) {
+        player.setDeltaMovement(delta.x, 0.0f, delta.z);
+        player.setOnGround(true);
     }
 }

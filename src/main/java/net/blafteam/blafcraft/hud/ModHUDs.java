@@ -23,11 +23,14 @@ public class ModHUDs {
         // В 1.21 GuiGraphics получаем так:
         GuiGraphics graphics = event.getGuiGraphics();
 
+        int w = mc.getWindow().getGuiScaledWidth();
+        int h = mc.getWindow().getGuiScaledHeight();
+
         int x = 20;
         int y = 20;
 
-        // ResourceLocation icon = ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "textures/gui/speed.png");
-        // graphics.blit(icon, x, y, 0, 0, 16, 16, 16, 16);
+//        ResourceLocation icon = ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "textures/gui/speed.png");
+//        graphics.blit(icon, x, y, 0, 0, 16, 16, 16, 16);
 
         for (ActionType action : ActionType.values()) {
 

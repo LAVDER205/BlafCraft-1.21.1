@@ -40,8 +40,6 @@ public class ClientSetup {
         else if (event.getKey() == GLFW.GLFW_KEY_C) action = ActionType.ARROW;
 
         if (action != null) { // сработала какая-то способность
-            // Запускаем кулдаун на клиенте
-            ClientCooldowns.startCooldown(action);
             // Отправляем пакет на сервер (сервер сам решит, можно ли выполнить)
             PacketDistributor.sendToServer(new ActionPacket(action));
             }
