@@ -22,7 +22,7 @@ public class ModEffects {
                             AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
     public static final Holder<MobEffect> CREATION_STEP_EFFECT = MOB_EFFECTS.register("creation_step",
-            () -> new SlimeyEffect(MobEffectCategory.NEUTRAL, 0x36ebab));
+            () -> new CreationStepEffect(MobEffectCategory.NEUTRAL, 0x36ebab));
 
 
     public static void register(IEventBus eventBus) {

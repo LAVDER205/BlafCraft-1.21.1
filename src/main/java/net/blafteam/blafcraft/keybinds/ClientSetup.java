@@ -35,8 +35,8 @@ public class ClientSetup {
         if (event.getAction() != GLFW.GLFW_PRESS) return;
 
         ActionType action = null;
-        if (event.getKey() == GLFW.GLFW_KEY_Z) action = ActionType.SPEED;
-        else if (event.getKey() == GLFW.GLFW_KEY_X) action = ActionType.JUMP;
+        if (event.getKey() == GLFW.GLFW_KEY_Z) action = ActionType.CREATION_STEP;
+        else if (event.getKey() == GLFW.GLFW_KEY_X) action = ActionType.FIREBALL;
         else if (event.getKey() == GLFW.GLFW_KEY_C) action = ActionType.ARROW;
 
         if (action != null) { // сработала какая-то способность

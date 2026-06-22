@@ -1,14 +1,17 @@
 package net.blafteam.blafcraft.keybinds;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.effect.ModEffects;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.Arrow;
-import net.minecraft.world.entity.projectile.Snowball;
-import net.minecraft.world.entity.projectile.ThrownPotion;
+import net.minecraft.world.entity.projectile.LargeFireball;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -64,11 +67,6 @@ public class ServerHandler {
 
                 // Выполняем действие
                 switch (action) {
-                    case SPEED -> {
-                        player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200, 1));
-                    }
-                    case JUMP -> player.addEffect(new MobEffectInstance(MobEffects.JUMP, 200, 1));
-
                     case ARROW -> {
                         // Первый выстрел немедленно
                         shootArrow(player);
@@ -78,8 +76,29 @@ public class ServerHandler {
                         pendingActions.add(new PendingAction(player.getUUID(), ActionType.ARROW, 10));
                     }
 
-                    case SNOWBALL -> {
-                       shootSnowball(player);
+                    case FIREBALL -> {
+                        shootLargeFireball(player);
+
+                        BlockPos posBelow = player.blockPosition().below();
+                        BlockPos posBelowBelow = player.blockPosition().below().below();
+                        BlockState stateBelow = player.level().getBlockState(posBelow);
+                        BlockState stateBelowBelow = player.level().getBlockState(posBelowBelow);
+                        boolean hasSolidGroundBelow = !(stateBelow.getCollisionShape(player.level(), posBelow).isEmpty());
+                        boolean hasSolidGroundBelowBelow = !(stateBelowBelow.getCollisionShape(player.level(), posBelowBelow).isEmpty());
+
+                        if (player.getXRot() >= 60 && (hasSolidGroundBelow || hasSolidGroundBelowBelow)) {
+                            Vec3 delta = player.getDeltaMovement();
+                            player.addDeltaMovement(new Vec3(0, 1, 0));
+                            player.connection.send(new ClientboundSetEntityMotionPacket(player)); // sync server and client
+                        }
+                    }
+
+                    case CREATION_STEP -> {
+                        if (player.hasEffect(ModEffects.CREATION_STEP_EFFECT)) {
+                            player.removeEffect(ModEffects.CREATION_STEP_EFFECT);
+                        } else  if (player.totalExperience >= 1){
+                        player.addEffect(new MobEffectInstance(ModEffects.CREATION_STEP_EFFECT, -1, 0, false, false, false));
+                        }
                     }
                 }
 
@@ -100,14 +119,14 @@ public class ServerHandler {
         player.level().addFreshEntity(arrow);
     }
 
-    private static void shootSnowball(ServerPlayer player) {
-        Snowball snowball = EntityType.SNOWBALL.create(player.level());
-        if (snowball != null) {
-            snowball.setOwner(player);
-            snowball.setPos(player.getEyePosition());
+    private static void shootLargeFireball(ServerPlayer player) {
+        LargeFireball largeFireball = EntityType.FIREBALL.create(player.level());
+        if (largeFireball != null) {
+            largeFireball.setOwner(player);
+            largeFireball.setPos(player.getEyePosition());
             Vec3 look = player.getViewVector(1.0F);
-            snowball.shoot(look.x, look.y, look.z, 1.5f, 0.0f);
-            player.level().addFreshEntity(snowball);
+            largeFireball.shoot(look.x, look.y, look.z, 1.5f, 0.0f);
+            player.level().addFreshEntity(largeFireball);
         }
     }
 

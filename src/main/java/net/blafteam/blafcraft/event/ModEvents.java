@@ -6,6 +6,8 @@ import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.item.custom.HammerItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -35,6 +37,7 @@ public class ModEvents {
 
     // Done with the help of https://github.com/CoFH/CoFHCore/blob/1.19.x/src/main/java/cofh/core/event/AreaEffectEvents.java
     // Don't be a jerk License
+    // --------------------------------HAMMER LOGIC -------------------------------
     @SubscribeEvent
     public static void onHammerUsage(BlockEvent.BreakEvent event) {
         Player player = event.getPlayer();
@@ -51,6 +54,8 @@ public class ModEvents {
                     continue; // skip
                 }
 
+                player.getPersistentData().putBoolean("blafcraft:is_hovering", true);
+
                 HARVESTED_BLOCKS.add(pos);
                 serverPlayer.gameMode.destroyBlock(pos);
                 HARVESTED_BLOCKS.remove(pos);
@@ -58,6 +63,7 @@ public class ModEvents {
         }
     }
 
+    // --------------------------------SCULK SWORD LOGIC -------------------------------
     @SubscribeEvent
     public static void onSculkSwordHit(AttackEntityEvent event) {
         Player player = event.getEntity();
@@ -76,11 +82,13 @@ public class ModEvents {
         }
     }
 
+    // --------------------------------CREATION STEP LOGIC -------------------------------
     @SubscribeEvent
-    public static void onPlayerTick(PlayerTickEvent.Pre event) {
+    public static void onPlayerTick_CreationStep(PlayerTickEvent.Pre event) {
         Player player = event.getEntity();
 
         if (player.hasEffect(ModEffects.CREATION_STEP_EFFECT)) {
+            if (!player.level().isClientSide && player instanceof ServerPlayer serverPlayer) { spawnHoverCubeParticles(player, serverPlayer); }
             handleAirWalking(player);
         }
     }
@@ -123,10 +131,50 @@ public class ModEvents {
             // Grid Hover
             setEntityHovering(player, delta);
         }
+
     }
 
     private static void setEntityHovering(Player player, Vec3 delta) {
         player.setDeltaMovement(delta.x, 0.0f, delta.z);
         player.setOnGround(true);
     }
+
+    public static void spawnHoverCubeParticles(Player player, ServerPlayer serverPlayer) {
+
+        ServerLevel serverLevel = (ServerLevel) player.level();
+
+        double playerX = Math.floor(player.getX());
+        double playerY = Math.floor(player.getY() - 1);
+        double playerZ = Math.floor(player.getZ());
+
+        for (int i = 0; i < 12; i++) {
+            double xPos = playerX;
+            double yPos = playerY;
+            double zPos = playerZ;
+
+            int edge = player.getRandom().nextInt(12);
+            double offset = player.getRandom().nextDouble();
+
+            switch (edge) {
+                case 0 -> { xPos += offset; }
+                case 1 -> { xPos += offset; zPos += 1.0; }
+                case 2 -> { zPos += offset; }
+                case 3 -> { zPos += offset; xPos += 1.0; }
+
+                case 4 -> { xPos += offset; yPos += 1.0; }
+                case 5 -> { xPos += offset; zPos += 1.0; yPos += 1.0; }
+                case 6 -> { zPos += offset; yPos += 1.0; }
+                case 7 -> { zPos += offset; xPos += 1.0; yPos += 1.0; }
+
+                case 8 -> { yPos += offset; }
+                case 9 -> { yPos += offset; zPos += 1.0; }
+                case 10 -> { yPos += offset; xPos += 1.0; }
+                case 11 -> { yPos += offset; xPos += 1.0; zPos += 1.0; }
+            }
+
+            serverLevel.sendParticles(serverPlayer, ParticleTypes.END_ROD, false, xPos, yPos, zPos, 1, 0.0, 0.0, 0.0, 0.002f);
+        }
+    }
+
+    // --------------------------------SMTH LOGIC -------------------------------
 }

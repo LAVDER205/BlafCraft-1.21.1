@@ -1,10 +1,9 @@
 package net.blafteam.blafcraft.keybinds;
 
 public enum ActionType {
-    SPEED(100, 1),
-    JUMP(100, 2),
-    ARROW(20, 3),
-    SNOWBALL(10, 4);
+    ARROW(40, 1),
+    FIREBALL(80, 2),
+    CREATION_STEP(0, 0);
 
     private final int cooldownTicks;
     private final int price;
