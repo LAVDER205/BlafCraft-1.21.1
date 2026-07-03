@@ -77,6 +77,8 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         leggingsRecipe(recipeOutput, ModItems.BISMUTH_LEGGINGS.get(), ModItems.BISMUTH.get());
         bootsRecipe(recipeOutput, ModItems.BISMUTH_BOOTS.get(), ModItems.BISMUTH.get());
 
+        // BREWING RECIPES ARE IN THE MOD EVENTS !!!! (idk why but ill take it)
+
         // Actual mod
 
         swordRecipe(recipeOutput, ModItems.SCULK_SWORD.get(), ModItems.SCULK_INGOT.get(), Items.STICK);

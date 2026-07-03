@@ -4,7 +4,11 @@ import net.blafteam.blafcraft.block.ModBlocks;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.item.ModCreativeModeTabs;
 import net.blafteam.blafcraft.item.ModItems;
+import net.blafteam.blafcraft.particle.ModParticles;
+import net.blafteam.blafcraft.particle.TeleportParticles;
+import net.blafteam.blafcraft.potion.ModPotions;
 import net.blafteam.blafcraft.sound.ModSounds;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -47,6 +51,10 @@ public class BlafCraft {
         ModSounds.register(modEventBus);
         ModEffects.register(modEventBus);
 
+        ModParticles.PARTICLE_TYPES.register(modEventBus);
+
+        ModPotions.register(modEventBus);
+
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
 
@@ -82,5 +90,10 @@ public class BlafCraft {
         @SubscribeEvent
         static void onClientSetup(FMLClientSetupEvent event) {
 
+        }
+        @SubscribeEvent
+        public static void registerParticleFactories(RegisterParticleProvidersEvent event) {
+            event.registerSpriteSet(ModParticles.TELEPORT_PARTICLES.get(), TeleportParticles.Provider::new);
+        }
     }
-} }
+}

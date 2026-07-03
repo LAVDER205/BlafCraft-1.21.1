@@ -4,6 +4,7 @@ import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.item.custom.HammerItem;
+import net.blafteam.blafcraft.potion.ModPotions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -16,12 +17,18 @@ import net.minecraft.world.entity.EntityEvent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.PotionBrewing;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
+import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
+import net.neoforged.neoforge.event.entity.player.CriticalHitEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -63,11 +70,20 @@ public class ModEvents {
         }
     }
 
+    // --------------------------------BREWING RECIPES-------------------------------
+
+    @SubscribeEvent
+    public static void onBrewingRecipeRegister(RegisterBrewingRecipesEvent event) {
+        PotionBrewing.Builder builder = event.getBuilder();
+
+        builder.addMix(Potions.AWKWARD, Items.SLIME_BALL, ModPotions.SLIMEY_POTION);
+    }
+
     // --------------------------------SCULK SWORD LOGIC -------------------------------
     @SubscribeEvent
     public static void onSculkSwordHit(AttackEntityEvent event) {
         Player player = event.getEntity();
-        Entity  target = event.getTarget();
+        Entity target = event.getTarget();
         ItemStack mainHandItem = player.getMainHandItem();
 
         if(mainHandItem.getItem() == ModItems.SCULK_SWORD.get() && player instanceof ServerPlayer serverPlayer) {
@@ -176,5 +192,32 @@ public class ModEvents {
         }
     }
 
-    // --------------------------------SMTH LOGIC -------------------------------
+    // -------------------------------- BLOODLUST LOGIC -------------------------------
+
+    @SubscribeEvent
+    public static void onHitWithBloodlust(AttackEntityEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        if (livingEntity.hasEffect(ModEffects.BLOODLUST_EFFECT)) {
+            livingEntity.heal(2.0F);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onCriticalHitWithBloodlust(CriticalHitEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        if (livingEntity.hasEffect(ModEffects.BLOODLUST_EFFECT)) {
+            livingEntity.heal(4.0F);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onKillWithBloodlust(LivingDeathEvent event) {
+        LivingEntity deadEntity = event.getEntity();
+        if (event.getSource().getEntity() instanceof LivingEntity killerEntity && killerEntity.hasEffect(ModEffects.BLOODLUST_EFFECT)) {
+            if (deadEntity instanceof Player) killerEntity.heal(20.0f);
+                    else killerEntity.heal(10.0f);
+        }
+    }
+
+    // -------------------------------- SMTH LOGIC -------------------------------
 }

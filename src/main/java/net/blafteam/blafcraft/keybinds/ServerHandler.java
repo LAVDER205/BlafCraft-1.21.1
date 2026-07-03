@@ -2,12 +2,15 @@ package net.blafteam.blafcraft.keybinds;
 
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.effect.ModEffects;
+import net.blafteam.blafcraft.particle.ModParticles;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.LargeFireball;
@@ -50,15 +53,16 @@ public class ServerHandler {
                 UUID playerId = player.getUUID();
                 ActionType action = packet.action();
                 long currentTime = player.level().getGameTime(); // серверное время в тиках
+                ServerLevel serverLevel = (ServerLevel) player.level();
 
                 // Получаем или создаём запись для игрока
                 Map<ActionType, Long> playerCooldowns = cooldowns.computeIfAbsent(playerId, k -> new HashMap<>());
                 long lastUsed = playerCooldowns.getOrDefault(action, 0L);
                 int cooldown = action.getCooldownTicks();
-                int price = action.getPrice();
+                int exp_price = action.getExp_price();
 
                 // Если кулдаун не прошёл — просто выходим
-                if (currentTime - lastUsed < cooldown || player.experienceLevel < price) {
+                if (currentTime - lastUsed < cooldown || player.experienceLevel < exp_price) {
                     return; // можно также отправить сообщение игроку о необходимости подождать
                 }
 
@@ -70,7 +74,6 @@ public class ServerHandler {
                     case ARROW -> {
                         // Первый выстрел немедленно
                         shootArrow(player);
-
                         // Планируем второй выстрел через n тиков
                         pendingActions.add(new PendingAction(player.getUUID(), ActionType.ARROW, 5));
                         pendingActions.add(new PendingAction(player.getUUID(), ActionType.ARROW, 10));
@@ -79,6 +82,7 @@ public class ServerHandler {
                     case FIREBALL -> {
                         shootLargeFireball(player);
 
+                        // FIREBALL JUMP
                         BlockPos posBelow = player.blockPosition().below();
                         BlockPos posBelowBelow = player.blockPosition().below().below();
                         BlockState stateBelow = player.level().getBlockState(posBelow);
@@ -100,9 +104,23 @@ public class ServerHandler {
                         player.addEffect(new MobEffectInstance(ModEffects.CREATION_STEP_EFFECT, -1, 0, false, false, false));
                         }
                     }
+
+                    case TELEPORT_DASH -> {
+                        serverLevel.sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false, player.getX(), player.getY(), player.getZ(), 5, 0, 0, 0, 5);
+                        serverLevel.sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false, player.getEyePosition().x, player.getEyePosition().y, player.getEyePosition().z, 5, 0, 0, 0, 5);
+
+                        Vec3 look = player.getViewVector(1.0F);
+
+                        double strength = 6.0;
+                        player.teleportRelative(look.x * strength, 0, look.z * strength);
+
+
+                        serverLevel.sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false, player.getX(), player.getY(), player.getZ(), 5, 0, 0, 0, 5);
+                        serverLevel.sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false, player.getEyePosition().x, player.getEyePosition().y, player.getEyePosition().z, 5, 0, 0, 0, 5);
+                    }
                 }
 
-                player.setExperienceLevels(player.experienceLevel - price); // цена
+                player.setExperienceLevels(player.experienceLevel - exp_price); // цена
 
                 ClientCooldowns.startCooldown(action);// кд
             }

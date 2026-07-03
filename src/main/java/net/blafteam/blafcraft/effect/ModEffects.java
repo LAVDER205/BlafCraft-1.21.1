@@ -22,7 +22,13 @@ public class ModEffects {
                             AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
     public static final Holder<MobEffect> CREATION_STEP_EFFECT = MOB_EFFECTS.register("creation_step",
-            () -> new CreationStepEffect(MobEffectCategory.NEUTRAL, 0x36ebab));
+            () -> new CreationStepEffect(MobEffectCategory.NEUTRAL, 0xFFFFFF));
+
+    public static final Holder<MobEffect> BLOODLUST_EFFECT = MOB_EFFECTS.register("bloodlust",
+            () -> new SlimeyEffect(MobEffectCategory.NEUTRAL, 0x8B0000)
+                    .addAttributeModifier(Attributes.MOVEMENT_SPEED,
+                            ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "bloodlust"), 0.5f,
+                            AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
 
     public static void register(IEventBus eventBus) {

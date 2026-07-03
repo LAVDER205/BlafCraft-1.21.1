@@ -81,6 +81,16 @@ public class ModItemModelProvider extends ItemModelProvider {
 //        trimmedArmorItem(ModItems.CREATION_CHESTPLATE);
 //        trimmedArmorItem(ModItems.CREATION_LEGGINGS);
 //        trimmedArmorItem(ModItems.CREATION_BOOTS);
+
+        basicItem(ModItems.RED_FACTON.get());
+        basicItem(ModItems.ORANGE_FACTON.get());
+        basicItem(ModItems.YELLOW_FACTON.get());
+        basicItem(ModItems.GREEN_FACTON.get());
+        basicItem(ModItems.BLUE_FACTON.get());
+        basicItem(ModItems.PURPLE_FACTON.get());
+        basicItem(ModItems.PINK_FACTON  .get());
+        basicItem(ModItems.LIGHT_FACTON.get());
+        basicItem(ModItems.DARK_FACTON.get());
     }
 
     // Shoutout to El_Redstoniano for making this

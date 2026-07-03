@@ -108,6 +108,25 @@ public class ModItems {
 //            () -> new ArmorItem(ModArmorMaterials.CREATION_ARMOR_MATERIAL, ArmorItem.Type.BOOTS,
 //                    new Item.Properties().durability(ArmorItem.Type.BOOTS.getDurability(42))));
 
+    public static final DeferredItem<Item> RED_FACTON = ITEMS.register("red_facton",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> ORANGE_FACTON = ITEMS.register("orange_facton",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> YELLOW_FACTON = ITEMS.register("yellow_facton",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> GREEN_FACTON = ITEMS.register("green_facton",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> BLUE_FACTON = ITEMS.register("blue_facton",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> PURPLE_FACTON = ITEMS.register("purple_facton",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> PINK_FACTON = ITEMS.register("pink_facton",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> LIGHT_FACTON = ITEMS.register("light_facton",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> DARK_FACTON = ITEMS.register("dark_facton",
+            () -> new Item(new Item.Properties()));
+
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

@@ -22,6 +22,20 @@
   "item.blafcraft.revenge_music_disc": "Revenge Music Disc",
   "item.blafcraft.revenge_music_disc.desc": "CaptainSparklez, TryHardNinja - Revenge",
 
+  "item.blafcraft.red_facton": "§4Strange Orb§r",
+  "item.blafcraft.orange_facton": "§6Strange Orb§r",
+  "item.blafcraft.yellow_facton": "§eStrange Orb§r",
+  "item.blafcraft.green_facton": "§2Strange Orb§r",
+  "item.blafcraft.blue_facton": "§9Strange Orb§r",
+  "item.blafcraft.purple_facton": "§5Strange Orb§r",
+  "item.blafcraft.pink_facton": "§dStrange Orb§r",
+  "item.blafcraft.light_facton": "§7Strange Orb§r",
+  "item.blafcraft.dark_facton": "§8Strange Orb§r",
+
+  "item.minecraft.potion.effect.slimey_potion": "Slimey Potion",
+  "item.minecraft.splash_potion.effect.slimey_potion": "Slimey Splash Potion",
+  "item.minecraft.lingering_potion.effect.slimey_potion": "Slimey Lingering Potion",
+
   "block.blafcraft.bismuth_block": "Block of Bismuth",
   "block.blafcraft.bismuth_ore": "Bismuth Ore",
   "block.blafcraft.bismuth_deepsaalte_ore": "Bismuth Deepslate Ore",
@@ -49,6 +63,14 @@
 
   "effect.blafcraft.slimey": "Slimey",
   "effect.blafcraft.creation_step": "Creation Step",
+  "effect.blafcraft.bloodlust": "Bloodlust",
+
+  "painting.blafcraft.world.title": "World",
+  "painting.blafcraft.world.author": "NanoAttack",
+  "painting.blafcraft.shrimp.title": "Shrimp",
+  "painting.blafcraft.shrimp.author": "NanoAttack",
+  "painting.blafcraft.saw_them.title": "Saw Them",
+  "painting.blafcraft.saw_them.author": "NanoAttack",
 
 
   "item.blafcraft.sculk_ingot": "Sculk Ingot",

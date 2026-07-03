@@ -45,6 +45,16 @@ public class ModCreativeModeTabs {
 
                         output.accept(ModItems.SCULK_INGOT);
                         output.accept(ModItems.RAW_SCULK);
+
+                        output.accept(ModItems.RED_FACTON);
+                        output.accept(ModItems.ORANGE_FACTON);
+                        output.accept(ModItems.YELLOW_FACTON);
+                        output.accept(ModItems.GREEN_FACTON);
+                        output.accept(ModItems.BLUE_FACTON);
+                        output.accept(ModItems.PURPLE_FACTON);
+                        output.accept(ModItems.PINK_FACTON);
+                        output.accept(ModItems.LIGHT_FACTON );
+                        output.accept(ModItems.DARK_FACTON);
                     }).build());
 
     public static final Supplier<CreativeModeTab> BLAFCRAFT_BLOCKS_TAB = CREATIVE_MODE_TAB .register("blafcraft_blocks_tab",
