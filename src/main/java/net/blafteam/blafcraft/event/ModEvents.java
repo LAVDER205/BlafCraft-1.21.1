@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -27,8 +28,10 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.CriticalHitEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -219,5 +222,14 @@ public class ModEvents {
         }
     }
 
-    // -------------------------------- SMTH LOGIC -------------------------------
+    // -------------------------------- MILK LOGIC -------------------------------
+//    @SubscribeEvent
+//    public static void onItemUse(PlayerInteractEvent.RightClickItem event) {
+//        Player player = event.getEntity();
+//        ItemStack stack = event.getItemStack();
+//
+//        if (stack.is(Items.MILK_BUCKET) && player.hasEffect(ModEffects.CREATION_STEP_EFFECT)) {
+//            event.setCanceled(true);
+//        }
+//    }
 }

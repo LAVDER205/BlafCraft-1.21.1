@@ -1,10 +1,13 @@
 package net.blafteam.blafcraft.hud;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.keybinds.ActionType;
 import net.blafteam.blafcraft.keybinds.ClientCooldowns;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -18,7 +21,8 @@ public class ModHUDs {
     @SubscribeEvent
     public static void onRender(RenderGuiLayerEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null) return;
+        LocalPlayer player = mc.player;
+        if (player == null) return;
 
         // В 1.21 GuiGraphics получаем так:
         GuiGraphics graphics = event.getGuiGraphics();
@@ -29,9 +33,7 @@ public class ModHUDs {
         int x = 20;
         int y = 20;
 
-//        ResourceLocation icon = ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "textures/gui/speed.png");
-//        graphics.blit(icon, x, y, 0, 0, 16, 16, 16, 16);
-
+        // Cooldowns
         for (ActionType action : ActionType.values()) {
 
             int remain = ClientCooldowns.getRemaining(action);
@@ -41,6 +43,15 @@ public class ModHUDs {
                 graphics.drawString(mc.font, text, x + 16, y, 0xFFFFFF);
                 y += 10; // сдвиг чтоб не было наслоения
             }
+        }
+
+        // Bloodlust Overlay
+        if (player.hasEffect(ModEffects.BLOODLUST_EFFECT)) {
+            ResourceLocation bloodlustOverlay = ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "textures/gui/bloodlust_overlay.png");
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+            graphics.blit(bloodlustOverlay, 0, 0, 0, 0, w, h, w, h);
+            RenderSystem.disableBlend();
         }
     }
 

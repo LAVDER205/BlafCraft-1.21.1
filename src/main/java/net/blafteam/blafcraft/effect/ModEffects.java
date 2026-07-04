@@ -25,10 +25,16 @@ public class ModEffects {
             () -> new CreationStepEffect(MobEffectCategory.NEUTRAL, 0xFFFFFF));
 
     public static final Holder<MobEffect> BLOODLUST_EFFECT = MOB_EFFECTS.register("bloodlust",
-            () -> new SlimeyEffect(MobEffectCategory.NEUTRAL, 0x8B0000)
+            () -> new BloodlustEffect(MobEffectCategory.NEUTRAL, 0x8B0000)
                     .addAttributeModifier(Attributes.MOVEMENT_SPEED,
                             ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "bloodlust"), 0.5f,
                             AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+
+    public static final Holder<MobEffect> OVERDOSE_EFFECT = MOB_EFFECTS.register("overdose",
+            () -> new OverdoseEffect(MobEffectCategory.NEUTRAL, 0x5BB56E));
+
+    public static final Holder<MobEffect> BLEEDING_EFFECT = MOB_EFFECTS.register("bleeding",
+            () -> new BleedingEffect(MobEffectCategory.HARMFUL, 0x8B0000));
 
 
     public static void register(IEventBus eventBus) {
