@@ -1,13 +1,19 @@
 package net.blafteam.blafcraft.event;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.effect.BloodlustEffect;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.item.custom.HammerItem;
 import net.blafteam.blafcraft.potion.ModPotions;
+import net.blafteam.blafcraft.sound.LoopingSoundPayload;
+import net.blafteam.blafcraft.sound.ModSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
@@ -53,14 +59,14 @@ public class ModEvents {
         Player player = event.getPlayer();
         ItemStack mainHandItem = player.getMainHandItem();
 
-        if(mainHandItem.getItem() instanceof HammerItem hammer && player instanceof ServerPlayer serverPlayer) {
+        if (mainHandItem.getItem() instanceof HammerItem hammer && player instanceof ServerPlayer serverPlayer) {
             BlockPos initialBlockPos = event.getPos();
-            if(HARVESTED_BLOCKS.contains(initialBlockPos)) {
+            if (HARVESTED_BLOCKS.contains(initialBlockPos)) {
                 return;
             }
 
-            for(BlockPos pos : HammerItem.getBlocksToBeDestroyed(1, initialBlockPos, serverPlayer)) {
-                if(pos == initialBlockPos || !hammer.isCorrectToolForDrops(mainHandItem, event.getLevel().getBlockState(pos))) {
+            for (BlockPos pos : HammerItem.getBlocksToBeDestroyed(1, initialBlockPos, serverPlayer)) {
+                if (pos == initialBlockPos || !hammer.isCorrectToolForDrops(mainHandItem, event.getLevel().getBlockState(pos))) {
                     continue; // skip
                 }
 
@@ -89,12 +95,12 @@ public class ModEvents {
         Entity target = event.getTarget();
         ItemStack mainHandItem = player.getMainHandItem();
 
-        if(mainHandItem.getItem() == ModItems.SCULK_SWORD.get() && player instanceof ServerPlayer serverPlayer) {
+        if (mainHandItem.getItem() == ModItems.SCULK_SWORD.get() && player instanceof ServerPlayer serverPlayer) {
             if (target instanceof LivingEntity livingTarget) {
                 livingTarget.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 10, 0));
             }
         }
-        if(mainHandItem.getItem() == ModItems.SCULK_AXE.get() && player instanceof ServerPlayer serverPlayer) {
+        if (mainHandItem.getItem() == ModItems.SCULK_AXE.get() && player instanceof ServerPlayer serverPlayer) {
             if (target instanceof LivingEntity livingTarget) {
                 livingTarget.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 20, 0));
             }
@@ -107,7 +113,9 @@ public class ModEvents {
         Player player = event.getEntity();
 
         if (player.hasEffect(ModEffects.CREATION_STEP_EFFECT)) {
-            if (!player.level().isClientSide && player instanceof ServerPlayer serverPlayer) { spawnHoverCubeParticles(player, serverPlayer); }
+            if (!player.level().isClientSide && player instanceof ServerPlayer serverPlayer) {
+                spawnHoverCubeParticles(player, serverPlayer);
+            }
             handleAirWalking(player);
         }
     }
@@ -175,20 +183,56 @@ public class ModEvents {
             double offset = player.getRandom().nextDouble();
 
             switch (edge) {
-                case 0 -> { xPos += offset; }
-                case 1 -> { xPos += offset; zPos += 1.0; }
-                case 2 -> { zPos += offset; }
-                case 3 -> { zPos += offset; xPos += 1.0; }
+                case 0 -> {
+                    xPos += offset;
+                }
+                case 1 -> {
+                    xPos += offset;
+                    zPos += 1.0;
+                }
+                case 2 -> {
+                    zPos += offset;
+                }
+                case 3 -> {
+                    zPos += offset;
+                    xPos += 1.0;
+                }
 
-                case 4 -> { xPos += offset; yPos += 1.0; }
-                case 5 -> { xPos += offset; zPos += 1.0; yPos += 1.0; }
-                case 6 -> { zPos += offset; yPos += 1.0; }
-                case 7 -> { zPos += offset; xPos += 1.0; yPos += 1.0; }
+                case 4 -> {
+                    xPos += offset;
+                    yPos += 1.0;
+                }
+                case 5 -> {
+                    xPos += offset;
+                    zPos += 1.0;
+                    yPos += 1.0;
+                }
+                case 6 -> {
+                    zPos += offset;
+                    yPos += 1.0;
+                }
+                case 7 -> {
+                    zPos += offset;
+                    xPos += 1.0;
+                    yPos += 1.0;
+                }
 
-                case 8 -> { yPos += offset; }
-                case 9 -> { yPos += offset; zPos += 1.0; }
-                case 10 -> { yPos += offset; xPos += 1.0; }
-                case 11 -> { yPos += offset; xPos += 1.0; zPos += 1.0; }
+                case 8 -> {
+                    yPos += offset;
+                }
+                case 9 -> {
+                    yPos += offset;
+                    zPos += 1.0;
+                }
+                case 10 -> {
+                    yPos += offset;
+                    xPos += 1.0;
+                }
+                case 11 -> {
+                    yPos += offset;
+                    xPos += 1.0;
+                    zPos += 1.0;
+                }
             }
 
             serverLevel.sendParticles(serverPlayer, ParticleTypes.END_ROD, false, xPos, yPos, zPos, 1, 0.0, 0.0, 0.0, 0.002f);
@@ -218,18 +262,41 @@ public class ModEvents {
         LivingEntity deadEntity = event.getEntity();
         if (event.getSource().getEntity() instanceof LivingEntity killerEntity && killerEntity.hasEffect(ModEffects.BLOODLUST_EFFECT)) {
             if (deadEntity instanceof Player) killerEntity.heal(20.0f);
-                    else killerEntity.heal(10.0f);
+            else killerEntity.heal(10.0f);
+        }
+    }
+
+    private static final ResourceLocation BLOODLUST_ID =
+            ResourceLocation.fromNamespaceAndPath("blafcraft", "bloodlust");
+
+    @SubscribeEvent
+    public static void onEffectRemove(MobEffectEvent.Remove event) {
+        Holder<MobEffect> holder = event.getEffect();
+        if (holder.getKey() != null && holder.getKey().location().equals(BLOODLUST_ID)) {
+            if (event.getEntity() instanceof ServerPlayer player) {
+                PacketDistributor.sendToPlayer(player, new LoopingSoundPayload(ModSounds.HEARTBEAT.get(), 1.4f, 1.0f, false));
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onEffectExpired(MobEffectEvent.Expired event) {
+        Holder<MobEffect> holder = event.getEffectInstance().getEffect();
+        if (holder.getKey() != null && holder.getKey().location().equals(BLOODLUST_ID)) {
+            if (event.getEntity() instanceof ServerPlayer player) {
+                PacketDistributor.sendToPlayer(player, new LoopingSoundPayload(ModSounds.HEARTBEAT.get(), 1.4f, 1.0f, false));
+            }
         }
     }
 
     // -------------------------------- MILK LOGIC -------------------------------
-//    @SubscribeEvent
-//    public static void onItemUse(PlayerInteractEvent.RightClickItem event) {
-//        Player player = event.getEntity();
-//        ItemStack stack = event.getItemStack();
-//
-//        if (stack.is(Items.MILK_BUCKET) && player.hasEffect(ModEffects.CREATION_STEP_EFFECT)) {
-//            event.setCanceled(true);
-//        }
-//    }
+    @SubscribeEvent
+    public static void onItemUse(PlayerInteractEvent.RightClickItem event) {
+        Player player = event.getEntity();
+        ItemStack stack = event.getItemStack();
+
+        if (stack.is(Items.MILK_BUCKET) && player.hasEffect(ModEffects.OVERDOSE_EFFECT)) {
+            event.setCanceled(true);
+        }
+    }
 }

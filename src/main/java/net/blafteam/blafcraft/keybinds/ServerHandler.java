@@ -3,6 +3,8 @@ package net.blafteam.blafcraft.keybinds;
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.particle.ModParticles;
+import net.blafteam.blafcraft.sound.LoopingSoundPayload;
+import net.blafteam.blafcraft.sound.ModSounds;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -20,6 +22,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
@@ -77,6 +80,8 @@ public class ServerHandler {
                         // Планируем второй выстрел через n тиков
                         pendingActions.add(new PendingAction(player.getUUID(), ActionType.ARROW, 5));
                         pendingActions.add(new PendingAction(player.getUUID(), ActionType.ARROW, 10));
+
+                        PacketDistributor.sendToPlayer(player, new LoopingSoundPayload(ModSounds.HEARTBEAT.get(), 0.7f, 1.0f, true));
                     }
 
                     case FIREBALL -> {
@@ -95,6 +100,8 @@ public class ServerHandler {
                             player.addDeltaMovement(new Vec3(0, 1, 0));
                             player.connection.send(new ClientboundSetEntityMotionPacket(player)); // sync server and client
                         }
+
+                        PacketDistributor.sendToPlayer(player, new LoopingSoundPayload(ModSounds.HEARTBEAT.get(), 1.0f, 1.0f, false));
                     }
 
                     case CREATION_STEP -> {

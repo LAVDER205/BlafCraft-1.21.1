@@ -42,5 +42,11 @@
       "stream": true
       }
     ]
+  },
+  "heartbeat": {
+    "subtitle": "sounds.blafcraft.heartbeat",
+    "sounds": [
+      "blafcraft:heartbeat"
+    ]
   }
 }
