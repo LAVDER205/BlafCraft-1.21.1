@@ -31,10 +31,16 @@ public class ModEffects {
                             AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
     public static final Holder<MobEffect> OVERDOSE_EFFECT = MOB_EFFECTS.register("overdose",
-            () -> new OverdoseEffect(MobEffectCategory.NEUTRAL, 0x5BB56E));
+            () -> new OverdoseEffect(MobEffectCategory.NEUTRAL, 0x35B554));
 
     public static final Holder<MobEffect> BLEEDING_EFFECT = MOB_EFFECTS.register("bleeding",
             () -> new BleedingEffect(MobEffectCategory.HARMFUL, 0x8B0000));
+
+    public static final Holder<MobEffect> POTION_SICKNESS_EFFECT = MOB_EFFECTS.register("potion_sickness",
+            () -> new PotionSicknessEffect(MobEffectCategory.HARMFUL, 0x819987)
+                    .addAttributeModifier(Attributes.MOVEMENT_SPEED,
+                            ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "potion_sickness"), -0.1f,
+                            AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
 
     public static void register(IEventBus eventBus) {

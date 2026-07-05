@@ -87,6 +87,10 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
         oreSmelting(recipeOutput, SCULK_SMELTABLES, RecipeCategory.MISC, ModItems.SCULK_INGOT.get(), 0.25f, 200, "sculk");
         oreBlasting(recipeOutput, SCULK_SMELTABLES, RecipeCategory.MISC, ModItems.SCULK_INGOT.get(), 0.25f, 100, "sculk");
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Items.GLOWSTONE_DUST, 2)
+                .requires(Items.GLOW_BERRIES)
+                .unlockedBy("has_glow_berries", has(Items.GLOW_BERRIES)).save(recipeOutput, "blafcraft:glowstone_dust_from_glow_berries");
     }
 
     protected static void oreSmelting(RecipeOutput recipeOutput, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult,

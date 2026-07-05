@@ -55,6 +55,13 @@ public class ModCreativeModeTabs {
                         output.accept(ModItems.PINK_FACTON);
                         output.accept(ModItems.LIGHT_FACTON );
                         output.accept(ModItems.DARK_FACTON);
+
+                        output.accept(ModItems.STIMULATOR);
+                        output.accept(ModItems.STIMULATOR_SPEED);
+                        output.accept(ModItems.STIMULATOR_STRENGTH);
+                        output.accept(ModItems.STIMULATOR_REGENERATION);
+                        output.accept(ModItems.STIMULATOR_JUMP);
+                        output.accept(ModItems.STIMULATOR_RESISTANCE);
                     }).build());
 
     public static final Supplier<CreativeModeTab> BLAFCRAFT_BLOCKS_TAB = CREATIVE_MODE_TAB .register("blafcraft_blocks_tab",

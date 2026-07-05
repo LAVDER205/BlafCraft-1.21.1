@@ -107,7 +107,7 @@ public class ServerHandler {
                     case CREATION_STEP -> {
                         if (player.hasEffect(ModEffects.CREATION_STEP_EFFECT)) {
                             player.removeEffect(ModEffects.CREATION_STEP_EFFECT);
-                        } else  if (player.totalExperience >= 1){
+                        } else if (player.totalExperience >= 1){
                         player.addEffect(new MobEffectInstance(ModEffects.CREATION_STEP_EFFECT, -1, 0, false, false, false));
                         }
                     }

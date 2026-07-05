@@ -32,6 +32,15 @@
   "item.blafcraft.light_facton": "§7Strange Orb§r",
   "item.blafcraft.dark_facton": "§8Strange Orb§r",
 
+  "item.blafcraft.stimulator": "Stimulator",
+  "item.blafcraft.stimulator_speed": "Stimulator",
+  "item.blafcraft.stimulator_strength": "Stimulator",
+  "item.blafcraft.stimulator_regeneration": "Stimulator",
+  "item.blafcraft.stimulator_jump": "Stimulator",
+  "item.blafcraft.stimulator_resistance": "Stimulator",
+
+
+
   "item.minecraft.potion.effect.slimey_potion": "Slimey Potion",
   "item.minecraft.splash_potion.effect.slimey_potion": "Slimey Splash Potion",
   "item.minecraft.lingering_potion.effect.slimey_potion": "Slimey Lingering Potion",
@@ -68,6 +77,7 @@
   "effect.blafcraft.bloodlust": "Bloodlust",
   "effect.blafcraft.bleeding": "Bleeding",
   "effect.blafcraft.overdose": "Overdose",
+  "effect.blafcraft.potion_sickness": "Potion Sickness",
 
   "painting.blafcraft.world.title": "World",
   "painting.blafcraft.world.author": "NanoAttack",

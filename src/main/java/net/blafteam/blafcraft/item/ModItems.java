@@ -1,10 +1,7 @@
 package net.blafteam.blafcraft.item;
 
 import net.blafteam.blafcraft.BlafCraft;
-import net.blafteam.blafcraft.item.custom.ChiselItem;
-import net.blafteam.blafcraft.item.custom.FuelItem;
-import net.blafteam.blafcraft.item.custom.HammerItem;
-import net.blafteam.blafcraft.item.custom.ModArmorItem;
+import net.blafteam.blafcraft.item.custom.*;
 import net.blafteam.blafcraft.sound.ModSounds;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
@@ -111,21 +108,35 @@ public class ModItems {
     public static final DeferredItem<Item> RED_FACTON = ITEMS.register("red_facton",
             () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> ORANGE_FACTON = ITEMS.register("orange_facton",
-            () -> new Item(new Item.Properties()));
+            () -> new Item(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> YELLOW_FACTON = ITEMS.register("yellow_facton",
-            () -> new Item(new Item.Properties()));
+            () -> new Item(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> GREEN_FACTON = ITEMS.register("green_facton",
-            () -> new Item(new Item.Properties()));
+            () -> new Item(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> BLUE_FACTON = ITEMS.register("blue_facton",
-            () -> new Item(new Item.Properties()));
+            () -> new Item(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> PURPLE_FACTON = ITEMS.register("purple_facton",
-            () -> new Item(new Item.Properties()));
+            () -> new Item(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> PINK_FACTON = ITEMS.register("pink_facton",
-            () -> new Item(new Item.Properties()));
+            () -> new Item(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> LIGHT_FACTON = ITEMS.register("light_facton",
-            () -> new Item(new Item.Properties()));
+            () -> new Item(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> DARK_FACTON = ITEMS.register("dark_facton",
-            () -> new Item(new Item.Properties()));
+            () -> new Item(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> STIMULATOR = ITEMS.register("stimulator",
+            () -> new StimulatorItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> STIMULATOR_SPEED = ITEMS.register("stimulator_speed",
+            () -> new StimulatorItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> STIMULATOR_STRENGTH = ITEMS.register("stimulator_strength",
+            () -> new StimulatorItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> STIMULATOR_REGENERATION = ITEMS.register("stimulator_regeneration",
+            () -> new StimulatorItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> STIMULATOR_JUMP = ITEMS.register("stimulator_jump",
+            () -> new StimulatorItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> STIMULATOR_RESISTANCE = ITEMS.register("stimulator_resistance",
+            () -> new StimulatorItem(new Item.Properties().stacksTo(1)));
+
 
 
     public static void register(IEventBus eventBus) {

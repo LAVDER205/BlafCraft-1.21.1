@@ -33,6 +33,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
@@ -244,17 +245,25 @@ public class ModEvents {
     @SubscribeEvent
     public static void onHitWithBloodlust(AttackEntityEvent event) {
         LivingEntity livingEntity = event.getEntity();
-        if (livingEntity.hasEffect(ModEffects.BLOODLUST_EFFECT)) {
+        Entity targetEntity = event.getTarget();
+        if (targetEntity instanceof LivingEntity && livingEntity.hasEffect(ModEffects.BLOODLUST_EFFECT)) {
             livingEntity.heal(2.0F);
+            if (targetEntity.getRandom().nextFloat() < 0.5f) { // 50%
+                ((LivingEntity) targetEntity).addEffect(new MobEffectInstance(ModEffects.BLEEDING_EFFECT, 100, 0, false, false, true));
+            }
+
         }
     }
 
     @SubscribeEvent
     public static void onCriticalHitWithBloodlust(CriticalHitEvent event) {
         LivingEntity livingEntity = event.getEntity();
-        if (livingEntity.hasEffect(ModEffects.BLOODLUST_EFFECT)) {
+        Entity targetEntity = event.getTarget();
+        if (targetEntity instanceof LivingEntity && livingEntity.hasEffect(ModEffects.BLOODLUST_EFFECT)) {
             livingEntity.heal(4.0F);
+            ((LivingEntity) targetEntity).addEffect(new MobEffectInstance(ModEffects.BLEEDING_EFFECT, 100, 0, false, false, true));
         }
+
     }
 
     @SubscribeEvent
@@ -270,7 +279,7 @@ public class ModEvents {
             ResourceLocation.fromNamespaceAndPath("blafcraft", "bloodlust");
 
     @SubscribeEvent
-    public static void onEffectRemove(MobEffectEvent.Remove event) {
+    public static void onBloodlustEffectRemove(MobEffectEvent.Remove event) {
         Holder<MobEffect> holder = event.getEffect();
         if (holder.getKey() != null && holder.getKey().location().equals(BLOODLUST_ID)) {
             if (event.getEntity() instanceof ServerPlayer player) {
@@ -280,7 +289,7 @@ public class ModEvents {
     }
 
     @SubscribeEvent
-    public static void onEffectExpired(MobEffectEvent.Expired event) {
+    public static void onBloodlustEffectExpired(MobEffectEvent.Expired event) {
         Holder<MobEffect> holder = event.getEffectInstance().getEffect();
         if (holder.getKey() != null && holder.getKey().location().equals(BLOODLUST_ID)) {
             if (event.getEntity() instanceof ServerPlayer player) {
@@ -295,8 +304,30 @@ public class ModEvents {
         Player player = event.getEntity();
         ItemStack stack = event.getItemStack();
 
-        if (stack.is(Items.MILK_BUCKET) && player.hasEffect(ModEffects.OVERDOSE_EFFECT)) {
+        if (stack.is(Items.MILK_BUCKET) && (player.hasEffect(ModEffects.OVERDOSE_EFFECT) || player.hasEffect(ModEffects.POTION_SICKNESS_EFFECT))) {
             event.setCanceled(true);
+        }
+    }
+
+    // -------------------------------- OVERDOSE & POTION SICKNESS LOGIC -------------------------------
+
+    private static final ResourceLocation OVERDOSE_ID =
+            ResourceLocation.fromNamespaceAndPath("blafcraft", "overdose");
+
+    @SubscribeEvent
+    public static void onOverdoseEffectExpired(MobEffectEvent.Expired event) {
+        Holder<MobEffect> holder = event.getEffectInstance().getEffect();
+        if (holder.getKey() != null && holder.getKey().location().equals(OVERDOSE_ID)) {
+            event.getEntity().addEffect(new MobEffectInstance(ModEffects.POTION_SICKNESS_EFFECT, 3600, 0, true, true, true));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPotionSicknessDamaged(LivingDamageEvent.Pre event) {
+        LivingEntity livingEntity = event.getEntity();
+        if (livingEntity.hasEffect(ModEffects.POTION_SICKNESS_EFFECT)) {
+            float currentDamage = event.getNewDamage();
+            event.setNewDamage(currentDamage * 1.5f);
         }
     }
 }

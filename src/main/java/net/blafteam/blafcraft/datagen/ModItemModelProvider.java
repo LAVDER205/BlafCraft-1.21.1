@@ -91,6 +91,14 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.PINK_FACTON  .get());
         basicItem(ModItems.LIGHT_FACTON.get());
         basicItem(ModItems.DARK_FACTON.get());
+
+        basicItem(ModItems.STIMULATOR.get());
+        basicItem(ModItems.STIMULATOR_SPEED.get());
+        basicItem(ModItems.STIMULATOR_STRENGTH.get());
+        basicItem(ModItems.STIMULATOR_REGENERATION.get());
+        basicItem(ModItems.STIMULATOR_JUMP.get());
+        basicItem(ModItems.STIMULATOR_RESISTANCE.get());
+
     }
 
     // Shoutout to El_Redstoniano for making this
