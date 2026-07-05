@@ -99,6 +99,8 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.STIMULATOR_JUMP.get());
         basicItem(ModItems.STIMULATOR_RESISTANCE.get());
 
+        withExistingParent(ModItems.GECKO_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
+
     }
 
     // Shoutout to El_Redstoniano for making this

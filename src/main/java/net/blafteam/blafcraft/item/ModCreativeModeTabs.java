@@ -41,6 +41,8 @@ public class ModCreativeModeTabs {
                         output.accept(ModItems.BISMUTH_BOOTS);
                         output.accept(ModItems.REVENGE_MUSIC_DISC);
 
+                        output.accept(ModItems.GECKO_SPAWN_EGG);
+
                         // Actual mod
 
                         output.accept(ModItems.SCULK_INGOT);

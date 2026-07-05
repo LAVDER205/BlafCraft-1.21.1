@@ -1,11 +1,13 @@
 package net.blafteam.blafcraft.item;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.entity.ModEntities;
 import net.blafteam.blafcraft.item.custom.*;
 import net.blafteam.blafcraft.sound.ModSounds;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -69,6 +71,10 @@ public class ModItems {
                     new Item.Properties().durability(ArmorItem.Type.BOOTS.getDurability(19))));
     public static final DeferredItem<Item> REVENGE_MUSIC_DISC = ITEMS.register("revenge_music_disc",
             () -> new Item(new Item.Properties().jukeboxPlayable(ModSounds.REVENGE_KEY).stacksTo(1)));
+
+    public static final DeferredItem<Item> GECKO_SPAWN_EGG = ITEMS.register("gecko_spawn_egg",
+            () -> new DeferredSpawnEggItem(ModEntities.GECKO, 0x31afaf, 0xffac00,
+                    new Item.Properties()));
 
 // Actual mod
     public static final DeferredItem<Item> SCULK_INGOT = ITEMS.register("sculk_ingot",

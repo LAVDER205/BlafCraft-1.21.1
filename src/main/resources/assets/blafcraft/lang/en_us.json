@@ -22,6 +22,8 @@
   "item.blafcraft.revenge_music_disc": "Revenge Music Disc",
   "item.blafcraft.revenge_music_disc.desc": "CaptainSparklez, TryHardNinja - Revenge",
 
+  "item.blafcraft.gecko_spawn_egg": "Gecko Spawn Egg",
+
   "item.blafcraft.red_facton": "§4Strange Orb§r",
   "item.blafcraft.orange_facton": "§6Strange Orb§r",
   "item.blafcraft.yellow_facton": "§eStrange Orb§r",
@@ -93,6 +95,7 @@
   "item.blafcraft.sculk_sword": "Sculk Sword",
   "item.blafcraft.sculk_axe": "Sculk Axe",
 
-  "block.blafcraft.sculk_ore": "Sculk Ore"
+  "block.blafcraft.sculk_ore": "Sculk Ore",
 
+  "entity.mccourse.gecko": "Gecko"
 }

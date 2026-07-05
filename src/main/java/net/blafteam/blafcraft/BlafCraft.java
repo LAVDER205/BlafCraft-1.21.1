@@ -2,6 +2,8 @@ package net.blafteam.blafcraft;
 
 import net.blafteam.blafcraft.block.ModBlocks;
 import net.blafteam.blafcraft.effect.ModEffects;
+import net.blafteam.blafcraft.entity.ModEntities;
+import net.blafteam.blafcraft.entity.client.GeckoRenderer;
 import net.blafteam.blafcraft.item.ModCreativeModeTabs;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.particle.BloodParticles;
@@ -9,6 +11,7 @@ import net.blafteam.blafcraft.particle.ModParticles;
 import net.blafteam.blafcraft.particle.TeleportParticles;
 import net.blafteam.blafcraft.potion.ModPotions;
 import net.blafteam.blafcraft.sound.ModSounds;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import org.slf4j.Logger;
 
@@ -56,6 +59,8 @@ public class BlafCraft {
 
         ModPotions.register(modEventBus);
 
+        ModEntities.register(modEventBus);
+
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
 
@@ -90,6 +95,7 @@ public class BlafCraft {
     static class ClientModEvents {
         @SubscribeEvent
         static void onClientSetup(FMLClientSetupEvent event) {
+            EntityRenderers.register(ModEntities.GECKO.get(), GeckoRenderer::new);
 
         }
         @SubscribeEvent
