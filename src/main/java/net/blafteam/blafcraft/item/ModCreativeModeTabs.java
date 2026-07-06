@@ -43,6 +43,8 @@ public class ModCreativeModeTabs {
 
                         output.accept(ModItems.GECKO_SPAWN_EGG);
 
+                        output.accept(ModItems.TOMAHAWK);
+
                         // Actual mod
 
                         output.accept(ModItems.SCULK_INGOT);
@@ -64,6 +66,8 @@ public class ModCreativeModeTabs {
                         output.accept(ModItems.STIMULATOR_REGENERATION);
                         output.accept(ModItems.STIMULATOR_JUMP);
                         output.accept(ModItems.STIMULATOR_RESISTANCE);
+
+
                     }).build());
 
     public static final Supplier<CreativeModeTab> BLAFCRAFT_BLOCKS_TAB = CREATIVE_MODE_TAB .register("blafcraft_blocks_tab",

@@ -3,6 +3,7 @@ package net.blafteam.blafcraft.event;
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.entity.ModEntities;
 import net.blafteam.blafcraft.entity.client.GeckoModel;
+import net.blafteam.blafcraft.entity.client.TomahawkProjectileModel;
 import net.blafteam.blafcraft.entity.custom.GeckoEntity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -14,6 +15,7 @@ public class ModEventBusEvents {
     @SubscribeEvent
     public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(GeckoModel.LAYER_LOCATION, GeckoModel::createBodyLayer);
+        event.registerLayerDefinition(TomahawkProjectileModel.LAYER_LOCATION, TomahawkProjectileModel::createBodyLayer);
     }
 
     @SubscribeEvent

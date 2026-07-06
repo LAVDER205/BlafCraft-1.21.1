@@ -76,6 +76,9 @@ public class ModItems {
             () -> new DeferredSpawnEggItem(ModEntities.GECKO, 0x31afaf, 0xffac00,
                     new Item.Properties()));
 
+    public static final DeferredItem<Item> TOMAHAWK = ITEMS.register("tomahawk",
+            () -> new TomahawkItem(new Item.Properties().stacksTo(16)));
+
 // Actual mod
     public static final DeferredItem<Item> SCULK_INGOT = ITEMS.register("sculk_ingot",
         () -> new Item(new Item.Properties()));

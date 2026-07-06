@@ -4,6 +4,7 @@ import net.blafteam.blafcraft.block.ModBlocks;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.entity.ModEntities;
 import net.blafteam.blafcraft.entity.client.GeckoRenderer;
+import net.blafteam.blafcraft.entity.client.TomahawkProjectileRenderer;
 import net.blafteam.blafcraft.item.ModCreativeModeTabs;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.particle.BloodParticles;
@@ -96,6 +97,7 @@ public class BlafCraft {
         @SubscribeEvent
         static void onClientSetup(FMLClientSetupEvent event) {
             EntityRenderers.register(ModEntities.GECKO.get(), GeckoRenderer::new);
+            EntityRenderers.register(ModEntities.TOMAHAWK.get(), TomahawkProjectileRenderer::new);
 
         }
         @SubscribeEvent
