@@ -1,6 +1,10 @@
-package net.blafteam.blafcraft.sound;
+package net.blafteam.blafcraft.event;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.mana.ClientManaHandler;
+import net.blafteam.blafcraft.mana.ManaSyncPayload;
+import net.blafteam.blafcraft.sound.ClientPacketHandler;
+import net.blafteam.blafcraft.sound.LoopingSoundPayload;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -21,5 +25,10 @@ public class ClientModBusEvents { // регистрация пакета на к
                 ClientPacketHandler::handleLoopingSound
         );
 
+        registrar.playToClient(
+                ManaSyncPayload.TYPE,
+                ManaSyncPayload.STREAM_CODEC,
+                ClientManaHandler::handle
+        );
     }
 }

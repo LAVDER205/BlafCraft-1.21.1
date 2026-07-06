@@ -31,13 +31,40 @@ public class ClientSetup {
 
     @SubscribeEvent
     public static void onKeyPress(InputEvent.Key event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+        String nickname = mc.player.getName().getString();
+
         if (Minecraft.getInstance().screen != null) return;
         if (event.getAction() != GLFW.GLFW_PRESS) return;
 
         ActionType action = null;
-        if (event.getKey() == GLFW.GLFW_KEY_Z) action = ActionType.TELEPORT_DASH;
-        else if (event.getKey() == GLFW.GLFW_KEY_X) action = ActionType.FIREBALL;
-        else if (event.getKey() == GLFW.GLFW_KEY_C) action = ActionType.ARROW;
+        if (event.getKey() == GLFW.GLFW_KEY_Z) {
+            switch (nickname) {
+                case "FRIGBY13" -> {
+                    action = ActionType.CREATION_STEP;
+                }
+                case "Dev" -> {
+                    action = ActionType.TELEPORT_DASH;
+                }
+            }
+        }
+        else if (event.getKey() == GLFW.GLFW_KEY_X) switch (nickname) {
+            case "FRIGBY13" -> {
+                action = ActionType.FIREBALL;
+            }
+            case "Dev" -> {
+                action = ActionType.TELEPORT_DASH;
+            }
+        }
+        else if (event.getKey() == GLFW.GLFW_KEY_C) switch (nickname) {
+            case "FRIGBY13" -> {
+                action = ActionType.ARROW;
+            }
+            case "Dev" -> {
+                action = ActionType.TELEPORT_DASH;
+            }
+        }
 
         if (action != null) { // сработала какая-то способность
             // Отправляем пакет на сервер (сервер сам решит, можно ли выполнить)

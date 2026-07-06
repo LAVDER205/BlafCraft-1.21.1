@@ -11,6 +11,7 @@ import net.blafteam.blafcraft.sound.ModSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -26,6 +27,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionBrewing;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -328,6 +330,22 @@ public class ModEvents {
         if (livingEntity.hasEffect(ModEffects.POTION_SICKNESS_EFFECT)) {
             float currentDamage = event.getNewDamage();
             event.setNewDamage(currentDamage * 1.5f);
+        }
+    }
+
+    // -------------------------------- LAVDER PASSIVE LOGIC -------------------------------
+    @SubscribeEvent
+    public static void use(PlayerInteractEvent.RightClickItem event) {
+        ItemStack stack = event.getItemStack();
+        Player player = event.getEntity();
+        if (stack.is(Items.POTION) && player.getMainHandItem().getItem() != ModItems.STIMULATOR.get() && event.getEntity().getName().getString().equals("Dev")) {
+            PotionContents contents = stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+
+            for (MobEffectInstance effect : contents.getAllEffects()) {
+                event.getEntity().addEffect(new MobEffectInstance(effect));
+            }
+
+            player.setItemInHand(event.getHand(), new ItemStack(Items.GLASS_BOTTLE));
         }
     }
 }

@@ -2,12 +2,10 @@ package net.blafteam.blafcraft.keybinds;
 
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.effect.ModEffects;
+import net.blafteam.blafcraft.mana.ManaManager;
+import net.blafteam.blafcraft.mana.ManaSyncPayload;
 import net.blafteam.blafcraft.particle.ModParticles;
-import net.blafteam.blafcraft.sound.LoopingSoundPayload;
-import net.blafteam.blafcraft.sound.ModSounds;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -28,7 +26,6 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
 
 @EventBusSubscriber(modid = BlafCraft.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class ServerHandler {
@@ -63,9 +60,10 @@ public class ServerHandler {
                 long lastUsed = playerCooldowns.getOrDefault(action, 0L);
                 int cooldown = action.getCooldownTicks();
                 int exp_price = action.getExp_price();
+                int mana_price = action.getMana_price();
 
                 // Если кулдаун не прошёл — просто выходим
-                if (currentTime - lastUsed < cooldown || player.experienceLevel < exp_price) {
+                if (currentTime - lastUsed < cooldown || player.experienceLevel < exp_price || !ManaManager.consumeMana(player, mana_price)) {
                     return; // можно также отправить сообщение игроку о необходимости подождать
                 }
 
@@ -75,13 +73,10 @@ public class ServerHandler {
                 // Выполняем действие
                 switch (action) {
                     case ARROW -> {
-                        // Первый выстрел немедленно
                         shootArrow(player);
-                        // Планируем второй выстрел через n тиков
+
                         pendingActions.add(new PendingAction(player.getUUID(), ActionType.ARROW, 5));
                         pendingActions.add(new PendingAction(player.getUUID(), ActionType.ARROW, 10));
-
-                        PacketDistributor.sendToPlayer(player, new LoopingSoundPayload(ModSounds.HEARTBEAT.get(), 0.7f, 1.0f, true));
                     }
 
                     case FIREBALL -> {
@@ -96,19 +91,16 @@ public class ServerHandler {
                         boolean hasSolidGroundBelowBelow = !(stateBelowBelow.getCollisionShape(player.level(), posBelowBelow).isEmpty());
 
                         if (player.getXRot() >= 60 && (hasSolidGroundBelow || hasSolidGroundBelowBelow)) {
-                            Vec3 delta = player.getDeltaMovement();
                             player.addDeltaMovement(new Vec3(0, 1, 0));
                             player.connection.send(new ClientboundSetEntityMotionPacket(player)); // sync server and client
                         }
-
-                        PacketDistributor.sendToPlayer(player, new LoopingSoundPayload(ModSounds.HEARTBEAT.get(), 1.0f, 1.0f, false));
                     }
 
                     case CREATION_STEP -> {
                         if (player.hasEffect(ModEffects.CREATION_STEP_EFFECT)) {
                             player.removeEffect(ModEffects.CREATION_STEP_EFFECT);
                         } else if (player.totalExperience >= 1){
-                        player.addEffect(new MobEffectInstance(ModEffects.CREATION_STEP_EFFECT, -1, 0, false, false, false));
+                            player.addEffect(new MobEffectInstance(ModEffects.CREATION_STEP_EFFECT, -1, 0, false, false, false));
                         }
                     }
 
@@ -127,7 +119,16 @@ public class ServerHandler {
                     }
                 }
 
-                player.setExperienceLevels(player.experienceLevel - exp_price); // цена
+//                int currentMaxMana = ManaManager.getMaxMana(player); // change max mana
+//                ManaManager.setMaxMana(player, currentMaxMana + 50); // change max mana
+//
+//                float currentManaRegen = ManaManager.getMaxMana(player); // change mana regen
+//                ManaManager.setManaRegen(player, currentManaRegen + 1); // change mana regen
+
+                player.setExperienceLevels(player.experienceLevel - exp_price); // цена exp
+
+                PacketDistributor.sendToPlayer(player, new ManaSyncPayload( // синхронизация нового значения маны
+                        ManaManager.getMana(player), 100));
 
                 ClientCooldowns.startCooldown(action);// кд
             }

@@ -1,17 +1,19 @@
 package net.blafteam.blafcraft.keybinds;
 
 public enum ActionType {
-    ARROW(40, 1),
-    FIREBALL(80, 2),
-    CREATION_STEP(0, 0),
-    TELEPORT_DASH(0, 0);
+    ARROW(40, 1, 0),
+    FIREBALL(80, 2, 0),
+    CREATION_STEP(0, 0, 0),
+    TELEPORT_DASH(0, 0, 50);
 
     private final int cooldownTicks;
     private final int exp_price;
+    private final int mana_price;
 
-    ActionType(int cooldownTicks, int price) {
+    ActionType(int cooldownTicks, int exp_price, int mana_price) {
         this.cooldownTicks = cooldownTicks;
-        this.exp_price = price;
+        this.exp_price = exp_price;
+        this.mana_price = mana_price;
     }
 
     public int getCooldownTicks() {
@@ -20,5 +22,9 @@ public enum ActionType {
 
     public int getExp_price() {
         return exp_price;
+    }
+
+    public int getMana_price() {
+        return mana_price;
     }
 }
