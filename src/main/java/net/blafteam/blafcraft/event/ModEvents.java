@@ -1,19 +1,16 @@
 package net.blafteam.blafcraft.event;
 
 import net.blafteam.blafcraft.BlafCraft;
-import net.blafteam.blafcraft.effect.BloodlustEffect;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.item.custom.HammerItem;
 import net.blafteam.blafcraft.potion.ModPotions;
 import net.blafteam.blafcraft.sound.LoopingSoundPayload;
 import net.blafteam.blafcraft.sound.ModSounds;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,11 +18,12 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityEvent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
@@ -33,7 +31,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
@@ -44,10 +41,9 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
-import org.lwjgl.glfw.GLFW;
 
-import java.awt.event.KeyEvent;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @EventBusSubscriber(modid = BlafCraft.MODID, bus = EventBusSubscriber.Bus.GAME)
@@ -89,6 +85,18 @@ public class ModEvents {
         PotionBrewing.Builder builder = event.getBuilder();
 
         builder.addMix(Potions.AWKWARD, Items.SLIME_BALL, ModPotions.SLIMEY_POTION);
+
+        createStandardPotions(builder, Items.FIRE_CHARGE, ModPotions.FIERY_TOUCH_POTION, ModPotions.STRONG_FIERY_TOUCH_POTION, ModPotions.LONG_FIERY_TOUCH_POTION);
+        createStandardPotions(builder, Items.IRON_NUGGET, ModPotions.RESISTANCE_POTION, ModPotions.STRONG_RESISTANCE_POTION, ModPotions.LONG_RESISTANCE_TOUCH_POTION);
+    }
+
+    private static void createStandardPotions(PotionBrewing.Builder builder, Item item,
+                                              Holder <Potion> normal_p,
+                                              Holder <Potion> strong_p,
+                                              Holder <Potion> long_p) {
+        builder.addMix(Potions.AWKWARD, item, normal_p);
+        builder.addMix(ModPotions.FIERY_TOUCH_POTION, Items.GLOWSTONE_DUST, strong_p);
+        builder.addMix(ModPotions.FIERY_TOUCH_POTION, Items.REDSTONE, long_p);
     }
 
     // --------------------------------SCULK SWORD LOGIC -------------------------------
@@ -346,6 +354,17 @@ public class ModEvents {
             }
 
             player.setItemInHand(event.getHand(), new ItemStack(Items.GLASS_BOTTLE));
+        }
+    }
+
+    // -------------------------------- FIERY TOUCH LOGIC -------------------------------
+    @SubscribeEvent
+    public static void onHitWithFieryTouch(AttackEntityEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        Entity targetEntity = event.getTarget();
+        if (targetEntity instanceof LivingEntity && livingEntity.hasEffect(ModEffects.FIERY_TOUCH_EFFECT)) {
+            int amplifier = Objects.requireNonNull(livingEntity.getEffect(ModEffects.FIERY_TOUCH_EFFECT)).getAmplifier();
+            targetEntity.igniteForTicks(60 + (20 * amplifier));
         }
     }
 }

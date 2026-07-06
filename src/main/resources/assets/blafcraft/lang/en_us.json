@@ -42,11 +42,43 @@
   "item.blafcraft.stimulator_jump": "Stimulator",
   "item.blafcraft.stimulator_resistance": "Stimulator",
 
-
-
   "item.minecraft.potion.effect.slimey_potion": "Slimey Potion",
   "item.minecraft.splash_potion.effect.slimey_potion": "Slimey Splash Potion",
   "item.minecraft.lingering_potion.effect.slimey_potion": "Slimey Lingering Potion",
+  "item.minecraft.tripped_arrow.effect.slimey_potion": "Slimey Arrow",
+
+
+  "item.minecraft.potion.effect.fiery_touch_potion": "Fiery Touch Potion",
+  "item.minecraft.splash_potion.effect.fiery_touch_potion": "Fiery Touch Splash Potion",
+  "item.minecraft.lingering_potion.effect.fiery_touch_potion": "Fiery Touch Lingering Potion",
+  "item.minecraft.tripped_arrow.fiery_touch_potion": "Fiery Touch Arrow",
+
+  "item.minecraft.potion.effect.strong_fiery_touch_potion": "Fiery Touch Potion",
+  "item.minecraft.splash_potion.effect.strong_fiery_touch_potion": "Fiery Touch Splash Potion",
+  "item.minecraft.lingering_potion.effect.strong_fiery_touch_potion": "Fiery Touch Lingering Potion",
+  "item.minecraft.tripped_arrow.strong_fiery_touch_potion": "Fiery Touch Arrow",
+
+  "item.minecraft.potion.effect.long_fiery_touch_potion": "Fiery Touch Potion",
+  "item.minecraft.splash_potion.effect.long_fiery_touch_potion": "Fiery Touch Splash Potion",
+  "item.minecraft.lingering_potion.effect.long_fiery_touch_potion": "Fiery Touch Lingering Potion",
+  "item.minecraft.tripped_arrow.effect.long_fiery_touch_potion": "Fiery Touch Arrow",
+
+
+  "item.minecraft.potion.effect.resistance_potion": "Potion of Resistance",
+  "item.minecraft.splash_potion.effect.resistance_potion": "Splash Potion of Resistance",
+  "item.minecraft.lingering_potion.effect.resistance_potion": "Lingering Potion of Resistance",
+  "item.minecraft.tripped_arrow.effect.resistance_potion": "Arrow of Resistance",
+
+  "item.minecraft.potion.effect.strong_resistance_potion": "Potion of Resistance",
+  "item.minecraft.splash_potion.effect.strong_resistance_potion": "Splash Potion of Resistance",
+  "item.minecraft.lingering_potion.effect.strong_resistance_potion": "Lingering Potion of Resistance",
+  "item.minecraft.tripped_arrow.effect.strong_resistance_potion": "Arrow of Resistance",
+
+  "item.minecraft.potion.effect.long_resistance_potion": "Potion of Resistance",
+  "item.minecraft.splash_potion.effect.long_resistance_potion": "Splash Potion of Resistance",
+  "item.minecraft.lingering_potion.effect.long_resistance_potion": "Lingering Potion of Resistance",
+  "item.minecraft.tripped_arrow.effect.long_resistance_potion": "Arrow of Resistance",
+
 
   "block.blafcraft.bismuth_block": "Block of Bismuth",
   "block.blafcraft.bismuth_ore": "Bismuth Ore",
@@ -81,6 +113,7 @@
   "effect.blafcraft.bleeding": "Bleeding",
   "effect.blafcraft.overdose": "Overdose",
   "effect.blafcraft.potion_sickness": "Potion Sickness",
+  "effect.blafcraft.fiery_touch": "Fiery Touch",
 
   "painting.blafcraft.world.title": "World",
   "painting.blafcraft.world.author": "NanoAttack",

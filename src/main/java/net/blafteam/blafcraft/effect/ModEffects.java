@@ -16,16 +16,16 @@ public class ModEffects {
             DeferredRegister.create(BuiltInRegistries.MOB_EFFECT, BlafCraft.MODID);
 
     public static final Holder<MobEffect> SLIMEY_EFFECT = MOB_EFFECTS.register("slimey",
-            () -> new SlimeyEffect(MobEffectCategory.NEUTRAL, 0x36ebab)
+            () -> new SlimeyEffect(MobEffectCategory.BENEFICIAL, 0x36ebab)
                     .addAttributeModifier(Attributes.MOVEMENT_SPEED,
                             ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "slimey"), -0.25f,
                             AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
     public static final Holder<MobEffect> CREATION_STEP_EFFECT = MOB_EFFECTS.register("creation_step",
-            () -> new CreationStepEffect(MobEffectCategory.NEUTRAL, 0xFFFFFF));
+            () -> new CreationStepEffect(MobEffectCategory.BENEFICIAL, 0xFFFFFF));
 
     public static final Holder<MobEffect> BLOODLUST_EFFECT = MOB_EFFECTS.register("bloodlust",
-            () -> new BloodlustEffect(MobEffectCategory.NEUTRAL, 0x8B0000)
+            () -> new BloodlustEffect(MobEffectCategory.BENEFICIAL, 0x8B0000)
                     .addAttributeModifier(Attributes.MOVEMENT_SPEED,
                             ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "bloodlust"), 0.5f,
                             AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
@@ -41,6 +41,9 @@ public class ModEffects {
                     .addAttributeModifier(Attributes.MOVEMENT_SPEED,
                             ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "potion_sickness"), -0.1f,
                             AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+
+    public static final Holder<MobEffect> FIERY_TOUCH_EFFECT = MOB_EFFECTS.register("fiery_touch",
+            () -> new FieryTouchEffect(MobEffectCategory.BENEFICIAL, 0xED4A2B));
 
 
     public static void register(IEventBus eventBus) {

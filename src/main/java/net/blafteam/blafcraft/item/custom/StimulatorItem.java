@@ -2,6 +2,7 @@ package net.blafteam.blafcraft.item.custom;
 
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.item.ModItems;
+import net.blafteam.blafcraft.potion.ModPotions;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -40,6 +41,8 @@ public class StimulatorItem extends Item {
                         resultItem = ModItems.STIMULATOR_REGENERATION.get();
                     } else if (contents.is(Potions.LEAPING)) {
                         resultItem = ModItems.STIMULATOR_JUMP.get();
+                    } else if (contents.is(ModPotions.RESISTANCE_POTION)) {
+                        resultItem = ModItems.STIMULATOR_RESISTANCE.get();
                     }
 
                     if (resultItem != null) {

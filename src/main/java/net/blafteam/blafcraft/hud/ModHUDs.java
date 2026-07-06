@@ -55,24 +55,28 @@ public class ModHUDs {
             RenderSystem.disableBlend();
         }
 
-        float mana = ClientManaHandler.getMana();
-        int maxMana = ClientManaHandler.getMaxMana();
+        // Mana bar
+        if (player.getName().getString().equals("Dev")) {
+            float mana = ClientManaHandler.getMana();
+            int maxMana = ClientManaHandler.getMaxMana();
 
-        // Рисуем полоску маны в левом нижнем углу (например)
-        int barWidth = 100;
-        int barHeight = 10;
-        int x1 = 10;
-        int y1 = h - 30;
+            // Рисуем полоску маны в левом нижнем углу (например)
+            int barWidth = 100;
+            int barHeight = 10;
+            int x1 = 10;
+            int y1 = h - 30;
 
-        // Фон
-        graphics.fill(x1, y1, x1 + barWidth, y1 + barHeight, 0xFF333333);
-        // Заполнение (синий цвет)
-        int filledWidth = (int) (barWidth * (mana / maxMana));
-        graphics.fill(x1, y1, x1 + filledWidth, y1 + barHeight, 0xFF0000FF);
-        // Текст "Мана: 75/100"
-        String manaText = "Mana: " + (int) mana + "/" + maxMana;
-        graphics.drawString(mc.font, manaText, x1 + barWidth + 5, y1 + 1, 0xFFFFFF);
+            // Фон
+            graphics.fill(x1, y1, x1 + barWidth, y1 + barHeight, 0xFF333333);
+            // Заполнение (синий цвет)
+            int filledWidth = (int) (barWidth * (mana / maxMana));
+            graphics.fill(x1, y1, x1 + filledWidth, y1 + barHeight, 0xFF0000FF);
+            // Текст "Мана: 75/100"
+            String manaText = "Mana: " + (int) mana + "/" + maxMana;
+            graphics.drawString(mc.font, manaText, x1 + barWidth + 5, y1 + 1, 0xFFFFFF);
+        }
     }
+
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Pre event) {
