@@ -1,8 +1,11 @@
 package net.blafteam.blafcraft;
 
 import net.blafteam.blafcraft.block.ModBlocks;
+import net.blafteam.blafcraft.block.entity.ModBlockEntities;
+import net.blafteam.blafcraft.block.entity.renderer.RealizerBlockEntityRenderer;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.entity.ModEntities;
+import net.blafteam.blafcraft.entity.client.ChairRenderer;
 import net.blafteam.blafcraft.entity.client.GeckoRenderer;
 import net.blafteam.blafcraft.entity.client.TomahawkProjectileRenderer;
 import net.blafteam.blafcraft.item.ModCreativeModeTabs;
@@ -13,6 +16,7 @@ import net.blafteam.blafcraft.particle.TeleportParticles;
 import net.blafteam.blafcraft.potion.ModPotions;
 import net.blafteam.blafcraft.sound.ModSounds;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import org.slf4j.Logger;
 
@@ -62,6 +66,8 @@ public class BlafCraft {
 
         ModEntities.register(modEventBus);
 
+        ModBlockEntities.register(modEventBus);
+
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
 
@@ -99,11 +105,18 @@ public class BlafCraft {
             EntityRenderers.register(ModEntities.GECKO.get(), GeckoRenderer::new);
             EntityRenderers.register(ModEntities.TOMAHAWK.get(), TomahawkProjectileRenderer::new);
 
+            EntityRenderers.register(ModEntities.CHAIR_ENTITY.get(), ChairRenderer::new);
+
         }
         @SubscribeEvent
         public static void registerParticleFactories(RegisterParticleProvidersEvent event) {
             event.registerSpriteSet(ModParticles.TELEPORT_PARTICLES.get(), TeleportParticles.Provider::new);
             event.registerSpriteSet(ModParticles.BLOOD_PARTICLES.get(), BloodParticles.Provider::new);
+        }
+
+        @SubscribeEvent
+        public static void regosterBER(EntityRenderersEvent.RegisterRenderers event) {
+            event.registerBlockEntityRenderer(ModBlockEntities.REALIZER_BE.get(), RealizerBlockEntityRenderer::new);
         }
     }
 }

@@ -94,8 +94,11 @@ public class ModCreativeModeTabs {
 
                         output.accept(ModBlocks.BISMUTH_LAMP);
 
+                        output.accept(ModBlocks.CHAIR);
+
 
                         output.accept(ModBlocks.SCULK_ORE);
+                        output.accept(ModBlocks.REALIZER);
 
                     }).build());
 

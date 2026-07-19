@@ -56,7 +56,7 @@ public class ModHUDs {
         }
 
         // Mana bar
-        if (player.getName().getString().equals("Dev")) {
+        if (player.getName().getString().equals("Nice_00")) {
             float mana = ClientManaHandler.getMana();
             int maxMana = ClientManaHandler.getMaxMana();
 

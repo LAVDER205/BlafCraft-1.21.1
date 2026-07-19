@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "blafcraft:block/chair"
+    },
+    "facing=south": {
+      "model": "blafcraft:block/chair",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "blafcraft:block/chair",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "blafcraft:block/chair",
+      "y": 270
+    }
+  }
+}

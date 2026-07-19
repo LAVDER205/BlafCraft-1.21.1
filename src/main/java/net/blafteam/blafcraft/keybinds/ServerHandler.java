@@ -15,6 +15,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.LargeFireball;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -67,13 +69,15 @@ public class ServerHandler {
                     return; // можно также отправить сообщение игроку о необходимости подождать
                 }
 
-                // Сохраняем время использования
-                playerCooldowns.put(action, currentTime);
-
                 // Выполняем действие
                 switch (action) {
+                    case TEST -> {
+
+
+                    }
                     case ARROW -> {
                         shootArrow(player);
+                        debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
 
                         pendingActions.add(new PendingAction(player.getUUID(), ActionType.ARROW, 5));
                         pendingActions.add(new PendingAction(player.getUUID(), ActionType.ARROW, 10));
@@ -94,6 +98,7 @@ public class ServerHandler {
                             player.addDeltaMovement(new Vec3(0, 1, 0));
                             player.connection.send(new ClientboundSetEntityMotionPacket(player)); // sync server and client
                         }
+                        debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
                     }
 
                     case CREATION_STEP -> {
@@ -101,21 +106,47 @@ public class ServerHandler {
                             player.removeEffect(ModEffects.CREATION_STEP_EFFECT);
                         } else if (player.totalExperience >= 1){
                             player.addEffect(new MobEffectInstance(ModEffects.CREATION_STEP_EFFECT, -1, 0, false, false, false));
+                            debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
                         }
                     }
 
                     case TELEPORT_DASH -> {
-                        serverLevel.sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false, player.getX(), player.getY(), player.getZ(), 5, 0, 0, 0, 5);
-                        serverLevel.sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false, player.getEyePosition().x, player.getEyePosition().y, player.getEyePosition().z, 5, 0, 0, 0, 5);
+                        serverLevel.sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false, player.getX(), player.getY() + player.getBbHeight() / 2.0, player.getZ(), 10, 0.2, 0.5, 0.2, 5);
 
                         Vec3 look = player.getViewVector(1.0F);
-
                         double strength = 6.0;
+
                         player.teleportRelative(look.x * strength, 0, look.z * strength);
 
+                        serverLevel.sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false, player.getX(), player.getY() + player.getBbHeight() / 2.0, player.getZ(), 10, 0.2, 0.5, 0.2, 5);
 
-                        serverLevel.sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false, player.getX(), player.getY(), player.getZ(), 5, 0, 0, 0, 5);
-                        serverLevel.sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false, player.getEyePosition().x, player.getEyePosition().y, player.getEyePosition().z, 5, 0, 0, 0, 5);
+                        debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
+                    }
+
+                    case TELEPORT_GLANCE -> {
+                        HitResult hitResult = player.pick(50.0, 1.0F, false);
+
+                        if (hitResult.getType() == HitResult.Type.BLOCK) {
+                            BlockHitResult blockHitResult = (BlockHitResult) hitResult;
+                            BlockPos targetBlock = blockHitResult.getBlockPos();
+
+                            BlockPos posAbove = targetBlock.above();
+                            BlockState stateAbove = player.level().getBlockState(posAbove);
+                            boolean hasSolidGroundAbove = stateAbove.getCollisionShape(player.level(), posAbove).isEmpty();
+
+                            if (hasSolidGroundAbove) {
+                                serverLevel.sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false, player.getX(), player.getY() + player.getBbHeight() / 2.0, player.getZ(), 10, 0.2, 0.5, 0.2, 5);
+                                player.teleportTo(targetBlock.getX() + 0.5, targetBlock.getY() + 1, targetBlock.getZ() + 0.5);
+                                serverLevel.sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false, player.getX(), player.getY() + player.getBbHeight() / 2.0, player.getZ(), 10, 0.2, 0.5, 0.2, 5);
+
+                                debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
+                            }
+                        }
+                    }
+
+                    case BLOODLUST -> {
+                        player.addEffect(new MobEffectInstance(ModEffects.BLOODLUST_EFFECT, 1200, 0));
+                        debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
                     }
                 }
 
@@ -124,15 +155,21 @@ public class ServerHandler {
 //
 //                float currentManaRegen = ManaManager.getMaxMana(player); // change mana regen
 //                ManaManager.setManaRegen(player, currentManaRegen + 1); // change mana regen
-
-                player.setExperienceLevels(player.experienceLevel - exp_price); // цена exp
-
-                PacketDistributor.sendToPlayer(player, new ManaSyncPayload( // синхронизация нового значения маны
-                        ManaManager.getMana(player), 100));
-
-                ClientCooldowns.startCooldown(action);// кд
             }
         });
+    }
+
+    private static void debitAndCooldown(ServerPlayer player, Map<ActionType, Long> playerCooldowns, long currentTime, ActionType action, int exp_price, int mana_price) {
+        // Сохраняем время использования
+        playerCooldowns.put(action, currentTime);
+
+        player.setExperienceLevels(player.experienceLevel - exp_price); // цена exp
+
+        PacketDistributor.sendToPlayer(player, new ManaSyncPayload( // синхронизация нового значения маны
+                ManaManager.getMana(player), 100));
+
+        ClientCooldowns.startCooldown(action);// кд
+
     }
 
     private static void shootArrow(ServerPlayer player) {

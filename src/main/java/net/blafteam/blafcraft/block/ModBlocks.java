@@ -2,7 +2,9 @@ package net.blafteam.blafcraft.block;
 
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.block.custom.BismuthLampBlock;
+import net.blafteam.blafcraft.block.custom.ChairBlock;
 import net.blafteam.blafcraft.block.custom.MagicBlock;
+import net.blafteam.blafcraft.block.custom.RealizerBlock;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.sound.ModSounds;
 import net.minecraft.util.valueproviders.UniformInt;
@@ -69,6 +71,15 @@ public class ModBlocks {
 
     public static final DeferredBlock<Block> BISMUTH_LAMP = registerBlock("bismuth_lamp",
             () -> new BismuthLampBlock(BlockBehaviour.Properties.of().strength(2f).requiresCorrectToolForDrops().lightLevel(state -> state.getValue(BismuthLampBlock.CLICKED) ? 15 : 0)));
+
+    public static final DeferredBlock<Block> CHAIR = registerBlock("chair",
+            () -> new ChairBlock(BlockBehaviour.Properties.of().noOcclusion()));
+
+    public static final DeferredBlock<Block> REALIZER = registerBlock("realizer",
+            () -> new RealizerBlock(BlockBehaviour.Properties.of().noOcclusion()));
+
+
+
 
 
     public static final DeferredBlock<Block> SCULK_ORE = registerBlock("sculk_ore",

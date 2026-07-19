@@ -115,23 +115,23 @@ public class ModItems {
 //                    new Item.Properties().durability(ArmorItem.Type.BOOTS.getDurability(42))));
 
     public static final DeferredItem<Item> RED_FACTON = ITEMS.register("red_facton",
-            () -> new Item(new Item.Properties()));
+            () -> new FactonItem(new Item.Properties()));
     public static final DeferredItem<Item> ORANGE_FACTON = ITEMS.register("orange_facton",
-            () -> new Item(new Item.Properties().stacksTo(1)));
+            () -> new FactonItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> YELLOW_FACTON = ITEMS.register("yellow_facton",
-            () -> new Item(new Item.Properties().stacksTo(1)));
+            () -> new FactonItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> GREEN_FACTON = ITEMS.register("green_facton",
-            () -> new Item(new Item.Properties().stacksTo(1)));
+            () -> new FactonItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> BLUE_FACTON = ITEMS.register("blue_facton",
-            () -> new Item(new Item.Properties().stacksTo(1)));
+            () -> new FactonItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> PURPLE_FACTON = ITEMS.register("purple_facton",
-            () -> new Item(new Item.Properties().stacksTo(1)));
+            () -> new FactonItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> PINK_FACTON = ITEMS.register("pink_facton",
-            () -> new Item(new Item.Properties().stacksTo(1)));
+            () -> new FactonItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> LIGHT_FACTON = ITEMS.register("light_facton",
-            () -> new Item(new Item.Properties().stacksTo(1)));
+            () -> new FactonItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> DARK_FACTON = ITEMS.register("dark_facton",
-            () -> new Item(new Item.Properties().stacksTo(1)));
+            () -> new FactonItem(new Item.Properties().stacksTo(1)));
 
     public static final DeferredItem<Item> STIMULATOR = ITEMS.register("stimulator",
             () -> new StimulatorItem(new Item.Properties().stacksTo(1)));

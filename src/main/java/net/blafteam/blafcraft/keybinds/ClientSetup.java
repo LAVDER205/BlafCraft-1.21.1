@@ -41,28 +41,48 @@ public class ClientSetup {
         ActionType action = null;
         if (event.getKey() == GLFW.GLFW_KEY_Z) {
             switch (nickname) {
-                case "FRIGBY13" -> {
+                case "Frigby" -> {
                     action = ActionType.CREATION_STEP;
                 }
-                case "Dev" -> {
+                case "Frynote" -> {
                     action = ActionType.TELEPORT_DASH;
+                }
+                case "LAVDER208" -> {
+                    action = ActionType.BLOODLUST;
+                }
+                case "Dev" -> {
+                    action = ActionType.ARROW;
                 }
             }
         }
-        else if (event.getKey() == GLFW.GLFW_KEY_X) switch (nickname) {
-            case "FRIGBY13" -> {
+        else if (event.getKey() == GLFW.GLFW_KEY_X)
+            switch (nickname) {
+            case "Frigby" -> {
                 action = ActionType.FIREBALL;
             }
-            case "Dev" -> {
+            case "Frynote" -> {
                 action = ActionType.TELEPORT_DASH;
+            }
+            case "LAVDER208" -> {
+                action = ActionType.BLOODLUST;
+            }
+            case "Dev" -> {
+                action = ActionType.TEST;
             }
         }
-        else if (event.getKey() == GLFW.GLFW_KEY_C) switch (nickname) {
-            case "FRIGBY13" -> {
+        else if (event.getKey() == GLFW.GLFW_KEY_C)
+            switch (nickname) {
+            case "Frigby" -> {
                 action = ActionType.ARROW;
             }
-            case "Dev" -> {
+            case "Frynote" -> {
                 action = ActionType.TELEPORT_DASH;
+            }
+            case "LAVDER208" -> {
+                action = ActionType.BLOODLUST;
+            }
+            case "Dev" -> {
+                action = ActionType.TEST;
             }
         }
 

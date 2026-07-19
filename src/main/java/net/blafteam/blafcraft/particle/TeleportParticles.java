@@ -9,13 +9,23 @@ public class TeleportParticles extends TextureSheetParticle {
     protected TeleportParticles(ClientLevel level, double x, double y, double z, SpriteSet spriteSet, double xSpeed, double ySpeed, double zSpeed) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
 
-        this.friction = 0.8f; // ускорение
-        this.lifetime = 20; // ticks
+        this.friction = 0.9f; // ускорение
+        this.lifetime = 40; // ticks
         this.setSpriteFromAge(spriteSet);
+        this.roll = (float) (Math.random() * Math.PI * 2);
+        this.oRoll = this.roll;
+
+
 
         this.rCol = 1f;
         this.gCol = 1f;
         this.bCol = 1f;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        this.alpha = (float) (1 - Math.pow((double) this.age / this.lifetime, 8));
     }
 
     @Override

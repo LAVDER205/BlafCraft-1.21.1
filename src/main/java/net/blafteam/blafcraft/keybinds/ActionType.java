@@ -1,10 +1,13 @@
 package net.blafteam.blafcraft.keybinds;
 
 public enum ActionType {
+    TEST(60, 0, 0),
     ARROW(40, 1, 0),
     FIREBALL(80, 2, 0),
     CREATION_STEP(0, 0, 0),
-    TELEPORT_DASH(0, 0, 50);
+    TELEPORT_DASH(2, 0, 10),
+    TELEPORT_GLANCE(20, 0, 40),
+    BLOODLUST(0, 0, 0);
 
     private final int cooldownTicks;
     private final int exp_price;

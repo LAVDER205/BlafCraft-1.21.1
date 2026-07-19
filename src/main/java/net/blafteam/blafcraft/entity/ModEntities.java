@@ -1,6 +1,7 @@
 package net.blafteam.blafcraft.entity;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.entity.custom.ChairEntity;
 import net.blafteam.blafcraft.entity.custom.GeckoEntity;
 import net.blafteam.blafcraft.entity.custom.TomahawkProjectileEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -22,6 +23,10 @@ public class ModEntities {
     public static final Supplier<EntityType<TomahawkProjectileEntity>> TOMAHAWK =
             ENTITY_TYPES.register("tomahawk", () -> EntityType.Builder.<TomahawkProjectileEntity>of(TomahawkProjectileEntity::new, MobCategory.MISC)
                     .sized(0.5f, 1.15f).build("tomahawk"));
+
+    public static final Supplier<EntityType<ChairEntity>> CHAIR_ENTITY =
+            ENTITY_TYPES.register("chair_entity", () -> EntityType.Builder.of(ChairEntity::new, MobCategory.MISC)
+                    .sized(0.5f, 0.5f).build("chair_entity")); // size of the hitbox
 
 
     public static void register(IEventBus eventBus) {
