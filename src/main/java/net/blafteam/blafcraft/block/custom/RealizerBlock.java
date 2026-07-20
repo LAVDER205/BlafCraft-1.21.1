@@ -1,6 +1,7 @@
 package net.blafteam.blafcraft.block.custom;
 
 import com.mojang.serialization.MapCodec;
+import net.blafteam.blafcraft.block.entity.ModBlockEntities;
 import net.blafteam.blafcraft.block.entity.RealizerBlockEntity;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.item.custom.FactonItem;
@@ -8,6 +9,7 @@ import net.blafteam.blafcraft.particle.ModParticles;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -21,6 +23,8 @@ import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
@@ -35,7 +39,7 @@ import java.util.Map;
 public class RealizerBlock extends BaseEntityBlock {
     public static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 13, 14);
     public static final MapCodec<RealizerBlock> CODEC = simpleCodec(RealizerBlock::new);
-    private final int interval = 20;
+    private final int interval = 6;
 
     public RealizerBlock(Properties properties) {
         super(properties);
@@ -107,10 +111,16 @@ public class RealizerBlock extends BaseEntityBlock {
                     pos.getX() + 0.5, pos.getY() + 1.1875, pos.getZ() + 0.5,
                     1, 0.1, 0.1, 0.1, 0.1);
 
-            level.sendParticles(ModParticles.BLOOD_PARTICLES.get(),
-                    pos.getX() + 0.5, pos.getY() + 5, pos.getZ() + 0.5,
-                    10, 4.5, 0, 4.5, 0.3);
+            level.sendParticles(ModParticles.PETAL_PARTICLES.get(),
+                    pos.getX() + 0.5, pos.getY() + 25, pos.getZ() + 0.5,
+                    5, 20.5, 0, 20.5, 0.2);
         }
         level.scheduleTick(pos, this, interval);
+    }
+
+    @Override
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) { // каждый тик
+        if (level.isClientSide) return null;
+        return createTickerHelper(type, ModBlockEntities.REALIZER_BE.get(), RealizerBlockEntity::serverTick); // вызвал метод serverTick из be
     }
 }

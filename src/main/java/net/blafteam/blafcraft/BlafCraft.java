@@ -12,6 +12,7 @@ import net.blafteam.blafcraft.item.ModCreativeModeTabs;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.particle.BloodParticles;
 import net.blafteam.blafcraft.particle.ModParticles;
+import net.blafteam.blafcraft.particle.PetalParticles;
 import net.blafteam.blafcraft.particle.TeleportParticles;
 import net.blafteam.blafcraft.potion.ModPotions;
 import net.blafteam.blafcraft.sound.ModSounds;
@@ -112,6 +113,7 @@ public class BlafCraft {
         public static void registerParticleFactories(RegisterParticleProvidersEvent event) {
             event.registerSpriteSet(ModParticles.TELEPORT_PARTICLES.get(), TeleportParticles.Provider::new);
             event.registerSpriteSet(ModParticles.BLOOD_PARTICLES.get(), BloodParticles.Provider::new);
+            event.registerSpriteSet(ModParticles.PETAL_PARTICLES.get(), PetalParticles.Provider::new);
         }
 
         @SubscribeEvent

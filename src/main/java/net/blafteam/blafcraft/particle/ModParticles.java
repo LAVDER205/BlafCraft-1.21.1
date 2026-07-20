@@ -19,6 +19,9 @@ public class ModParticles {
     public static final Supplier<SimpleParticleType> BLOOD_PARTICLES =
             PARTICLE_TYPES.register("blood_particles", () -> new SimpleParticleType(false));
 
+    public static final Supplier<SimpleParticleType> PETAL_PARTICLES =
+            PARTICLE_TYPES.register("petal_particles", () -> new SimpleParticleType(true));
+
     public static void register(IEventBus eventBus) {
         PARTICLE_TYPES.register(eventBus);
     }
