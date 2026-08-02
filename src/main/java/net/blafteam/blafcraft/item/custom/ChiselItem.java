@@ -66,9 +66,9 @@ public class ChiselItem extends Item {
             tooltipComponents.add(Component.translatable("tooltip.tutorialmod.chisel"));
         }
 
-//        if(stack.get(ModDataComponents.COORDINATES) != null) {
-//            tooltipComponents.add(Component.literal("Last Block changed at " + stack.get(ModDataComponents.COORDINATES)));
-//        }  // don't work for some reason
+        if(stack.get(ModDataComponents.COORDINATES) != null) {
+            tooltipComponents.add(Component.literal("Last Block changed at " + stack.get(ModDataComponents.COORDINATES)));
+        }  // don't work for some reason
 
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
     }

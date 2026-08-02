@@ -115,7 +115,7 @@ public class ModItems {
 //                    new Item.Properties().durability(ArmorItem.Type.BOOTS.getDurability(42))));
 
     public static final DeferredItem<Item> RED_FACTON = ITEMS.register("red_facton",
-            () -> new FactonItem(new Item.Properties()));
+            () -> new FactonItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> ORANGE_FACTON = ITEMS.register("orange_facton",
             () -> new FactonItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> YELLOW_FACTON = ITEMS.register("yellow_facton",

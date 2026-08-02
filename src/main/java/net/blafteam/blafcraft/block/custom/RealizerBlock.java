@@ -3,19 +3,24 @@ package net.blafteam.blafcraft.block.custom;
 import com.mojang.serialization.MapCodec;
 import net.blafteam.blafcraft.block.entity.ModBlockEntities;
 import net.blafteam.blafcraft.block.entity.RealizerBlockEntity;
-import net.blafteam.blafcraft.item.ModItems;
+import net.blafteam.blafcraft.component.ModDataComponents;
 import net.blafteam.blafcraft.item.custom.FactonItem;
 import net.blafteam.blafcraft.particle.ModParticles;
+import net.blafteam.blafcraft.particle.PetalParticleOptions;
+import net.blafteam.blafcraft.particle.SparkleParticleOptions;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -26,15 +31,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class RealizerBlock extends BaseEntityBlock {
     public static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 13, 14);
@@ -82,6 +82,10 @@ public class RealizerBlock extends BaseEntityBlock {
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
                                               Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (level.getBlockEntity(pos) instanceof RealizerBlockEntity realizerBlockEntity) {
+            if (player.isCrouching() && !level.isClientSide) {
+                ((ServerPlayer) player).openMenu(new SimpleMenuProvider(realizerBlockEntity, Component.literal("Realizer")), pos);
+                return ItemInteractionResult.SUCCESS;
+            }
             if (realizerBlockEntity.inventory.getStackInSlot(0).isEmpty() && stack.getItem() instanceof FactonItem) {
                 realizerBlockEntity.inventory.insertItem(0, stack.copy(), false);
                 stack.shrink(1);
@@ -107,11 +111,18 @@ public class RealizerBlock extends BaseEntityBlock {
     @Override
     public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (level.getBlockEntity(pos) instanceof RealizerBlockEntity realizerBlockEntity && !realizerBlockEntity.inventory.getStackInSlot(0).isEmpty()) {
-            level.sendParticles(ModParticles.TELEPORT_PARTICLES.get(),
-                    pos.getX() + 0.5, pos.getY() + 1.1875, pos.getZ() + 0.5,
-                    1, 0.1, 0.1, 0.1, 0.1);
+            DyeColor dye = realizerBlockEntity.inventory.getStackInSlot(0).get(ModDataComponents.COLOR);
+            int rgb = dye.getFireworkColor();
 
-            level.sendParticles(ModParticles.PETAL_PARTICLES.get(),
+            float r = FastColor.ARGB32.red(rgb) / 255.0f;
+            float g = FastColor.ARGB32.green(rgb) / 255.0f;
+            float b = FastColor.ARGB32.blue(rgb) / 255.0f;
+
+            level.sendParticles(new SparkleParticleOptions(r, g, b),
+                    pos.getX() + 0.5, pos.getY() + 1.1875, pos.getZ() + 0.5,
+                    2, 0.1, 0.1, 0.1, 0.5);
+
+            level.sendParticles(new PetalParticleOptions(r, g, b),
                     pos.getX() + 0.5, pos.getY() + 25, pos.getZ() + 0.5,
                     5, 20.5, 0, 20.5, 0.2);
         }

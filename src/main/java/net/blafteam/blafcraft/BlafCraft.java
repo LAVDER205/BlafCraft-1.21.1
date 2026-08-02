@@ -3,6 +3,7 @@ package net.blafteam.blafcraft;
 import net.blafteam.blafcraft.block.ModBlocks;
 import net.blafteam.blafcraft.block.entity.ModBlockEntities;
 import net.blafteam.blafcraft.block.entity.renderer.RealizerBlockEntityRenderer;
+import net.blafteam.blafcraft.component.ModDataComponents;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.entity.ModEntities;
 import net.blafteam.blafcraft.entity.client.ChairRenderer;
@@ -10,14 +11,14 @@ import net.blafteam.blafcraft.entity.client.GeckoRenderer;
 import net.blafteam.blafcraft.entity.client.TomahawkProjectileRenderer;
 import net.blafteam.blafcraft.item.ModCreativeModeTabs;
 import net.blafteam.blafcraft.item.ModItems;
-import net.blafteam.blafcraft.particle.BloodParticles;
-import net.blafteam.blafcraft.particle.ModParticles;
-import net.blafteam.blafcraft.particle.PetalParticles;
-import net.blafteam.blafcraft.particle.TeleportParticles;
+import net.blafteam.blafcraft.particle.*;
 import net.blafteam.blafcraft.potion.ModPotions;
+import net.blafteam.blafcraft.screen.ModMenuTypes;
+import net.blafteam.blafcraft.screen.custom.RealizerScreen;
 import net.blafteam.blafcraft.sound.ModSounds;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import org.slf4j.Logger;
 
@@ -54,6 +55,7 @@ public class BlafCraft {
         NeoForge.EVENT_BUS.register(this);
 
         ModCreativeModeTabs.register(modEventBus);
+        ModDataComponents.register(modEventBus);
 
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
@@ -68,6 +70,8 @@ public class BlafCraft {
         ModEntities.register(modEventBus);
 
         ModBlockEntities.register(modEventBus);
+
+        ModMenuTypes.register(modEventBus);
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
@@ -114,11 +118,17 @@ public class BlafCraft {
             event.registerSpriteSet(ModParticles.TELEPORT_PARTICLES.get(), TeleportParticles.Provider::new);
             event.registerSpriteSet(ModParticles.BLOOD_PARTICLES.get(), BloodParticles.Provider::new);
             event.registerSpriteSet(ModParticles.PETAL_PARTICLES.get(), PetalParticles.Provider::new);
+            event.registerSpriteSet(ModParticles.SPARKLE_PARTICLES.get(), SparkleParticles.Provider::new);
         }
 
         @SubscribeEvent
         public static void regosterBER(EntityRenderersEvent.RegisterRenderers event) {
             event.registerBlockEntityRenderer(ModBlockEntities.REALIZER_BE.get(), RealizerBlockEntityRenderer::new);
+        }
+
+        @SubscribeEvent
+        public static void RegisterScreens(RegisterMenuScreensEvent event) {
+            event.register(ModMenuTypes.REALIZER_MENU.get(), RealizerScreen::new);
         }
     }
 }

@@ -6,14 +6,14 @@ import net.minecraft.core.particles.SimpleParticleType;
 import org.jetbrains.annotations.Nullable;
 
 public class PetalParticles extends TextureSheetParticle {
-    protected PetalParticles(ClientLevel level, double x, double y, double z, SpriteSet spriteSet, double xSpeed, double ySpeed, double zSpeed) {
+    protected PetalParticles(ClientLevel level, double x, double y, double z, SpriteSet spriteSet, double xSpeed, double ySpeed, double zSpeed, PetalParticleOptions options) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
 
         this.lifetime = 160;
         this.quadSize = 0.15f;
         this.setSpriteFromAge(spriteSet);
 
-        this.setColor(0.4f, 0.0f, 0.4f);  // тёмно-красный
+        this.setColor(options.r(), options.g(), options.b());
         this.hasPhysics = true;
         this.gravity = 0.2f;
         this.friction = 0.98f;
@@ -36,7 +36,7 @@ public class PetalParticles extends TextureSheetParticle {
         return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
-    public static class Provider implements ParticleProvider<SimpleParticleType> {
+    public static class Provider implements ParticleProvider<PetalParticleOptions> {
         private final SpriteSet spriteSet;
 
         public Provider(SpriteSet spriteSet) {
@@ -44,8 +44,8 @@ public class PetalParticles extends TextureSheetParticle {
         }
 
         @Override
-        public @Nullable Particle createParticle(SimpleParticleType type, ClientLevel level, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
-            return new PetalParticles(level, pX, pY, pZ, this.spriteSet, pXSpeed / 5, pYSpeed - 1, pZSpeed / 5);
+        public @Nullable Particle createParticle(PetalParticleOptions options, ClientLevel level, double pX, double pY, double pZ, double pXSpeed, double pYSpeed, double pZSpeed) {
+            return new PetalParticles(level, pX, pY, pZ, this.spriteSet, pXSpeed / 5, pYSpeed - 1, pZSpeed / 5, options);
         }
     }
 }
