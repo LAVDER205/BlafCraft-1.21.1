@@ -67,6 +67,8 @@ public class ModCreativeModeTabs {
                         output.accept(ModItems.STIMULATOR_JUMP);
                         output.accept(ModItems.STIMULATOR_RESISTANCE);
 
+                        output.accept(ModItems.RELIC);
+
 
                     }).build());
 

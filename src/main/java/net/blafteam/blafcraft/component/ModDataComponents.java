@@ -1,5 +1,6 @@
 package net.blafteam.blafcraft.component;
 
+import com.mojang.serialization.Codec;
 import net.blafteam.blafcraft.BlafCraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
@@ -19,6 +20,9 @@ public class ModDataComponents {
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<DyeColor>> COLOR = register("color",
             builder -> builder.persistent(DyeColor.CODEC));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> COUNTER = register("counter",
+            builder -> builder.persistent(Codec.INT));
 
 
 

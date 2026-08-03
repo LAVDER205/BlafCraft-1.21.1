@@ -58,6 +58,8 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
 
         add(ModBlocks.SCULK_ORE.get(),
                 block -> createOreDrop(ModBlocks.SCULK_ORE.get(), ModItems.RAW_SCULK.get()));
+        dropSelf(ModBlocks.CHAIR.get());
+        dropSelf(ModBlocks.REALIZER.get());
 
     }
 

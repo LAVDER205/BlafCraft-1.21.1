@@ -42,6 +42,8 @@
   "item.blafcraft.stimulator_jump": "Stimulator",
   "item.blafcraft.stimulator_resistance": "Stimulator",
 
+  "item.blafcraft.relic": "Relic",
+
   "item.minecraft.potion.effect.slimey_potion": "Slimey Potion",
   "item.minecraft.splash_potion.effect.slimey_potion": "Slimey Splash Potion",
   "item.minecraft.lingering_potion.effect.slimey_potion": "Slimey Lingering Potion",
@@ -106,9 +108,13 @@
   "creativetab.blafcraft.blafcraft_blocks": "BlafCraft Blocks",
 
   "tooltip.blafcraft.magic_block.tooltip": "This block is very MaGiCal",
-  "tooltip.blafcraft.chisel.shift_down": "cool item lele",
+  "tooltip.blafcraft.chisel.shift_down": "cool item lelele",
   "tooltip.blafcraft.chisel" : "Press Shift for more information",
   "tooltip.blafcraft.radish.tooltip": "Yummy",
+
+  "tooltip.blafcraft.press_shift_to_take_a_look": "Press Shift to take a look",
+
+  "tooltip.blafcraft.stimulator": "Increases effect strength, but gonna be bad after",
 
   "effect.blafcraft.slimey": "Slimey",
   "effect.blafcraft.creation_step": "Creation Step",

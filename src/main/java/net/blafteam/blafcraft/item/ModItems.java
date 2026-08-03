@@ -146,6 +146,9 @@ public class ModItems {
     public static final DeferredItem<Item> STIMULATOR_RESISTANCE = ITEMS.register("stimulator_resistance",
             () -> new StimulatorItem(new Item.Properties().stacksTo(1)));
 
+    public static final DeferredItem<Item> RELIC = ITEMS.register("relic",
+            () -> new RelicItem(new Item.Properties().stacksTo(1)));
+
 
 
     public static void register(IEventBus eventBus) {
