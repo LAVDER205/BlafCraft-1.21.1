@@ -68,6 +68,6 @@ public class HighlightRenderer {
         outlineBuffer.endOutlineBatch();
     }
 
-    // PacketDistributor.sendToPlayer((ServerPlayer) player, new HighlightEntityPacket(targetEntity.getId(), true)); - highlight
-    // PacketDistributor.sendToPlayer((ServerPlayer) player, new HighlightEntityPacket(targetEntity.getId(), false)); - off highlight
+    // PacketDistributor.sendToPlayer((ServerPlayer) player, new HighlightEntityPacket(targetEntity.getId(), true)); - highlight on
+    // PacketDistributor.sendToPlayer((ServerPlayer) player, new HighlightEntityPacket(targetEntity.getId(), false)); - highlight off
 }
