@@ -2,6 +2,7 @@ package net.blafteam.blafcraft.event;
 
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.component.ModDataComponents;
+import net.blafteam.blafcraft.custom.HighlightEntityPacket;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.item.custom.HammerItem;
@@ -403,10 +404,13 @@ public class ModEvents {
         LivingEntity livingEntity = event.getEntity();
         Entity targetEntity = event.getTarget();
 
-        if (targetEntity instanceof LivingEntity && livingEntity.hasEffect(ModEffects.TIME_BOMB_EFFECT) && livingEntity.getEffect(ModEffects.TIME_BOMB_EFFECT).getAmplifier() == 1) {
-            int duration = Objects.requireNonNull(livingEntity.getEffect(ModEffects.TIME_BOMB_EFFECT)).getDuration();
-            livingEntity.removeEffect(ModEffects.TIME_BOMB_EFFECT);
-            ((LivingEntity) targetEntity).addEffect(new MobEffectInstance(ModEffects.TIME_BOMB_EFFECT, duration, 0, false, true, true));
+        if (!livingEntity.level().isClientSide) {
+            if (targetEntity instanceof LivingEntity && livingEntity.hasEffect(ModEffects.TIME_BOMB_EFFECT) && livingEntity.getEffect(ModEffects.TIME_BOMB_EFFECT).getAmplifier() == 1) {
+                int duration = Objects.requireNonNull(livingEntity.getEffect(ModEffects.TIME_BOMB_EFFECT)).getDuration();
+                livingEntity.removeEffect(ModEffects.TIME_BOMB_EFFECT);
+                ((LivingEntity) targetEntity).addEffect(new MobEffectInstance(ModEffects.TIME_BOMB_EFFECT, duration, 0, false, true, true));
+                PacketDistributor.sendToPlayer((ServerPlayer) livingEntity, new HighlightEntityPacket(targetEntity.getId(), true));
+            }
         }
     }
 

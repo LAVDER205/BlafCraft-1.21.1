@@ -1,6 +1,8 @@
 package net.blafteam.blafcraft.event;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.custom.ClientHighlightHandler;
+import net.blafteam.blafcraft.custom.HighlightEntityPacket;
 import net.blafteam.blafcraft.mana.ClientManaHandler;
 import net.blafteam.blafcraft.mana.ManaSyncPayload;
 import net.blafteam.blafcraft.sound.ClientPacketHandler;
@@ -30,5 +32,7 @@ public class ClientModBusEvents { // регистрация пакета на к
                 ManaSyncPayload.STREAM_CODEC,
                 ClientManaHandler::handle
         );
+
+        registrar.playToClient(HighlightEntityPacket.TYPE, HighlightEntityPacket.STREAM_CODEC, ClientHighlightHandler::handle);
     }
 }
