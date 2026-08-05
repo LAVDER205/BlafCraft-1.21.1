@@ -45,6 +45,9 @@ public class ModEffects {
     public static final Holder<MobEffect> FIERY_TOUCH_EFFECT = MOB_EFFECTS.register("fiery_touch",
             () -> new FieryTouchEffect(MobEffectCategory.BENEFICIAL, 0xED4A2B));
 
+    public static final Holder<MobEffect> TIME_BOMB_EFFECT = MOB_EFFECTS.register("time_bomb",
+            () -> new TimeBombEffect(MobEffectCategory.HARMFUL, 0x000000));
+
 
     public static void register(IEventBus eventBus) {
         MOB_EFFECTS.register(eventBus);

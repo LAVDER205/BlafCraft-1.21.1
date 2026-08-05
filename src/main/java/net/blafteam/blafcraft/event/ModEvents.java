@@ -12,9 +12,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -29,6 +32,7 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -368,6 +372,60 @@ public class ModEvents {
         if (targetEntity instanceof LivingEntity && livingEntity.hasEffect(ModEffects.FIERY_TOUCH_EFFECT)) {
             int amplifier = Objects.requireNonNull(livingEntity.getEffect(ModEffects.FIERY_TOUCH_EFFECT)).getAmplifier();
             targetEntity.igniteForTicks(60 + (20 * amplifier));
+        }
+    }
+
+    // -------------------------------- TIME BOMB LOGIC -------------------------------
+    private static final ResourceLocation TIME_BOMB_ID =
+            ResourceLocation.fromNamespaceAndPath("blafcraft", "time_bomb");
+
+    @SubscribeEvent
+    public static void onTimeBombEffectExpired(MobEffectEvent.Expired event) {
+        Holder<MobEffect> holder = event.getEffectInstance().getEffect();
+        int amplifier = event.getEffectInstance().getAmplifier();
+        Entity entity = event.getEntity();
+
+        if (holder.getKey() != null && holder.getKey().location().equals(TIME_BOMB_ID)) {
+            if (event.getEntity().level() instanceof ServerLevel serverLevel) {
+                if (amplifier == 1)
+                    serverLevel.explode(entity, entity.getX(), entity.getY(), entity.getZ(), 10.0f, false, Level.ExplosionInteraction.TRIGGER);
+                else if (amplifier == 0) {
+                    serverLevel.explode(entity, entity.getX(), entity.getY(), entity.getZ(), 1.5f, false, Level.ExplosionInteraction.TRIGGER);
+                    entity.hurt(entity.damageSources().explosion(null), 6);
+                    launchUp(entity, 1);
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onHitWithTimeBomb(AttackEntityEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        Entity targetEntity = event.getTarget();
+
+        if (targetEntity instanceof LivingEntity && livingEntity.hasEffect(ModEffects.TIME_BOMB_EFFECT) && livingEntity.getEffect(ModEffects.TIME_BOMB_EFFECT).getAmplifier() == 1) {
+            int duration = Objects.requireNonNull(livingEntity.getEffect(ModEffects.TIME_BOMB_EFFECT)).getDuration();
+            livingEntity.removeEffect(ModEffects.TIME_BOMB_EFFECT);
+            ((LivingEntity) targetEntity).addEffect(new MobEffectInstance(ModEffects.TIME_BOMB_EFFECT, duration, 0, false, true, true));
+        }
+    }
+
+    public static void launchUp(Entity entity, double strength) {
+        if (entity.level().isClientSide) return;
+
+
+        entity.setPos(entity.getX(), entity.getY() + 0.5, entity.getZ());
+        entity.setOnGround(false);
+        entity.hasImpulse = true;
+
+
+        entity.setDeltaMovement(entity.getDeltaMovement().x, strength, entity.getDeltaMovement().z);
+
+
+        if (entity instanceof ServerPlayer player) {
+            player.connection.send(new ClientboundSetEntityMotionPacket(player));
+        } else if (entity.level() instanceof ServerLevel serverLevel) {
+            serverLevel.getChunkSource().broadcast(entity, new ClientboundSetEntityMotionPacket(entity));
         }
     }
 }

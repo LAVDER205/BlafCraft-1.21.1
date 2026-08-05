@@ -7,7 +7,8 @@ public enum ActionType {
     CREATION_STEP(0, 0, 0),
     TELEPORT_DASH(2, 0, 10),
     TELEPORT_GLANCE(20, 0, 40),
-    BLOODLUST(0, 0, 0);
+    BLOODLUST(0, 0, 0),
+    TIME_BOMB(400, 0, 0);
 
     private final int cooldownTicks;
     private final int exp_price;

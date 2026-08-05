@@ -73,7 +73,6 @@ public class ServerHandler {
                 switch (action) {
                     case TEST -> {
 
-
                     }
                     case ARROW -> {
                         shootArrow(player);
@@ -146,6 +145,10 @@ public class ServerHandler {
 
                     case BLOODLUST -> {
                         player.addEffect(new MobEffectInstance(ModEffects.BLOODLUST_EFFECT, 1200, 0));
+                        debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
+                    }
+                    case TIME_BOMB -> {
+                        player.addEffect(new MobEffectInstance(ModEffects.TIME_BOMB_EFFECT, 200, 1, false, true, true));
                         debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
                     }
                 }
