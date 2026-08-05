@@ -72,8 +72,7 @@ public class ServerHandler {
                 // Выполняем действие
                 switch (action) {
                     case TEST -> {
-                        player.addEffect(new MobEffectInstance(ModEffects.TIME_BOMB_EFFECT, 200, 1, false, true, true));
-                        debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
+
                     }
                     case ARROW -> {
                         shootArrow(player);

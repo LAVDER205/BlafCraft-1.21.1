@@ -409,7 +409,6 @@ public class ModEvents {
                 int duration = Objects.requireNonNull(livingEntity.getEffect(ModEffects.TIME_BOMB_EFFECT)).getDuration();
                 livingEntity.removeEffect(ModEffects.TIME_BOMB_EFFECT);
                 ((LivingEntity) targetEntity).addEffect(new MobEffectInstance(ModEffects.TIME_BOMB_EFFECT, duration, 0, false, true, true));
-                PacketDistributor.sendToPlayer((ServerPlayer) livingEntity, new HighlightEntityPacket(targetEntity.getId(), true));
             }
         }
     }
