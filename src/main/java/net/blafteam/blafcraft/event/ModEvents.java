@@ -1,9 +1,9 @@
 package net.blafteam.blafcraft.event;
 
 import net.blafteam.blafcraft.BlafCraft;
-import net.blafteam.blafcraft.component.ModDataComponents;
-import net.blafteam.blafcraft.custom.HighlightEntityPacket;
 import net.blafteam.blafcraft.effect.ModEffects;
+import net.blafteam.blafcraft.highlight.HighlightEntityPacket;
+import net.blafteam.blafcraft.highlight.HighlightManager;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.item.custom.HammerItem;
 import net.blafteam.blafcraft.potion.ModPotions;
@@ -17,15 +17,12 @@ import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -38,7 +35,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
+import net.neoforged.neoforge.common.EffectCure;
+import net.neoforged.neoforge.common.EffectCures;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
@@ -300,7 +298,10 @@ public class ModEvents {
     public static void onBloodlustEffectRemove(MobEffectEvent.Remove event) {
         Holder<MobEffect> holder = event.getEffect();
         if (holder.getKey() != null && holder.getKey().location().equals(BLOODLUST_ID)) {
-            if (event.getEntity() instanceof ServerPlayer player) {
+            EffectCure effectCure = event.getCure();
+            if (effectCure != null && effectCure.equals(EffectCures.MILK)) {
+                event.setCanceled(true);
+            } else if (event.getEntity() instanceof ServerPlayer player) {
                 PacketDistributor.sendToPlayer(player, new LoopingSoundPayload(ModSounds.HEARTBEAT.get(), 1.4f, 1.0f, false));
             }
         }
@@ -332,6 +333,9 @@ public class ModEvents {
     private static final ResourceLocation OVERDOSE_ID =
             ResourceLocation.fromNamespaceAndPath("blafcraft", "overdose");
 
+    private static final ResourceLocation POTION_SICKNESS_ID =
+            ResourceLocation.fromNamespaceAndPath("blafcraft", "potion_sickness");
+
     @SubscribeEvent
     public static void onOverdoseEffectExpired(MobEffectEvent.Expired event) {
         Holder<MobEffect> holder = event.getEffectInstance().getEffect();
@@ -346,6 +350,18 @@ public class ModEvents {
         if (livingEntity.hasEffect(ModEffects.POTION_SICKNESS_EFFECT)) {
             float currentDamage = event.getNewDamage();
             event.setNewDamage(currentDamage * 1.5f);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPotionSicknessRemovedWithMilk(MobEffectEvent.Remove event) {
+        Holder<MobEffect> holder = event.getEffect();
+        if (holder.getKey() != null && holder.getKey().location().equals(POTION_SICKNESS_ID)) {
+            assert event.getCure() != null;
+            EffectCure effectCure = event.getCure();
+            if (effectCure != null && effectCure.equals(EffectCures.MILK)) {
+                event.setCanceled(true);
+            }
         }
     }
 
@@ -381,6 +397,17 @@ public class ModEvents {
             ResourceLocation.fromNamespaceAndPath("blafcraft", "time_bomb");
 
     @SubscribeEvent
+    public static void onTimeBombRemovedWithMilk(MobEffectEvent.Remove event) {
+        Holder<MobEffect> holder = event.getEffect();
+        if (holder.getKey() != null && holder.getKey().location().equals(TIME_BOMB_ID)) {
+            EffectCure effectCure = event.getCure();
+            if (effectCure != null && effectCure.equals(EffectCures.MILK)) {
+                event.setCanceled(true);
+            }
+        }
+    }
+
+    @SubscribeEvent
     public static void onTimeBombEffectExpired(MobEffectEvent.Expired event) {
         Holder<MobEffect> holder = event.getEffectInstance().getEffect();
         int amplifier = event.getEffectInstance().getAmplifier();
@@ -409,6 +436,7 @@ public class ModEvents {
                 int duration = Objects.requireNonNull(livingEntity.getEffect(ModEffects.TIME_BOMB_EFFECT)).getDuration();
                 livingEntity.removeEffect(ModEffects.TIME_BOMB_EFFECT);
                 ((LivingEntity) targetEntity).addEffect(new MobEffectInstance(ModEffects.TIME_BOMB_EFFECT, duration, 0, false, true, true));
+                HighlightManager.highlight((ServerPlayer) livingEntity, targetEntity, 1.0f, 1.0f, 1.0f);
             }
         }
     }
@@ -429,6 +457,21 @@ public class ModEvents {
             player.connection.send(new ClientboundSetEntityMotionPacket(player));
         } else if (entity.level() instanceof ServerLevel serverLevel) {
             serverLevel.getChunkSource().broadcast(entity, new ClientboundSetEntityMotionPacket(entity));
+        }
+    }
+
+    // -------------------------------- SCULK INFECTION LOGIC -------------------------------
+    private static final ResourceLocation SCULK_INFECTION_ID =
+            ResourceLocation.fromNamespaceAndPath("blafcraft", "sculk_infection");
+
+    @SubscribeEvent
+    public static void onSculkInfectionRemovedWithMilk(MobEffectEvent.Remove event) {
+        Holder<MobEffect> holder = event.getEffect();
+        if (holder.getKey() != null && holder.getKey().location().equals(SCULK_INFECTION_ID)) {
+            EffectCure effectCure = event.getCure();
+            if (effectCure != null && effectCure.equals(EffectCures.MILK)) {
+                event.setCanceled(true);
+            }
         }
     }
 }

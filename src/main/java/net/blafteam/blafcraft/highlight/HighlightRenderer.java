@@ -1,4 +1,4 @@
-package net.blafteam.blafcraft.custom;
+package net.blafteam.blafcraft.highlight;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.blafteam.blafcraft.BlafCraft;
@@ -33,27 +33,30 @@ public class HighlightRenderer {
         Vec3 cameraPos = camera.getPosition();
         float partialTick = event.getPartialTick().getGameTimeDeltaTicks();
 
-        for (Integer id : ClientHighlightHandler.highlightedEntityIds) {
+        for (Integer id : ClientHighlightHandler.highlightedEntities.keySet()) {
             Entity entity = level.getEntity(id);
             if (entity == null) continue;
 
-            // Интерполированные координаты сущности
+            float[] color = ClientHighlightHandler.getHighlightColor(entity);
+            if (color == null) continue;
+
             double x = Mth.lerp(partialTick, entity.xOld, entity.getX());
             double y = Mth.lerp(partialTick, entity.yOld, entity.getY());
             double z = Mth.lerp(partialTick, entity.zOld, entity.getZ());
             float yRot = Mth.lerp(partialTick, entity.yRotO, entity.getYRot());
 
-            // Сохраняем матрицу, сдвигаем к позиции камеры
             poseStack.pushPose();
             poseStack.translate(x - cameraPos.x, y - cameraPos.y, z - cameraPos.z);
 
-            // Цвет обводки (R, G, B, A)
-            outlineBuffer.setColor(255, 0, 0, 0); // 255 max
+            // Преобразуем 0..1 → 0..255
+            int red   = (int)(color[0] * 255);
+            int green = (int)(color[1] * 255);
+            int blue  = (int)(color[2] * 255);
+            outlineBuffer.setColor(red, green, blue, 0); // альфа оставляем 0 (полная непрозрачность)
 
-            // Рендерим сущность в буфер обводки
             dispatcher.render(
                     entity,
-                    0.0, 0.0, 0.0, // теперь относительно сдвинутой матрицы
+                    0.0, 0.0, 0.0,
                     yRot,
                     partialTick,
                     poseStack,
@@ -61,13 +64,15 @@ public class HighlightRenderer {
                     15728880
             );
 
-            poseStack.popPose(); // восстанавливаем матрицу
+            poseStack.popPose();
         }
 
-        // Завершаем пакет обводок для применения шейдера
         outlineBuffer.endOutlineBatch();
     }
-
-    // PacketDistributor.sendToPlayer((ServerPlayer) player, new HighlightEntityPacket(targetEntity.getId(), true)); - highlight on
-    // PacketDistributor.sendToPlayer((ServerPlayer) player, new HighlightEntityPacket(targetEntity.getId(), false)); - highlight off
 }
+
+  // Подсветить сущность оранжевым (1.0, 0.5, 0.0)
+//PacketDistributor.sendToPlayer((ServerPlayer) player, new HighlightEntityPacket(targetEntity.getId(), true, 1.0f, 0.5f, 0.0f));
+//
+  // Убрать подсветку
+//PacketDistributor.sendToPlayer((ServerPlayer) player, new HighlightEntityPacket(targetEntity.getId(), false, 0f, 0f, 0f));

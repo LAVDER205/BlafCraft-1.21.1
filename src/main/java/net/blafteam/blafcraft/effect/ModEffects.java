@@ -48,6 +48,18 @@ public class ModEffects {
     public static final Holder<MobEffect> TIME_BOMB_EFFECT = MOB_EFFECTS.register("time_bomb",
             () -> new TimeBombEffect(MobEffectCategory.HARMFUL, 0x000000));
 
+    public static final Holder<MobEffect> SCULK_INFECTION_EFFECT = MOB_EFFECTS.register("sculk_infection",
+            () -> new SculkInfectionEffect(MobEffectCategory.NEUTRAL, 0x1A1266)
+                    .addAttributeModifier(Attributes.MOVEMENT_SPEED,
+                            ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "sculk_infection"), 0.2f,
+                            AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+                    .addAttributeModifier(Attributes.MAX_HEALTH ,
+                            ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "sculk_infection"), 0.2f,
+                            AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+                    .addAttributeModifier(Attributes.ATTACK_DAMAGE,
+                            ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "sculk_infection"), 0.2f,
+                            AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+
 
     public static void register(IEventBus eventBus) {
         MOB_EFFECTS.register(eventBus);
