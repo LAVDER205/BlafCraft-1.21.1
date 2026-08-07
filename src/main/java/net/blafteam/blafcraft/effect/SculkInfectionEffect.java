@@ -35,7 +35,7 @@ public class SculkInfectionEffect extends MobEffect {
                 if (!serverPlayer.equals(entity)) {
                     double distanceSqr = serverPlayer.distanceToSqr(entity);
                     if (HighlightManager.isHighlighted(serverPlayer, entity) && distanceSqr > radius_of_visibility * radius_of_visibility) {
-                        HighlightManager.unhighlight(serverPlayer, entity);
+                        HighlightManager.scheduleUnhighlight(serverPlayer, entity, 20);
                     } else if (!HighlightManager.isHighlighted(serverPlayer, entity) && distanceSqr <= radius_of_visibility * radius_of_visibility) {
                         HighlightManager.highlight(serverPlayer, entity, 1, 1, 1);
                     }

@@ -6,17 +6,22 @@ import net.blafteam.blafcraft.highlight.HighlightEntityPacket;
 import net.blafteam.blafcraft.highlight.HighlightManager;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.item.custom.HammerItem;
+import net.blafteam.blafcraft.keybinds.ServerHandler;
 import net.blafteam.blafcraft.potion.ModPotions;
 import net.blafteam.blafcraft.sound.LoopingSoundPayload;
 import net.blafteam.blafcraft.sound.ModSounds;
+import net.minecraft.client.resources.sounds.Sound;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -32,9 +37,11 @@ import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
 import net.neoforged.neoforge.common.EffectCure;
 import net.neoforged.neoforge.common.EffectCures;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
@@ -46,9 +53,12 @@ import net.neoforged.neoforge.event.entity.player.CriticalHitEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -464,6 +474,8 @@ public class ModEvents {
     private static final ResourceLocation SCULK_INFECTION_ID =
             ResourceLocation.fromNamespaceAndPath("blafcraft", "sculk_infection");
 
+    private static final double DETECTION_RADIUS = 50.0;
+
     @SubscribeEvent
     public static void onSculkInfectionRemovedWithMilk(MobEffectEvent.Remove event) {
         Holder<MobEffect> holder = event.getEffect();
@@ -471,6 +483,83 @@ public class ModEvents {
             EffectCure effectCure = event.getCure();
             if (effectCure != null && effectCure.equals(EffectCures.MILK)) {
                 event.setCanceled(true);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onSoundPlayed(PlaySoundEvent event) {
+        if (event.getSound() != null) {
+            if (event.getSound().getSource() != SoundSource.HOSTILE
+                    && event.getSound().getSource() != SoundSource.NEUTRAL
+                    && event.getSound().getSource() != SoundSource.PLAYERS) {
+                return;
+            }
+
+            Entity source = findEntityAtSoundPosition(event.getSound());
+            if (!(source instanceof LivingEntity living)) return;
+
+            ServerLevel level = (ServerLevel) living.level();
+            double radius = 50.0;
+            Vec3 pos = living.position();
+            AABB area = new AABB(pos.subtract(radius, radius, radius), pos.add(radius, radius, radius));
+
+            List<ServerPlayer> affectedPlayers = level.getEntitiesOfClass(ServerPlayer.class, area,
+                    p -> p.hasEffect(ModEffects.SCULK_INFECTION_EFFECT) && !p.equals(living));
+
+            for (ServerPlayer player : affectedPlayers) {
+                if (!HighlightManager.isHighlighted(player, living)) {
+                    HighlightManager.highlight(player, living, 1.0f, 1.0f, 1.0f);
+                    HighlightManager.scheduleUnhighlight(player, living, 20);
+                }
+            }
+        }
+    }
+
+    private static Entity findEntityAtSoundPosition(SoundInstance sound) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null) return null;
+
+        double x = sound.getX();
+        double y = sound.getY();
+        double z = sound.getZ();
+
+        // Ищем во всех загруженных мирах
+        for (ServerLevel level : server.getAllLevels()) {
+            // Получаем всех сущностей в маленьком кубике вокруг звука
+            List<Entity> candidates = level.getEntitiesOfClass(Entity.class,
+                    new AABB(x - 0.5, y - 0.5, z - 0.5, x + 0.5, y + 0.5, z + 0.5));
+            for (Entity e : candidates) {
+                // Точная проверка (расстояние меньше 0.1 блока)
+                if (e.position().distanceToSqr(x, y, z) < 0.01) {
+                    return e;
+                }
+            }
+        }
+        return null;
+    }
+
+    @SubscribeEvent
+    public static void onServerTick(ServerTickEvent.Post event) {
+        ServerLevel level = ServerLifecycleHooks.getCurrentServer().getLevel(Level.OVERWORLD);
+        if (level == null) return;
+
+        for (ServerPlayer player : level.players()) {
+            if (!player.hasEffect(ModEffects.SCULK_INFECTION_EFFECT)) continue;
+
+            List<ServerPlayer> nearbyPlayers = level.getEntitiesOfClass(ServerPlayer.class,
+                    new AABB(player.position().subtract(DETECTION_RADIUS, DETECTION_RADIUS, DETECTION_RADIUS),
+                            player.position().add(DETECTION_RADIUS, DETECTION_RADIUS, DETECTION_RADIUS)),
+                    other -> !other.equals(player)
+                            && other.getDeltaMovement().lengthSqr() > 0.0001
+                            && !other.isCrouching()
+            );
+
+            for (ServerPlayer noisy : nearbyPlayers) {
+                if (!HighlightManager.isHighlighted(player, noisy)) {
+                    HighlightManager.highlight(player, noisy, 1.0f, 1.0f, 1.0f);
+                    HighlightManager.scheduleUnhighlight(player, noisy, 20);
+                }
             }
         }
     }
