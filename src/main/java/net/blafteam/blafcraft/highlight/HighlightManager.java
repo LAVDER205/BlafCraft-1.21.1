@@ -75,23 +75,33 @@ public class HighlightManager {
     }
 
     // --- Планирование выключения ---
-    public static void scheduleUnhighlight(ServerPlayer player, Entity entity, int delayTicks) {
+    public static void scheduleUnhighlightWithoutUpdate(ServerPlayer player, Entity entity, int delayTicks) {
         Map<Integer, Integer> map = pendingRemovals.computeIfAbsent(player.getUUID(), k -> new HashMap<>());
         if (map.containsKey(entity.getId())) {
-            return; // уже запланировано – не сбрасываем таймер
+            return; // уже запланировано – игнорируем
         }
         // Отменяем возможное запланированное включение для этой же сущности
         cancelPendingHighlight(player, entity);
         map.put(entity.getId(), delayTicks);
     }
+    // --- Планирование выключения ---
+    public static void scheduleUnhighlightWithUpdate(ServerPlayer player, Entity entity, int delayTicks) {
+        Map<Integer, Integer> map = pendingRemovals.computeIfAbsent(player.getUUID(), k -> new HashMap<>());
+        map.put(entity.getId(), delayTicks);
+    }
 
     // --- Планирование включения ---
-    public static void scheduleHighlight(ServerPlayer player, Entity entity, float r, float g, float b, int delayTicks) {
+    public static void scheduleHighlightWithoutUpdate(ServerPlayer player, Entity entity, float r, float g, float b, int delayTicks) {
         Map<Integer, ScheduledHighlight> map = pendingHighlights.computeIfAbsent(player.getUUID(), k -> new HashMap<>());
         if (map.containsKey(entity.getId())) {
             return; // уже запланировано – игнорируем
         }
         cancelPendingRemoval(player, entity);
+        map.put(entity.getId(), new ScheduledHighlight(r, g, b, delayTicks));
+    }
+    // --- Планирование включения ---
+    public static void scheduleHighlightWithUpdate(ServerPlayer player, Entity entity, float r, float g, float b, int delayTicks) {
+        Map<Integer, ScheduledHighlight> map = pendingHighlights.computeIfAbsent(player.getUUID(), k -> new HashMap<>());
         map.put(entity.getId(), new ScheduledHighlight(r, g, b, delayTicks));
     }
 

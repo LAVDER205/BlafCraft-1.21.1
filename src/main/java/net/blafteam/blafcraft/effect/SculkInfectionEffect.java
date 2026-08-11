@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
 import java.util.List;
+import java.util.Objects;
 
 public class SculkInfectionEffect extends MobEffect {
     protected SculkInfectionEffect(MobEffectCategory category, int color) {
@@ -25,7 +26,7 @@ public class SculkInfectionEffect extends MobEffect {
             double y = livingEntity.getY();
             double z = livingEntity.getZ();
             Level level = livingEntity.level();
-            double radius_of_list = 100.0;
+            double radius_of_list = 50.0;
             double radius_of_visibility = 3.6;
             AABB area = new AABB(x - radius_of_list, y - radius_of_list, z - radius_of_list,
                     x + radius_of_list, y + radius_of_list, z + radius_of_list);
@@ -34,8 +35,13 @@ public class SculkInfectionEffect extends MobEffect {
             for (LivingEntity entity : entitiesInRange) {
                 if (!serverPlayer.equals(entity)) {
                     double distanceSqr = serverPlayer.distanceToSqr(entity);
-                    if (HighlightManager.isHighlighted(serverPlayer, entity) && distanceSqr > radius_of_visibility * radius_of_visibility) {
-                        HighlightManager.scheduleUnhighlight(serverPlayer, entity, 20);
+                    if (!HighlightManager.isHighlighted(serverPlayer, entity) && entity.hasEffect(ModEffects.SCULK_MARK_EFFECT) && Objects.requireNonNull(entity.getEffect(ModEffects.SCULK_MARK_EFFECT)).getAmplifier() == 0) {
+                        HighlightManager.highlight(serverPlayer, entity, 1, 0, 0);
+                    } else if (HighlightManager.isHighlighted(serverPlayer, entity) && distanceSqr > radius_of_visibility * radius_of_visibility && !entity.hasEffect(ModEffects.SCULK_MARK_EFFECT)) {
+                        HighlightManager.scheduleUnhighlightWithoutUpdate(serverPlayer, entity, 20);
+                    } else if (HighlightManager.isHighlighted(serverPlayer, entity) && distanceSqr <= radius_of_visibility * radius_of_visibility && !entity.hasEffect(ModEffects.SCULK_MARK_EFFECT)) {
+                        HighlightManager.unhighlight(serverPlayer, entity);
+                        HighlightManager.highlight(serverPlayer, entity, 1, 1, 1);
                     } else if (!HighlightManager.isHighlighted(serverPlayer, entity) && distanceSqr <= radius_of_visibility * radius_of_visibility) {
                         HighlightManager.highlight(serverPlayer, entity, 1, 1, 1);
                     }

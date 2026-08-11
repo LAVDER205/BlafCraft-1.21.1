@@ -27,6 +27,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -446,7 +447,6 @@ public class ModEvents {
                 int duration = Objects.requireNonNull(livingEntity.getEffect(ModEffects.TIME_BOMB_EFFECT)).getDuration();
                 livingEntity.removeEffect(ModEffects.TIME_BOMB_EFFECT);
                 ((LivingEntity) targetEntity).addEffect(new MobEffectInstance(ModEffects.TIME_BOMB_EFFECT, duration, 0, false, true, true));
-                HighlightManager.highlight((ServerPlayer) livingEntity, targetEntity, 1.0f, 1.0f, 1.0f);
             }
         }
     }
@@ -474,7 +474,7 @@ public class ModEvents {
     private static final ResourceLocation SCULK_INFECTION_ID =
             ResourceLocation.fromNamespaceAndPath("blafcraft", "sculk_infection");
 
-    private static final double DETECTION_RADIUS = 50.0;
+    private static final double DETECTION_RADIUS = 25.0;
 
     @SubscribeEvent
     public static void onSculkInfectionRemovedWithMilk(MobEffectEvent.Remove event) {
@@ -510,7 +510,7 @@ public class ModEvents {
             for (ServerPlayer player : affectedPlayers) {
                 if (!HighlightManager.isHighlighted(player, living)) {
                     HighlightManager.highlight(player, living, 1.0f, 1.0f, 1.0f);
-                    HighlightManager.scheduleUnhighlight(player, living, 20);
+                    HighlightManager.scheduleUnhighlightWithUpdate(player, living, 20);
                 }
             }
         }
@@ -547,6 +547,7 @@ public class ModEvents {
         for (ServerPlayer player : level.players()) {
             if (!player.hasEffect(ModEffects.SCULK_INFECTION_EFFECT)) continue;
 
+            // --- 1. Движущиеся игроки (кроме крадущихся) ---
             List<ServerPlayer> nearbyPlayers = level.getEntitiesOfClass(ServerPlayer.class,
                     new AABB(player.position().subtract(DETECTION_RADIUS, DETECTION_RADIUS, DETECTION_RADIUS),
                             player.position().add(DETECTION_RADIUS, DETECTION_RADIUS, DETECTION_RADIUS)),
@@ -558,9 +559,69 @@ public class ModEvents {
             for (ServerPlayer noisy : nearbyPlayers) {
                 if (!HighlightManager.isHighlighted(player, noisy)) {
                     HighlightManager.highlight(player, noisy, 1.0f, 1.0f, 1.0f);
-                    HighlightManager.scheduleUnhighlight(player, noisy, 20);
+                    HighlightManager.scheduleUnhighlightWithUpdate(player, noisy, 20);
                 }
             }
+
+            // --- 2. Движущиеся мобы (только горизонтальное перемещение) ---
+            List<Mob> nearbyMobs = level.getEntitiesOfClass(Mob.class,
+                    new AABB(player.position().subtract(DETECTION_RADIUS, DETECTION_RADIUS, DETECTION_RADIUS),
+                            player.position().add(DETECTION_RADIUS, DETECTION_RADIUS, DETECTION_RADIUS)),
+                    mob -> {
+                        Vec3 motion = mob.getDeltaMovement();
+                        // Учитываем только горизонтальную скорость, игнорируем Y (гравитацию)
+                        double horizSqr = motion.x * motion.x + motion.z * motion.z;
+                        return horizSqr > 0.001; // порог чуть выше, чем 0.0001
+                    }
+            );
+
+            for (Mob mob : nearbyMobs) {
+                if (!HighlightManager.isHighlighted(player, mob)) {
+                    HighlightManager.highlight(player, mob, 1.0f, 1.0f, 1.0f);
+                    HighlightManager.scheduleUnhighlightWithUpdate(player, mob, 20);
+                }
+            }
+        }
+    }
+
+    // -------------------------------- FREE FLIGHT LOGIC -------------------------------
+    @SubscribeEvent
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        Player player = event.getEntity();
+        if (!player.hasEffect(ModEffects.FREE_FLIGHT_EFFECT)) {
+            return;
+        }
+
+        if (!player.isFallFlying()) {
+            player.startFallFlying();
+        }
+    }
+
+    // -------------------------------- SCULK MARK LOGIC -------------------------------
+    @SubscribeEvent
+    public static void onHitWithSculkMark(AttackEntityEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        Entity targetEntity = event.getTarget();
+
+        if (!livingEntity.level().isClientSide) {
+            if (targetEntity instanceof LivingEntity && livingEntity.hasEffect(ModEffects.SCULK_MARK_EFFECT) && Objects.requireNonNull(livingEntity.getEffect(ModEffects.SCULK_MARK_EFFECT)).getAmplifier() == 1) {
+                livingEntity.removeEffect(ModEffects.SCULK_MARK_EFFECT);
+                livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200, 0, false, false, true));
+                ((LivingEntity) targetEntity).addEffect(new MobEffectInstance(ModEffects.SCULK_MARK_EFFECT, 200, 0, false, false, true));
+                HighlightManager.highlight((ServerPlayer) livingEntity, targetEntity, 1.0f, 0, 0);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onSculkMarkDamaged(LivingDamageEvent.Pre event) {
+        LivingEntity targetEntity = event.getEntity();
+        if (targetEntity.hasEffect(ModEffects.SCULK_MARK_EFFECT) &&
+                Objects.requireNonNull(targetEntity.getEffect(ModEffects.SCULK_MARK_EFFECT)).getAmplifier() == 0 &&
+                event.getSource().getEntity() instanceof LivingEntity livingEntity &&
+                livingEntity.hasEffect(ModEffects.SCULK_INFECTION_EFFECT)) {
+            float currentDamage = event.getNewDamage();
+            event.setNewDamage(currentDamage * 1.5f);
         }
     }
 }

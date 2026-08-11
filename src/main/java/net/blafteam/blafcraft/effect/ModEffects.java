@@ -60,6 +60,12 @@ public class ModEffects {
                             ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "sculk_infection"), 0.2f,
                             AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
+    public static final Holder<MobEffect> FREE_FLIGHT_EFFECT = MOB_EFFECTS.register("free_flight",
+            () -> new FreeFlightEffect(MobEffectCategory.BENEFICIAL, 0xFFFFFF));
+
+    public static final Holder<MobEffect> SCULK_MARK_EFFECT = MOB_EFFECTS.register("sculk_mark",
+            () -> new SculkMarkEffect(MobEffectCategory.HARMFUL, 0x1A1266));
+
 
     public static void register(IEventBus eventBus) {
         MOB_EFFECTS.register(eventBus);

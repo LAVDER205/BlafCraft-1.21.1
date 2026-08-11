@@ -49,6 +49,8 @@ public class ModCreativeModeTabs {
 
                         output.accept(ModItems.SCULK_INGOT);
                         output.accept(ModItems.RAW_SCULK);
+                        output.accept(ModItems.SCULK_SWORD);
+                        output.accept(ModItems.SCULK_AXE);
 
                         output.accept(ModItems.RED_FACTON);
                         output.accept(ModItems.ORANGE_FACTON);

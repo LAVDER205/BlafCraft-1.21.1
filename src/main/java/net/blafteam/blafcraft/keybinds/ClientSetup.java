@@ -67,7 +67,7 @@ public class ClientSetup {
                 action = ActionType.BLOODLUST;
             }
             case "Dev" -> {
-                action = ActionType.TEST;
+                action = ActionType.SCULK_MARK;
             }
         }
         else if (event.getKey() == GLFW.GLFW_KEY_C)
@@ -82,7 +82,7 @@ public class ClientSetup {
                 action = ActionType.BLOODLUST;
             }
             case "Dev" -> {
-                action = ActionType.TEST;
+                action = ActionType.START_FLYING;
             }
         }
 

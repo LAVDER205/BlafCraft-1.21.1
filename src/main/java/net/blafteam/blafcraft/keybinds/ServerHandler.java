@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 @EventBusSubscriber(modid = BlafCraft.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class ServerHandler {
+    public static final Set<UUID> playersWantToFly = new HashSet<>();
 
     private static class PendingAction {
         final UUID playerId; // игрок
@@ -149,6 +150,24 @@ public class ServerHandler {
                     }
                     case TIME_BOMB -> {
                         player.addEffect(new MobEffectInstance(ModEffects.TIME_BOMB_EFFECT, 200, 1, false, true, true));
+                        debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
+                    }
+
+                    case START_FLYING -> {
+                        Vec3 look = player.getViewVector(1.0F);
+                        double power = 1.5;
+                        if (!player.onGround() && !player.isFallFlying()) {
+                            player.setDeltaMovement(
+                                    player.getDeltaMovement().add(look.x * power, look.y * power, look.z * power)
+                            );
+                            player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                            player.addEffect(new MobEffectInstance(ModEffects.FREE_FLIGHT_EFFECT, -1, 0, false ,false, false));
+                            debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
+                        }
+                    }
+
+                    case SCULK_MARK -> {
+                        player.addEffect(new MobEffectInstance(ModEffects.SCULK_MARK_EFFECT, 200, 1, false, false, true));
                         debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
                     }
                 }
