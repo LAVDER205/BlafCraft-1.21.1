@@ -66,6 +66,17 @@ public class ModEffects {
     public static final Holder<MobEffect> SCULK_MARK_EFFECT = MOB_EFFECTS.register("sculk_mark",
             () -> new SculkMarkEffect(MobEffectCategory.HARMFUL, 0x1A1266));
 
+    public static final Holder<MobEffect> QUICK_ATTACK_EFFECT = MOB_EFFECTS.register("quick_attack",
+            () -> new QuickAttackEffect(MobEffectCategory.BENEFICIAL, 0xEBB586)
+                    .addAttributeModifier(Attributes.ATTACK_SPEED,
+                    ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "quick_attack"), 0.2f,
+                    AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+
+    public static final Holder<MobEffect> MORPH_EFFECT = MOB_EFFECTS.register("morph",
+            () -> new MorphEffect(MobEffectCategory.NEUTRAL, 0x1A1266).addAttributeModifier(Attributes.MOVEMENT_SPEED,
+                    ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "morph"), -0.45f,
+                    AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+
 
     public static void register(IEventBus eventBus) {
         MOB_EFFECTS.register(eventBus);

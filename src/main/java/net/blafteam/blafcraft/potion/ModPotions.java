@@ -31,6 +31,13 @@ public class ModPotions {
     public static final Holder<Potion> LONG_RESISTANCE_TOUCH_POTION = POTIONS.register("long_resistance_potion",
             () -> new Potion(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 9600, 0)));
 
+    public static final Holder<Potion> QUICK_ATTACK_POTION = POTIONS.register("quick_attack_potion",
+            () -> new Potion(new MobEffectInstance(ModEffects.QUICK_ATTACK_EFFECT, 3600, 0)));
+    public static final Holder<Potion> STRONG_QUICK_ATTACK_POTION = POTIONS.register("strong_quick_attack_potion",
+            () -> new Potion(new MobEffectInstance(ModEffects.QUICK_ATTACK_EFFECT, 1800, 1)));
+    public static final Holder<Potion> LONG_QUICK_ATTACK_POTION = POTIONS.register("long_quick_attack_potion",
+            () -> new Potion(new MobEffectInstance(ModEffects.QUICK_ATTACK_EFFECT, 9600, 0)));
+
     public static void register(IEventBus eventBus) {
         POTIONS.register(eventBus);
     }

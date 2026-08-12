@@ -105,6 +105,7 @@ public class ModEvents {
 
         createStandardPotions(builder, Items.FIRE_CHARGE, ModPotions.FIERY_TOUCH_POTION, ModPotions.STRONG_FIERY_TOUCH_POTION, ModPotions.LONG_FIERY_TOUCH_POTION);
         createStandardPotions(builder, Items.IRON_NUGGET, ModPotions.RESISTANCE_POTION, ModPotions.STRONG_RESISTANCE_POTION, ModPotions.LONG_RESISTANCE_TOUCH_POTION);
+        createStandardPotions(builder, Items.WIND_CHARGE, ModPotions.QUICK_ATTACK_POTION, ModPotions.STRONG_QUICK_ATTACK_POTION, ModPotions.LONG_QUICK_ATTACK_POTION);
     }
 
     private static void createStandardPotions(PotionBrewing.Builder builder, Item item,

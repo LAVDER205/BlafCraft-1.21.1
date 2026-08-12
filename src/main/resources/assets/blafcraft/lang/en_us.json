@@ -47,39 +47,56 @@
   "item.minecraft.potion.effect.slimey_potion": "Slimey Potion",
   "item.minecraft.splash_potion.effect.slimey_potion": "Slimey Splash Potion",
   "item.minecraft.lingering_potion.effect.slimey_potion": "Slimey Lingering Potion",
-  "item.minecraft.tripped_arrow.effect.slimey_potion": "Slimey Arrow",
+  "item.minecraft.tipped_arrow.effect.slimey_potion": "Slimey Arrow",
 
 
   "item.minecraft.potion.effect.fiery_touch_potion": "Fiery Touch Potion",
   "item.minecraft.splash_potion.effect.fiery_touch_potion": "Fiery Touch Splash Potion",
   "item.minecraft.lingering_potion.effect.fiery_touch_potion": "Fiery Touch Lingering Potion",
-  "item.minecraft.tripped_arrow.fiery_touch_potion": "Fiery Touch Arrow",
+  "item.minecraft.tipped_arrow.fiery_touch_potion": "Fiery Touch Arrow",
 
   "item.minecraft.potion.effect.strong_fiery_touch_potion": "Fiery Touch Potion",
   "item.minecraft.splash_potion.effect.strong_fiery_touch_potion": "Fiery Touch Splash Potion",
   "item.minecraft.lingering_potion.effect.strong_fiery_touch_potion": "Fiery Touch Lingering Potion",
-  "item.minecraft.tripped_arrow.strong_fiery_touch_potion": "Fiery Touch Arrow",
+  "item.minecraft.tipped_arrow.strong_fiery_touch_potion": "Fiery Touch Arrow",
 
   "item.minecraft.potion.effect.long_fiery_touch_potion": "Fiery Touch Potion",
   "item.minecraft.splash_potion.effect.long_fiery_touch_potion": "Fiery Touch Splash Potion",
   "item.minecraft.lingering_potion.effect.long_fiery_touch_potion": "Fiery Touch Lingering Potion",
-  "item.minecraft.tripped_arrow.effect.long_fiery_touch_potion": "Fiery Touch Arrow",
+  "item.minecraft.tipped_arrow.effect.long_fiery_touch_potion": "Fiery Touch Arrow",
 
 
   "item.minecraft.potion.effect.resistance_potion": "Potion of Resistance",
   "item.minecraft.splash_potion.effect.resistance_potion": "Splash Potion of Resistance",
   "item.minecraft.lingering_potion.effect.resistance_potion": "Lingering Potion of Resistance",
-  "item.minecraft.tripped_arrow.effect.resistance_potion": "Arrow of Resistance",
+  "item.minecraft.tipped_arrow.effect.resistance_potion": "Arrow of Resistance",
 
   "item.minecraft.potion.effect.strong_resistance_potion": "Potion of Resistance",
   "item.minecraft.splash_potion.effect.strong_resistance_potion": "Splash Potion of Resistance",
   "item.minecraft.lingering_potion.effect.strong_resistance_potion": "Lingering Potion of Resistance",
-  "item.minecraft.tripped_arrow.effect.strong_resistance_potion": "Arrow of Resistance",
+  "item.minecraft.tipped_arrow.effect.strong_resistance_potion": "Arrow of Resistance",
 
   "item.minecraft.potion.effect.long_resistance_potion": "Potion of Resistance",
   "item.minecraft.splash_potion.effect.long_resistance_potion": "Splash Potion of Resistance",
   "item.minecraft.lingering_potion.effect.long_resistance_potion": "Lingering Potion of Resistance",
-  "item.minecraft.tripped_arrow.effect.long_resistance_potion": "Arrow of Resistance",
+  "item.minecraft.tipped_arrow.effect.long_resistance_potion": "Arrow of Resistance",
+
+  "item.minecraft.potion.effect.quick_attack_potion": "Potion of Quick Attack",
+  "item.minecraft.splash_potion.effect.quick_attack_potion": "Splash Potion of Quick Attack",
+  "item.minecraft.lingering_potion.effect.quick_attack_potion": "Lingering Potion of Quick Attack",
+  "item.minecraft.tipped_arrow.effect.quick_attack_potion": "Arrow of Quick Attack",
+
+  "item.minecraft.potion.effect.strong_quick_attack_potion": "Potion of Quick Attack",
+  "item.minecraft.splash_potion.effect.strong_quick_attack_potion": "Splash Potion of Quick Attack",
+  "item.minecraft.lingering_potion.effect.strong_quick_attack_potion": "Lingering Potion of Quick Attack",
+  "item.minecraft.tipped_arrow.effect.strong_quick_attack_potion": "Arrow of Quick Attack",
+
+  "item.minecraft.potion.effect.long_quick_attack_potion": "Potion of Quick Attack",
+  "item.minecraft.splash_potion.effect.long_quick_attack_potion": "Splash Potion of Quick Attack",
+  "item.minecraft.lingering_potion.effect.long_quick_attack_potion": "Lingering Potion of Quick Attack",
+  "item.minecraft.tipped_arrow.effect.long_quick_attack_potion": "Arrow of Quick Attack",
+
+
 
 
   "block.blafcraft.bismuth_block": "Block of Bismuth",
@@ -127,6 +144,7 @@
   "effect.blafcraft.sculk_infection": "Sculk Infection",
   "effect.blafcraft.sculk_mark": "Sculk Mark",
   "effect.blafcraft.free_flight": "Free Flight",
+  "effect.blafcraft.quick_attack": "Quick Attack",
 
   "painting.blafcraft.world.title": "World",
   "painting.blafcraft.world.author": "NanoAttack",
