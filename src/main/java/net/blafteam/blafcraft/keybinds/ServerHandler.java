@@ -153,7 +153,7 @@ public class ServerHandler {
                         debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
                     }
 
-                    case START_FLYING -> {
+                    case FLIGHT -> {
                         Vec3 look = player.getViewVector(1.0F);
                         double power = 1.5;
                         if (!player.onGround() && !player.isFallFlying()) {

@@ -10,9 +10,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.api.distmarker.Dist;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @EventBusSubscriber(modid = BlafCraft.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class ClientSetup {
 
@@ -82,7 +79,7 @@ public class ClientSetup {
                 action = ActionType.BLOODLUST;
             }
             case "Dev" -> {
-                action = ActionType.START_FLYING;
+                action = ActionType.FLIGHT;
             }
         }
 

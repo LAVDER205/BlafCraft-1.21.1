@@ -477,12 +477,31 @@ public class ModEvents {
     private static final double DETECTION_RADIUS = 25.0;
 
     @SubscribeEvent
-    public static void onSculkInfectionRemovedWithMilk(MobEffectEvent.Remove event) {
+    public static void onSculkInfectionRemoved(MobEffectEvent.Remove event) {
+        // MILK
         Holder<MobEffect> holder = event.getEffect();
         if (holder.getKey() != null && holder.getKey().location().equals(SCULK_INFECTION_ID)) {
             EffectCure effectCure = event.getCure();
             if (effectCure != null && effectCure.equals(EffectCures.MILK)) {
                 event.setCanceled(true);
+            }
+            // OTHER
+            if (Objects.requireNonNull(event.getEntity().getEffect(ModEffects.SCULK_INFECTION_EFFECT)).getAmplifier() == 1) {
+                event.getEntity().addEffect(new MobEffectInstance(ModEffects.SCULK_INFECTION_EFFECT, -1, 0, false, false, false));
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onSculkInfectionEffectExpired(MobEffectEvent.Expired event) {
+        assert event.getEffectInstance() != null;
+        Holder<MobEffect> holder = event.getEffectInstance().getEffect();
+        int amplifier = event.getEffectInstance().getAmplifier();
+        Entity entity = event.getEntity();
+
+        if (holder.getKey() != null && holder.getKey().location().equals(SCULK_INFECTION_ID)) {
+            if (Objects.requireNonNull(event.getEntity().getEffect(ModEffects.SCULK_INFECTION_EFFECT)).getAmplifier() == 1) {
+                event.getEntity().addEffect(new MobEffectInstance(ModEffects.SCULK_INFECTION_EFFECT, -1, 0, false, false, false));
             }
         }
     }
@@ -607,6 +626,7 @@ public class ModEvents {
             if (targetEntity instanceof LivingEntity && livingEntity.hasEffect(ModEffects.SCULK_MARK_EFFECT) && Objects.requireNonNull(livingEntity.getEffect(ModEffects.SCULK_MARK_EFFECT)).getAmplifier() == 1) {
                 livingEntity.removeEffect(ModEffects.SCULK_MARK_EFFECT);
                 livingEntity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200, 0, false, false, true));
+                livingEntity.addEffect(new MobEffectInstance(ModEffects.SCULK_INFECTION_EFFECT, 200, 1, false, false, true));
                 ((LivingEntity) targetEntity).addEffect(new MobEffectInstance(ModEffects.SCULK_MARK_EFFECT, 200, 0, false, false, true));
                 HighlightManager.highlight((ServerPlayer) livingEntity, targetEntity, 1.0f, 0, 0);
             }

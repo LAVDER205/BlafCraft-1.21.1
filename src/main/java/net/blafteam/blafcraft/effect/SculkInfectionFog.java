@@ -22,7 +22,7 @@ public class SculkInfectionFog {
         int amplifier = instance.getAmplifier();
         float far = 3.0F;
 
-        event.setFarPlaneDistance(far);
+        event.setFarPlaneDistance(far + (3 * amplifier));
         event.setNearPlaneDistance(far * 0.5F);
         event.setCanceled(true);
     }
