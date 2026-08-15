@@ -1,6 +1,8 @@
 package net.blafteam.blafcraft.keybinds;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.component.FriendManager;
+import net.blafteam.blafcraft.custom.FriendUpdatePacket;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.mana.ManaManager;
 import net.blafteam.blafcraft.mana.ManaSyncPayload;
@@ -11,6 +13,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.LargeFireball;
@@ -49,6 +52,22 @@ public class ServerHandler {
 
     // Храним для каждого игрока (UUID) и для каждого типа действия время последнего использования
     private static final Map<UUID, Map<ActionType, Long>> cooldowns = new HashMap<>();
+
+    public static void handleFriendUpdate(FriendUpdatePacket packet, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.player() instanceof ServerPlayer player) {
+                ServerLevel level = player.serverLevel();
+                Entity target = level.getEntity(packet.targetUUID());
+                if (target instanceof ServerPlayer friend) {
+                    if (packet.add()) {
+                        FriendManager.addFriend(player, friend);
+                    } else {
+                        FriendManager.removeFriend(player, friend);
+                    }
+                }
+            }
+        });
+    }
 
     public static void handle(ActionPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {

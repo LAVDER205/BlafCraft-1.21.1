@@ -1,6 +1,8 @@
 package net.blafteam.blafcraft.event;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.custom.ClientMorphData;
+import net.blafteam.blafcraft.custom.MorphSyncPayload;
 import net.blafteam.blafcraft.highlight.ClientHighlightHandler;
 import net.blafteam.blafcraft.highlight.HighlightEntityPacket;
 import net.blafteam.blafcraft.mana.ClientManaHandler;
@@ -31,6 +33,12 @@ public class ClientModBusEvents { // регистрация пакета на к
                 ManaSyncPayload.TYPE,
                 ManaSyncPayload.STREAM_CODEC,
                 ClientManaHandler::handle
+        );
+
+        registrar.playToClient(
+                MorphSyncPayload.TYPE,
+                MorphSyncPayload.STREAM_CODEC,
+                ClientMorphData::handleMorphSync
         );
 
         registrar.playToClient(HighlightEntityPacket.TYPE, HighlightEntityPacket.STREAM_CODEC, ClientHighlightHandler::handle);

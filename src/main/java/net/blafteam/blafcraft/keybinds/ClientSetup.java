@@ -1,7 +1,10 @@
 package net.blafteam.blafcraft.keybinds;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.custom.FriendUpdatePacket;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.EntityHitResult;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -81,7 +84,12 @@ public class ClientSetup {
             case "Dev" -> {
                 action = ActionType.FLIGHT;
             }
+        } else if (event.getKey() == GLFW.GLFW_KEY_P) {
+            if (mc.hitResult instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof Player target) {
+                PacketDistributor.sendToServer(new FriendUpdatePacket(target.getUUID(), true)); // добавить
+            }
         }
+
 
         if (action != null) { // сработала какая-то способность
             // Отправляем пакет на сервер (сервер сам решит, можно ли выполнить)

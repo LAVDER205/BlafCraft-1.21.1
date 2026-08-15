@@ -1,16 +1,16 @@
 package net.blafteam.blafcraft.event;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.component.FriendManager;
+import net.blafteam.blafcraft.component.ModAttachments;
+import net.blafteam.blafcraft.custom.MorphSyncPayload;
 import net.blafteam.blafcraft.effect.ModEffects;
-import net.blafteam.blafcraft.highlight.HighlightEntityPacket;
 import net.blafteam.blafcraft.highlight.HighlightManager;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.item.custom.HammerItem;
-import net.blafteam.blafcraft.keybinds.ServerHandler;
 import net.blafteam.blafcraft.potion.ModPotions;
 import net.blafteam.blafcraft.sound.LoopingSoundPayload;
 import net.blafteam.blafcraft.sound.ModSounds;
-import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -22,10 +22,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
@@ -643,6 +645,67 @@ public class ModEvents {
                 livingEntity.hasEffect(ModEffects.SCULK_INFECTION_EFFECT)) {
             float currentDamage = event.getNewDamage();
             event.setNewDamage(currentDamage * 1.5f);
+        }
+    }
+
+    //-------------------------------- MORPH LOGIC -------------------------------
+    @SubscribeEvent
+    public static void onLivingDeath(LivingDeathEvent event) {
+        if (event.getSource().getEntity() instanceof ServerPlayer player) {
+            Entity killed = event.getEntity();
+            ResourceLocation morphId = EntityType.getKey(killed.getType());
+            if (player.hasEffect(ModEffects.MORPH_EFFECT) && Objects.requireNonNull(player.getEffect(ModEffects.MORPH_EFFECT)).getAmplifier() == 0) {
+                player.setData(ModAttachments.ENTITY.get(), morphId);
+
+                PacketDistributor.sendToPlayer(player, new MorphSyncPayload(morphId));
+
+                player.addEffect(new MobEffectInstance(ModEffects.MORPH_EFFECT, 3600, 1, false, false, true));
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onHitWithMorph(AttackEntityEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        if (event.getTarget() instanceof LivingEntity targetEntity) {
+            if (!livingEntity.level().isClientSide) {
+                if (livingEntity.hasEffect(ModEffects.MORPH_EFFECT) && Objects.requireNonNull(livingEntity.getEffect(ModEffects.MORPH_EFFECT)).getAmplifier() == 1) {
+                    DamageSource source = livingEntity.damageSources().mobAttack(livingEntity);
+
+                    livingEntity.removeEffect(ModEffects.MORPH_EFFECT);
+                    targetEntity.hurt(source, 8);
+                    targetEntity.addEffect(new MobEffectInstance(ModEffects.BLEEDING_EFFECT, 200, 0, false, false, true));
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onMorphPlayerHurtByMob(LivingDamageEvent.Pre event) {
+        if (event.getEntity().level().isClientSide()) return;
+
+        if (event.getEntity() instanceof Player player && player.hasEffect(ModEffects.MORPH_EFFECT)) {
+            MobEffectInstance morphEffect = player.getEffect(ModEffects.MORPH_EFFECT);
+            if (morphEffect != null && morphEffect.getAmplifier() == 1) {
+                Entity source = event.getSource().getEntity();
+                if (source instanceof LivingEntity && !(source instanceof Player)) {
+                    player.removeEffect(ModEffects.MORPH_EFFECT);
+                    player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 200, 1, false, false, true));
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerAttack(AttackEntityEvent event) {
+        Player attacker = event.getEntity();
+        Entity target = event.getTarget();
+        if (target instanceof Player victim) {
+            if (attacker instanceof ServerPlayer serverAttacker && victim instanceof ServerPlayer serverVictim) {
+                if (FriendManager.isFriend(serverAttacker, serverVictim)) {
+                    event.setCanceled(true); // полностью запретить атаку
+                }
+            }
         }
     }
 }

@@ -74,7 +74,7 @@ public class ModEffects {
 
     public static final Holder<MobEffect> MORPH_EFFECT = MOB_EFFECTS.register("morph",
             () -> new MorphEffect(MobEffectCategory.NEUTRAL, 0x1A1266).addAttributeModifier(Attributes.MOVEMENT_SPEED,
-                    ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "morph"), -0.45f,
+                    ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "morph"), -0.225f,
                     AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
 

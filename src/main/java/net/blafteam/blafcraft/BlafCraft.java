@@ -3,6 +3,7 @@ package net.blafteam.blafcraft;
 import net.blafteam.blafcraft.block.ModBlocks;
 import net.blafteam.blafcraft.block.entity.ModBlockEntities;
 import net.blafteam.blafcraft.block.entity.renderer.RealizerBlockEntityRenderer;
+import net.blafteam.blafcraft.component.ModAttachments;
 import net.blafteam.blafcraft.component.ModDataComponents;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.entity.ModEntities;
@@ -72,6 +73,8 @@ public class BlafCraft {
         ModBlockEntities.register(modEventBus);
 
         ModMenuTypes.register(modEventBus);
+
+        ModAttachments.ATTACHMENT_TYPES.register(modEventBus);
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
