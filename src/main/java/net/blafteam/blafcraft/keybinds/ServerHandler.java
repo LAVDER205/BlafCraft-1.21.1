@@ -1,8 +1,8 @@
 package net.blafteam.blafcraft.keybinds;
 
 import net.blafteam.blafcraft.BlafCraft;
-import net.blafteam.blafcraft.component.FriendManager;
-import net.blafteam.blafcraft.custom.FriendUpdatePacket;
+import net.blafteam.blafcraft.friend_system.FriendManager;
+import net.blafteam.blafcraft.friend_system.FriendUpdatePacket;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.mana.ManaManager;
 import net.blafteam.blafcraft.mana.ManaSyncPayload;

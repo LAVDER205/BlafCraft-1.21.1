@@ -1,8 +1,8 @@
 package net.blafteam.blafcraft.event;
 
 import net.blafteam.blafcraft.BlafCraft;
-import net.blafteam.blafcraft.custom.ClientMorphData;
-import net.blafteam.blafcraft.custom.MorphSyncPayload;
+import net.blafteam.blafcraft.morph.ClientMorphData;
+import net.blafteam.blafcraft.morph.MorphSyncPayload;
 import net.blafteam.blafcraft.highlight.ClientHighlightHandler;
 import net.blafteam.blafcraft.highlight.HighlightEntityPacket;
 import net.blafteam.blafcraft.mana.ClientManaHandler;

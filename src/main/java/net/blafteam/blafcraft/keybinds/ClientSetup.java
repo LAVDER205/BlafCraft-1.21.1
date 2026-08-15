@@ -1,7 +1,7 @@
 package net.blafteam.blafcraft.keybinds;
 
 import net.blafteam.blafcraft.BlafCraft;
-import net.blafteam.blafcraft.custom.FriendUpdatePacket;
+import net.blafteam.blafcraft.friend_system.FriendUpdatePacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.EntityHitResult;
@@ -84,7 +84,7 @@ public class ClientSetup {
             case "Dev" -> {
                 action = ActionType.FLIGHT;
             }
-        } else if (event.getKey() == GLFW.GLFW_KEY_P) {
+        } else if (event.getKey() == GLFW.GLFW_KEY_B) {
             if (mc.hitResult instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof Player target) {
                 PacketDistributor.sendToServer(new FriendUpdatePacket(target.getUUID(), true)); // добавить
             }

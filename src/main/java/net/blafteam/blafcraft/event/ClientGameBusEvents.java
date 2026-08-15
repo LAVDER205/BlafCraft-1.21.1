@@ -2,7 +2,7 @@ package net.blafteam.blafcraft.event;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.blafteam.blafcraft.BlafCraft;
-import net.blafteam.blafcraft.custom.ClientMorphData;
+import net.blafteam.blafcraft.morph.ClientMorphData;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;

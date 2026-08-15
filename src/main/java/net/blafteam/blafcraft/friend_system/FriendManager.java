@@ -1,5 +1,6 @@
-package net.blafteam.blafcraft.component;
+package net.blafteam.blafcraft.friend_system;
 
+import net.blafteam.blafcraft.component.ModAttachments;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 

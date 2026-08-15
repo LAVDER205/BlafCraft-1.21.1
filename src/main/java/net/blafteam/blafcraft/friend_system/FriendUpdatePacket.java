@@ -1,4 +1,4 @@
-package net.blafteam.blafcraft.custom;
+package net.blafteam.blafcraft.friend_system;
 
 import net.blafteam.blafcraft.BlafCraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;

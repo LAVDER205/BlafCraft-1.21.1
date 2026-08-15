@@ -1,9 +1,9 @@
 package net.blafteam.blafcraft.event;
 
 import net.blafteam.blafcraft.BlafCraft;
-import net.blafteam.blafcraft.component.FriendManager;
+import net.blafteam.blafcraft.friend_system.FriendManager;
 import net.blafteam.blafcraft.component.ModAttachments;
-import net.blafteam.blafcraft.custom.MorphSyncPayload;
+import net.blafteam.blafcraft.morph.MorphSyncPayload;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.highlight.HighlightManager;
 import net.blafteam.blafcraft.item.ModItems;
