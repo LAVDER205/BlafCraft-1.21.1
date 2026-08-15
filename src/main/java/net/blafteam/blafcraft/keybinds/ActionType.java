@@ -10,7 +10,8 @@ public enum ActionType {
     BLOODLUST(0, 0, 0),
     TIME_BOMB(400, 0, 0),
     FLIGHT(200,0,0),
-    SCULK_MARK(1200,0,0);
+    SCULK_MARK(1200,0,0),
+    MORPH(6000,0,0);
 
     private final int cooldownTicks;
     private final int exp_price;

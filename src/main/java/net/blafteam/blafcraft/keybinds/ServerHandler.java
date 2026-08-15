@@ -189,6 +189,11 @@ public class ServerHandler {
                         player.addEffect(new MobEffectInstance(ModEffects.SCULK_MARK_EFFECT, 200, 1, false, false, true));
                         debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
                     }
+
+                    case MORPH -> {
+                        player.addEffect(new MobEffectInstance(ModEffects.MORPH_EFFECT, 1200, 0, false, false, true));
+                        debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
+                    }
                 }
 
 //                int currentMaxMana = ManaManager.getMaxMana(player); // change max mana
