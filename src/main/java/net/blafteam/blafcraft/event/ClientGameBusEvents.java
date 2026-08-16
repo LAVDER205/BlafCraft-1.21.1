@@ -18,7 +18,9 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RenderNameTagEvent;
 import net.neoforged.neoforge.client.event.RenderPlayerEvent;
+import net.neoforged.neoforge.common.util.TriState;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +31,16 @@ public class ClientGameBusEvents {
 
     private static final Map<EntityType<?>, Entity> CACHED_ENTITIES = new HashMap<>();
 
+    //-------------------------------- DISABLING NAMETAGS LOGIC -------------------------------
+    @SubscribeEvent
+    public static void onRenderNameTag(RenderNameTagEvent event) {
+        // Скрываем ники только для игроков (включая самих себя)
+        if (event.getEntity() instanceof Player) {
+            event.setCanRender(TriState.FALSE);
+        }
+    }
+
+    //-------------------------------- MORPH LOGIC -------------------------------
     @SubscribeEvent
     public static void onRenderPlayerPre(RenderPlayerEvent.Pre event) {
         Player player = event.getEntity();

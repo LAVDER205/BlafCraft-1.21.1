@@ -44,7 +44,7 @@ public class ClientSetup {
                 case "Frigby" -> {
                     action = ActionType.CREATION_STEP;
                 }
-                case "Frynote" -> {
+                case "Nice_00" -> {
                     action = ActionType.TELEPORT_DASH;
                 }
                 case "LAVDER208" -> {
@@ -60,7 +60,7 @@ public class ClientSetup {
             case "Frigby" -> {
                 action = ActionType.FIREBALL;
             }
-            case "Frynote" -> {
+            case "Nice_00" -> {
                 action = ActionType.TELEPORT_DASH;
             }
             case "LAVDER208" -> {
@@ -75,7 +75,7 @@ public class ClientSetup {
             case "Frigby" -> {
                 action = ActionType.ARROW;
             }
-            case "Frynote" -> {
+            case "Nice_00" -> {
                 action = ActionType.TELEPORT_DASH;
             }
             case "LAVDER208" -> {

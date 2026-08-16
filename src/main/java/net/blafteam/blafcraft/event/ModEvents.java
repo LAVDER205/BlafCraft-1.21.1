@@ -119,6 +119,20 @@ public class ModEvents {
         builder.addMix(ModPotions.FIERY_TOUCH_POTION, Items.REDSTONE, long_p);
     }
 
+    //-------------------------------- FRIEND SYSTEM LOGIC -------------------------------
+    @SubscribeEvent
+    public static void onFriendPlayerAttack(AttackEntityEvent event) {
+        Player attacker = event.getEntity();
+        Entity target = event.getTarget();
+        if (target instanceof Player victim) {
+            if (attacker instanceof ServerPlayer serverAttacker && victim instanceof ServerPlayer serverVictim) {
+                if (FriendManager.isFriend(serverAttacker, serverVictim)) {
+                    event.setCanceled(true);
+                }
+            }
+        }
+    }
+
     // --------------------------------SCULK SWORD LOGIC -------------------------------
     @SubscribeEvent
     public static void onSculkSwordHit(AttackEntityEvent event) {
@@ -352,9 +366,24 @@ public class ModEvents {
 
     @SubscribeEvent
     public static void onOverdoseEffectExpired(MobEffectEvent.Expired event) {
+        assert event.getEffectInstance() != null;
         Holder<MobEffect> holder = event.getEffectInstance().getEffect();
+        LivingEntity livingEntity = event.getEntity();
         if (holder.getKey() != null && holder.getKey().location().equals(OVERDOSE_ID)) {
-            event.getEntity().addEffect(new MobEffectInstance(ModEffects.POTION_SICKNESS_EFFECT, 3600, 0, true, true, true));
+            livingEntity.addEffect(new MobEffectInstance(ModEffects.POTION_SICKNESS_EFFECT, 3600, 0, true, true, true));
+            if (livingEntity instanceof ServerPlayer player) {
+                PacketDistributor.sendToPlayer(player, new LoopingSoundPayload(ModSounds.OVERDOSE.get(), 1.4f, 1.0f, false));
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onOverdoseEffectRemove(MobEffectEvent.Remove event) {
+        Holder<MobEffect> holder = event.getEffect();
+        if (holder.getKey() != null && holder.getKey().location().equals(OVERDOSE_ID)) {
+            if (event.getEntity() instanceof ServerPlayer player) {
+                PacketDistributor.sendToPlayer(player, new LoopingSoundPayload(ModSounds.OVERDOSE.get(), 1.4f, 1.0f, false));
+            }
         }
     }
 
@@ -696,16 +725,5 @@ public class ModEvents {
         }
     }
 
-    @SubscribeEvent
-    public static void onPlayerAttack(AttackEntityEvent event) {
-        Player attacker = event.getEntity();
-        Entity target = event.getTarget();
-        if (target instanceof Player victim) {
-            if (attacker instanceof ServerPlayer serverAttacker && victim instanceof ServerPlayer serverVictim) {
-                if (FriendManager.isFriend(serverAttacker, serverVictim)) {
-                    event.setCanceled(true); // полностью запретить атаку
-                }
-            }
-        }
-    }
+
 }

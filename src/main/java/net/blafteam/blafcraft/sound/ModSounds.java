@@ -32,6 +32,7 @@ public class ModSounds {
     public static final  ResourceKey<JukeboxSong> REVENGE_KEY = createSong("revenge");
 
     public static final  Supplier<SoundEvent> HEARTBEAT = registerSoundEvent("heartbeat");
+    public static final  Supplier<SoundEvent> OVERDOSE = registerSoundEvent("overdose");
 
     private static ResourceKey<JukeboxSong>  createSong(String name) {
         return ResourceKey.create(Registries.JUKEBOX_SONG, ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, name));

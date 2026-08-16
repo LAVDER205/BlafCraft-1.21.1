@@ -6,6 +6,7 @@ import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.keybinds.ActionType;
 import net.blafteam.blafcraft.keybinds.ClientCooldowns;
 import net.blafteam.blafcraft.mana.ClientManaHandler;
+import net.blafteam.blafcraft.nickname.Nicknames;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
@@ -46,6 +47,7 @@ public class ModHUDs {
             }
         }
 
+        // OVERLAYS
         // Bloodlust Overlay
         if (player.hasEffect(ModEffects.BLOODLUST_EFFECT)) {
             ResourceLocation bloodlustOverlay = ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "textures/gui/bloodlust_overlay.png");
@@ -54,9 +56,17 @@ public class ModHUDs {
             graphics.blit(bloodlustOverlay, 0, 0, 0, 0, w, h, w, h);
             RenderSystem.disableBlend();
         }
+        // Bloodlust Overlay
+        if (player.hasEffect(ModEffects.OVERDOSE_EFFECT)) {
+            ResourceLocation overdoseOverlay = ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "textures/gui/overdose_overlay.png");
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+            graphics.blit(overdoseOverlay, 0, 0, 0, 0, w, h, w, h);
+            RenderSystem.disableBlend();
+        }
 
         // Mana bar
-        if (player.getName().getString().equals("Nice_00")) {
+        if (player.getDisplayName().getString().equals(Nicknames.Dev)) {
             float mana = ClientManaHandler.getMana();
             int maxMana = ClientManaHandler.getMaxMana();
 
@@ -66,6 +76,8 @@ public class ModHUDs {
             int x1 = 10;
             int y1 = h - 30;
 
+            ResourceLocation manaBar = ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "textures/gui/mana_bar.png");
+            graphics.blit(manaBar, x1 - 3, y1 - 2, 0, 0, 106, 14, 106, 14);
             // Фон
             graphics.fill(x1, y1, x1 + barWidth, y1 + barHeight, 0xFF333333);
             // Заполнение (синий цвет)
@@ -73,7 +85,7 @@ public class ModHUDs {
             graphics.fill(x1, y1, x1 + filledWidth, y1 + barHeight, 0xFF0000FF);
             // Текст "Мана: 75/100"
             String manaText = "Mana: " + (int) mana + "/" + maxMana;
-            graphics.drawString(mc.font, manaText, x1 + barWidth + 5, y1 + 1, 0xFFFFFF);
+            graphics.drawString(mc.font, manaText, x1 + 5, y1 + 1, 0xFFFFFF);
         }
     }
 
