@@ -73,9 +73,15 @@ public class ModEffects {
                     AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
 
     public static final Holder<MobEffect> MORPH_EFFECT = MOB_EFFECTS.register("morph",
-            () -> new MorphEffect(MobEffectCategory.NEUTRAL, 0x1A1266).addAttributeModifier(Attributes.MOVEMENT_SPEED,
+            () -> new MorphEffect(MobEffectCategory.NEUTRAL, 0xC2E7ED).addAttributeModifier(Attributes.MOVEMENT_SPEED,
                     ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "morph"), -0.225f,
                     AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+
+    public static final Holder<MobEffect> IRON_WILL_EFFECT = MOB_EFFECTS.register("iron_will",
+            () -> new IronWillEffect(MobEffectCategory.BENEFICIAL, 0x637B85));
+
+    public static final Holder<MobEffect> IMMORTAL_EFFECT = MOB_EFFECTS.register("immortal",
+            () -> new ImmortalEffect(MobEffectCategory.BENEFICIAL, 0x83A2A8));
 
 
     public static void register(IEventBus eventBus) {

@@ -1,6 +1,7 @@
-package net.blafteam.blafcraft.effect;
+package net.blafteam.blafcraft.fog;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.effect.ModEffects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.neoforged.api.distmarker.Dist;

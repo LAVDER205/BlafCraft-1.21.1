@@ -725,5 +725,20 @@ public class ModEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onIronWillDamaged(LivingDamageEvent.Pre event) {
+        LivingEntity targetEntity = event.getEntity();
+        float damage = event.getNewDamage();
+        if (targetEntity.hasEffect(ModEffects.IRON_WILL_EFFECT) && damage >= targetEntity.getHealth()) {
+            event.setNewDamage(0);
+            targetEntity.setHealth(1);
+        }
+    }
 
+    @SubscribeEvent
+    public static void onImmortalDamaged(LivingDamageEvent.Pre event) {
+        if (event.getEntity().hasEffect(ModEffects.IMMORTAL_EFFECT)) {
+            event.setNewDamage(0);
+        }
+    }
 }
