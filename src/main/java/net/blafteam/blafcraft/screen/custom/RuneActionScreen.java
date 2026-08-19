@@ -2,24 +2,12 @@ package net.blafteam.blafcraft.screen.custom;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blafteam.blafcraft.BlafCraft;
-import net.blafteam.blafcraft.block.ModBlocks;
-import net.blafteam.blafcraft.block.entity.RuneActionBlockEntity;
-import net.blafteam.blafcraft.screen.ModMenuTypes;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class RuneActionScreen extends AbstractContainerScreen<RuneActionMenu> {
     private static final ResourceLocation GUI_TEXTURE =
@@ -39,6 +27,24 @@ public class RuneActionScreen extends AbstractContainerScreen<RuneActionMenu> {
         int y = (height - imageHeight) / 2;
 
         guiGraphics.blit(GUI_TEXTURE, x, y, 0, 0, imageWidth, imageHeight);
+
+        // Вертикальная полоска энергии снизу вверх
+        int energy = menu.getEnergy();
+        int maxEnergy = menu.getMaxEnergy();
+        int barWidth = 8;      // ширина
+        int barHeight = 50;    // высота
+        int barX = x + 140;     // левый верхний угол
+        int barY = y + 20;
+
+        // Фон (пустой столбик)
+        guiGraphics.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF333333);
+
+        // Заполненная часть снизу вверх
+        int filledHeight = maxEnergy > 0 ? (int)((float)energy / maxEnergy * barHeight) : 0;
+        if (filledHeight > 0) {
+            // Заливаем нижнюю часть: от (barY + barHeight - filledHeight) до (barY + barHeight)
+            guiGraphics.fill(barX, barY + barHeight - filledHeight, barX + barWidth, barY + barHeight, 0xFFD97632);
+        }
     }
 
     @Override

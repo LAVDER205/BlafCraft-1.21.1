@@ -1,13 +1,13 @@
 package net.blafteam.blafcraft.screen.custom;
 
 import net.blafteam.blafcraft.block.ModBlocks;
-import net.blafteam.blafcraft.block.entity.RealizerBlockEntity;
 import net.blafteam.blafcraft.block.entity.RuneActionBlockEntity;
 import net.blafteam.blafcraft.screen.ModMenuTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -18,6 +18,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 public class RuneActionMenu extends AbstractContainerMenu {
     public final RuneActionBlockEntity blockEntity;
     private final Level level;
+    private final ContainerData data;
 
     public RuneActionMenu(int containerId, Inventory inv, FriendlyByteBuf extraData) {
         this(containerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
@@ -27,11 +28,22 @@ public class RuneActionMenu extends AbstractContainerMenu {
         super(ModMenuTypes.RUNE_ACTION_MENU.get(), containerId);
         this.blockEntity = ((RuneActionBlockEntity) blockEntity);
         this.level = inv.player.level();
+        this.data = (ContainerData) blockEntity;
 
         addPlayerInventory(inv);
         addPlayerHotbar(inv);
+        addDataSlots(data);
 
-        this.addSlot(new SlotItemHandler(this.blockEntity.inventory, 0, 80, 35));
+        this.addSlot(new SlotItemHandler(this.blockEntity.inventory, 0, 31, 37));
+        this.addSlot(new SlotItemHandler(this.blockEntity.inventory, 1, 84, 37));
+    }
+
+    public int getEnergy() {
+        return data.get(0);
+    }
+
+    public int getMaxEnergy() {
+        return data.get(1);
     }
 
     // CREDIT GOES TO: diesieben07 | https://github.com/diesieben07/SevenCommons
@@ -50,7 +62,7 @@ public class RuneActionMenu extends AbstractContainerMenu {
     private static final int TE_INVENTORY_FIRST_SLOT_INDEX = VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT;
 
     // THIS YOU HAVE TO DEFINE!
-    private static final int TE_INVENTORY_SLOT_COUNT = 1;  // must be the number of slots you have!
+    private static final int TE_INVENTORY_SLOT_COUNT = 2;  // must be the number of slots you have!
     @Override
     public ItemStack quickMoveStack(Player playerIn, int pIndex) {
         Slot sourceSlot = slots.get(pIndex);

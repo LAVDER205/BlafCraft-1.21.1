@@ -1,6 +1,7 @@
 package net.blafteam.blafcraft.event;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.entity.ModEntities;
 import net.blafteam.blafcraft.morph.ClientMorphData;
 import net.blafteam.blafcraft.morph.MorphSyncPayload;
 import net.blafteam.blafcraft.highlight.ClientHighlightHandler;
@@ -9,9 +10,11 @@ import net.blafteam.blafcraft.mana.ClientManaHandler;
 import net.blafteam.blafcraft.mana.ManaSyncPayload;
 import net.blafteam.blafcraft.sound.ClientPacketHandler;
 import net.blafteam.blafcraft.sound.LoopingSoundPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
