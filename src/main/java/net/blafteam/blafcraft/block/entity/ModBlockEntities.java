@@ -17,6 +17,18 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("realizer_be", () -> BlockEntityType.Builder.of(
                     RealizerBlockEntity::new, ModBlocks.REALIZER.get()).build(null));
 
+//    public static final Supplier<BlockEntityType<RuneStoreBlockEntity>> RUNE_STORE_BE =
+//            BLOCK_ENTITIES.register("rune_store_be", () -> BlockEntityType.Builder.of(
+//                    RuneStoreBlockEntity::new, ModBlocks.RUNE_STORE_BLOCK.get()).build(null));
+
+    public static final Supplier<BlockEntityType<RuneActionBlockEntity>> RUNE_ACTION_BE =
+            BLOCK_ENTITIES.register("rune_action_be", () -> BlockEntityType.Builder.of(
+                    RuneActionBlockEntity::new, ModBlocks.RUNE_ACTION_BLOCK.get()).build(null));
+
+//    public static final Supplier<BlockEntityType<RuneCraftBlockEntity>> RUNE_CRAFT_BE =
+//            BLOCK_ENTITIES.register("rune_craft_be", () -> BlockEntityType.Builder.of(
+//                    RuneCraftBlockEntity::new, ModBlocks.RUNE_CRAFT_BLOCK.get()).build(null));
+
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);
     }

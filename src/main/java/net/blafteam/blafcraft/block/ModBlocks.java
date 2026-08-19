@@ -1,10 +1,7 @@
 package net.blafteam.blafcraft.block;
 
 import net.blafteam.blafcraft.BlafCraft;
-import net.blafteam.blafcraft.block.custom.BismuthLampBlock;
-import net.blafteam.blafcraft.block.custom.ChairBlock;
-import net.blafteam.blafcraft.block.custom.MagicBlock;
-import net.blafteam.blafcraft.block.custom.RealizerBlock;
+import net.blafteam.blafcraft.block.custom.*;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.sound.ModSounds;
 import net.minecraft.util.valueproviders.UniformInt;
@@ -78,10 +75,6 @@ public class ModBlocks {
     public static final DeferredBlock<Block> REALIZER = registerBlock("realizer",
             () -> new RealizerBlock(BlockBehaviour.Properties.of().noOcclusion()));
 
-
-
-
-
     public static final DeferredBlock<Block> SCULK_ORE = registerBlock("sculk_ore",
             () -> new DropExperienceBlock(UniformInt.of(2, 4), BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops().sound(SoundType.STONE)));
 
@@ -94,6 +87,13 @@ public class ModBlocks {
     public static final DeferredBlock<Block> RUBY_DEEPSLATE_ORE = registerBlock("ruby_deepslate_ore",
             () -> new DropExperienceBlock(UniformInt.of(3, 6),
                     BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE)));
+
+    public static final DeferredBlock<Block> RUNE_STORE_BLOCK = registerBlock("rune_store_block",
+            () -> new Block(BlockBehaviour.Properties.of().strength(2f).sound(SoundType.AMETHYST)));
+    public static final DeferredBlock<Block> RUNE_ACTION_BLOCK = registerBlock("rune_action_block",
+            () -> new RuneActionBlock(BlockBehaviour.Properties.of().strength(2f).sound(SoundType.AMETHYST)));
+    public static final DeferredBlock<Block> RUNE_CRAFT_BLOCK = registerBlock("rune_craft_block",
+            () -> new Block(BlockBehaviour.Properties.of().strength(2f).sound(SoundType.AMETHYST)));
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
         DeferredBlock<T> toReturn = BLOCKS.register(name, block);

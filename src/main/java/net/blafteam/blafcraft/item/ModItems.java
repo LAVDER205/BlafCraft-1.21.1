@@ -142,7 +142,7 @@ public class ModItems {
     public static final DeferredItem<Item> DAMAGED_OCULAR = ITEMS.register("damaged_ocular",
             () -> new Item(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<ArmorItem> OCULAR_OF_OTHER_SIGHT = ITEMS.register("ocular_of_other_sight",
-            () -> new ModArmorItem(ModArmorMaterials.RUNE_ENGINEER_ARMOR_MATERIAL, ArmorItem.Type.HELMET,
+            () -> new UnbreakableArmorItem(ModArmorMaterials.RUNE_ENGINEER_ARMOR_MATERIAL, ArmorItem.Type.HELMET,
                     new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(19))));
     public static final DeferredItem<Item> LIQUID_COPPER = ITEMS.register("liquid_copper",
             () -> new Item(new Item.Properties()));
@@ -155,13 +155,13 @@ public class ModItems {
     public static final DeferredItem<Item> REACTOR_CORPUS = ITEMS.register("reactor_corpus",
             () -> new Item(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<ArmorItem> REACTOR = ITEMS.register("reactor",
-            () -> new ModArmorItem(ModArmorMaterials.RUNE_ENGINEER_ARMOR_MATERIAL, ArmorItem.Type.CHESTPLATE,
+            () -> new UnbreakableArmorItem(ModArmorMaterials.RUNE_ENGINEER_ARMOR_MATERIAL, ArmorItem.Type.CHESTPLATE,
                     new Item.Properties().durability(ArmorItem.Type.CHESTPLATE.getDurability(19))));
     public static final DeferredItem<ArmorItem> RUNE_ENGINEER_LEGGINGS = ITEMS.register("rune_engineer_leggings",
-            () -> new ModArmorItem(ModArmorMaterials.RUNE_ENGINEER_ARMOR_MATERIAL, ArmorItem.Type.LEGGINGS,
+            () -> new UnbreakableArmorItem(ModArmorMaterials.RUNE_ENGINEER_ARMOR_MATERIAL, ArmorItem.Type.LEGGINGS,
                     new Item.Properties().durability(ArmorItem.Type.LEGGINGS.getDurability(19))));
     public static final DeferredItem<ArmorItem> RUNE_ENGINEER_BOOTS = ITEMS.register("rune_engineer_boots",
-            () -> new ModArmorItem(ModArmorMaterials.RUNE_ENGINEER_ARMOR_MATERIAL, ArmorItem.Type.BOOTS,
+            () -> new UnbreakableArmorItem(ModArmorMaterials.RUNE_ENGINEER_ARMOR_MATERIAL, ArmorItem.Type.BOOTS,
                     new Item.Properties().durability(ArmorItem.Type.BOOTS.getDurability(19))));
 
 

@@ -16,6 +16,16 @@ public class ModBlockStateProvider extends BlockStateProvider {
         super(output, BlafCraft.MODID, exFileHelper);
     }
 
+//    ModelFile craftingStationModel = models().cube(
+//            "crafting_station",                     // название модели
+//            modLoc("block/crafting_station_bottom"), // down
+//            modLoc("block/crafting_station_top"),    // up
+//            modLoc("block/crafting_station_side"),   // north
+//            modLoc("block/crafting_station_side"),   // south
+//            modLoc("block/crafting_station_side"),   // east
+//            modLoc("block/crafting_station_side")    // west
+//    ).texture("particle", modLoc("block/crafting_station_top"));
+
     @Override
     protected void registerStatesAndModels() {
         blockWithItem(ModBlocks.BISMUTH_BLOCK);
@@ -55,6 +65,12 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
         blockWithItem(ModBlocks.RUBY_ORE);
         blockWithItem(ModBlocks.RUBY_DEEPSLATE_ORE);
+
+        // simpleBlockWithItem(ModBlocks.CRAFTING_STATION.get(), craftingStationModel);
+
+        blockWithItem(ModBlocks.RUNE_STORE_BLOCK);
+        blockWithItem(ModBlocks.RUNE_ACTION_BLOCK);
+        blockWithItem(ModBlocks.RUNE_CRAFT_BLOCK);
     }
 
     private void customLamp() {

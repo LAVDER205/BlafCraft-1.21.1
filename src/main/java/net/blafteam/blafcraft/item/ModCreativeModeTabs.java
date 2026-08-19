@@ -120,6 +120,10 @@ public class ModCreativeModeTabs {
                         output.accept(ModBlocks.RUBY_ORE);
                         output.accept(ModBlocks.RUBY_DEEPSLATE_ORE);
 
+                        output.accept(ModBlocks.RUNE_STORE_BLOCK);
+                        output.accept(ModBlocks.RUNE_ACTION_BLOCK);
+                        output.accept(ModBlocks.RUNE_CRAFT_BLOCK);
+
                     }).build());
 
     public static void register(IEventBus eventBus) {

@@ -2,6 +2,7 @@ package net.blafteam.blafcraft.screen;
 
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.screen.custom.RealizerMenu;
+import net.blafteam.blafcraft.screen.custom.RuneActionMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -17,6 +18,9 @@ public class ModMenuTypes {
 
     public static final DeferredHolder<MenuType<?>, MenuType<RealizerMenu>> REALIZER_MENU =
             registerMenuType("realizer_menu", RealizerMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<RuneActionMenu>> RUNE_ACTION_MENU =
+            registerMenuType("rune_action_menu", RuneActionMenu::new);
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> registerMenuType(String name,
                                                                                                                IContainerFactory<T> factory) {

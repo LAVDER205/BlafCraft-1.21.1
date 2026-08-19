@@ -55,8 +55,6 @@ public class RealizerBlock extends BaseEntityBlock {
         return CODEC;
     }
 
-    // BLOCK ENTITY
-
     @Override
     protected RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL; // or it will be invisible
@@ -66,6 +64,8 @@ public class RealizerBlock extends BaseEntityBlock {
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new RealizerBlockEntity(pos, state);
     }
+
+    // BLOCK ENTITY
 
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {

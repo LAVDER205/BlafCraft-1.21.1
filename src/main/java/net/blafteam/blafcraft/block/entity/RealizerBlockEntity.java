@@ -40,7 +40,6 @@ public class RealizerBlockEntity extends BlockEntity implements MenuProvider {
     public final ItemStackHandler inventory = new ItemStackHandler(1) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            // Разрешаем класть только FactonItem
             return stack.getItem() instanceof FactonItem;
         }
 
