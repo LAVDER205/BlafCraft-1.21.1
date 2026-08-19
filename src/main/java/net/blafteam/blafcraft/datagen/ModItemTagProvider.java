@@ -47,12 +47,5 @@ public class ModItemTagProvider extends ItemTagsProvider {
                 .add(ModItems.BISMUTH_CHESTPLATE.get())
                 .add(ModItems.BISMUTH_LEGGINGS.get())
                 .add(ModItems.BISMUTH_BOOTS.get());
-
-//                .add(ModItems.CREATION_HELMET.get())
-//                .add(ModItems.CREATION_CHESTPLATE.get())
-//                .add(ModItems.CREATION_LEGGINGS.get())
-//                .add(ModItems.CREATION_BOOTS.get());
-
-
     }
 }

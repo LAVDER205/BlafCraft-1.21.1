@@ -44,6 +44,21 @@
 
   "item.blafcraft.relic": "Relic",
 
+  "item.blafcraft.ruby": "Ruby",
+
+  "item.blafcraft.damaged_ocular": "Damaged Ocular",
+  "item.blafcraft.ocular_of_other_sight": "Ocular Of Other Sight",
+  "item.blafcraft.liquid_copper": "Liquid Copper",
+  "item.blafcraft.copper_winding": "Copper Winding",
+  "item.blafcraft.rune_controller": "Rune Controller",
+  "item.blafcraft.reactor_core": "Reactor Core",
+  "item.blafcraft.reactor_corpus": "Reactor Corpus",
+  "item.blafcraft.reactor": "Reactor",
+  "item.blafcraft.rune_engineer_leggings": "Rune Engineer Leggings",
+  "item.blafcraft.rune_engineer_boots": "Rune Engineer Boots",
+
+
+
   "item.minecraft.potion.effect.slimey_potion": "Slimey Potion",
   "item.minecraft.splash_potion.effect.slimey_potion": "Slimey Splash Potion",
   "item.minecraft.lingering_potion.effect.slimey_potion": "Slimey Lingering Potion",
@@ -120,6 +135,10 @@
 
   "block.blafcraft.chair": "Chair",
   "block.blafcraft.realizer": "Realizer",
+
+  "block.blafcraft.ruby_block": "Block of Ruby",
+  "block.blafcraft.ruby_ore": "Ruby Ore",
+  "block.blafcraft.ruby_deepslate_ore": "Ruby Deepslate Ore",
 
   "creativetab.blafcraft.blafcraft_items": "BlafCraft Items",
   "creativetab.blafcraft.blafcraft_blocks": "BlafCraft Blocks",

@@ -71,6 +71,18 @@ public class ModCreativeModeTabs {
 
                         output.accept(ModItems.RELIC);
 
+                        output.accept(ModItems.RUBY);
+
+                        output.accept(ModItems.DAMAGED_OCULAR);
+                        output.accept(ModItems.OCULAR_OF_OTHER_SIGHT);
+                        output.accept(ModItems.LIQUID_COPPER);
+                        output.accept(ModItems.COPPER_WINDING);
+                        output.accept(ModItems.RUNE_CONTROLLER);
+                        output.accept(ModItems.REACTOR_CORE);
+                        output.accept(ModItems.REACTOR_CORPUS);
+                        output.accept(ModItems.REACTOR);
+                        output.accept(ModItems.RUNE_ENGINEER_LEGGINGS);
+                        output.accept(ModItems.RUNE_ENGINEER_BOOTS);
 
                     }).build());
 
@@ -103,6 +115,10 @@ public class ModCreativeModeTabs {
 
                         output.accept(ModBlocks.SCULK_ORE);
                         output.accept(ModBlocks.REALIZER);
+
+                        output.accept(ModBlocks.RUBY_BLOCK);
+                        output.accept(ModBlocks.RUBY_ORE);
+                        output.accept(ModBlocks.RUBY_DEEPSLATE_ORE);
 
                     }).build());
 

@@ -28,6 +28,9 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         List<ItemLike> SCULK_SMELTABLES = List.of(ModItems.RAW_SCULK,
                 ModBlocks.SCULK_ORE);
 
+        List<ItemLike> RUBY_SMELTABLES = List.of(ModBlocks.RUBY_ORE,
+                ModBlocks.RUBY_DEEPSLATE_ORE);
+
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.BISMUTH_BLOCK.get())
                 .pattern("BBB")
                 .pattern("BBB")
@@ -91,6 +94,20 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Items.GLOWSTONE_DUST, 2)
                 .requires(Items.GLOW_BERRIES)
                 .unlockedBy("has_glow_berries", has(Items.GLOW_BERRIES)).save(recipeOutput, "blafcraft:glowstone_dust_from_glow_berries");
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ModBlocks.RUBY_BLOCK.get())
+                .pattern("BBB")
+                .pattern("BBB")
+                .pattern("BBB")
+                .define('B', ModItems.RUBY.get())
+                .unlockedBy("has_ruby", has(ModItems.RUBY)).save(recipeOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.RUBY.get(), 9)
+                .requires(ModBlocks.RUBY_BLOCK)
+                .unlockedBy("has_ruby_block", has(ModBlocks.RUBY_BLOCK)).save(recipeOutput);
+
+        oreSmelting(recipeOutput, RUBY_SMELTABLES, RecipeCategory.MISC, ModItems.RUBY.get(), 0.25f, 200, "ruby");
+        oreBlasting(recipeOutput, RUBY_SMELTABLES, RecipeCategory.MISC, ModItems.RUBY.get(), 0.25f, 100, "ruby");
     }
 
     protected static void oreSmelting(RecipeOutput recipeOutput, List<ItemLike> pIngredients, RecipeCategory pCategory, ItemLike pResult,

@@ -11,6 +11,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.EnumMap;
@@ -26,6 +27,15 @@ public class ModArmorMaterials {
                 attribute.put(ArmorItem.Type.HELMET, 5);
                 attribute.put(ArmorItem.Type.BODY, 11); // animals
             }), 16, 2f, 0.1f, () -> ModItems.BISMUTH.get());
+
+    public static final Holder<ArmorMaterial> RUNE_ENGINEER_ARMOR_MATERIAL = register("rune_engineer",
+            Util.make(new EnumMap<>(ArmorItem.Type.class), attribute -> {
+                attribute.put(ArmorItem.Type.BOOTS, 5);
+                attribute.put(ArmorItem.Type.LEGGINGS, 7);
+                attribute.put(ArmorItem.Type.CHESTPLATE, 9);
+                attribute.put(ArmorItem.Type.HELMET, 5);
+                // attribute.put(ArmorItem.Type.BODY, 11); // animals
+            }), 16, 2f, 0.1f, () -> Items.COPPER_INGOT);
 
 //    public static final Holder<ArmorMaterial> CREATION_ARMOR_MATERIAL = register("creation",
 //            Util.make(new EnumMap<>(ArmorItem.Type.class), attribute -> {

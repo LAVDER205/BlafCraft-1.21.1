@@ -81,7 +81,9 @@ public class ModEffects {
             () -> new IronWillEffect(MobEffectCategory.BENEFICIAL, 0x637B85));
 
     public static final Holder<MobEffect> IMMORTAL_EFFECT = MOB_EFFECTS.register("immortal",
-            () -> new ImmortalEffect(MobEffectCategory.BENEFICIAL, 0x83A2A8));
+            () -> new ImmortalEffect(MobEffectCategory.BENEFICIAL, 0x83A2A8).addAttributeModifier(Attributes.KNOCKBACK_RESISTANCE,
+                    ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "immortal_attack"), 1,
+                    AttributeModifier.Operation.ADD_VALUE));
 
 
     public static void register(IEventBus eventBus) {

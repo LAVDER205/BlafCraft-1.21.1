@@ -101,19 +101,6 @@ public class ModItems {
 //            () -> new HoeItem(ModToolTiers.SCULK, new Item.Properties()
 //                    .attributes(HoeItem.createAttributes(ModToolTiers.SCULK, 0F, -3.0f))));
 
-//    public static final DeferredItem<ArmorItem> CREATION_HELMET = ITEMS.register("creation_helmet",
-//            () -> new ArmorItem(ModArmorMaterials.CREATION_ARMOR_MATERIAL, ArmorItem.Type.HELMET,
-//                    new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(42))));
-//    public static final DeferredItem<ArmorItem> CREATION_CHESTPLATE = ITEMS.register("creation_chestplate",
-//            () -> new ArmorItem(ModArmorMaterials.CREATION_ARMOR_MATERIAL, ArmorItem.Type.CHESTPLATE,
-//                    new Item.Properties().durability(ArmorItem.Type.CHESTPLATE.getDurability(42))));
-//    public static final DeferredItem<ArmorItem> CREATION_LEGGINGS = ITEMS.register("creation_leggings",
-//            () -> new ArmorItem(ModArmorMaterials.CREATION_ARMOR_MATERIAL, ArmorItem.Type.LEGGINGS,
-//                    new Item.Properties().durability(ArmorItem.Type.LEGGINGS.getDurability(42))));
-//    public static final DeferredItem<ArmorItem> CREATION_BOOTS = ITEMS.register("creation_boots",
-//            () -> new ArmorItem(ModArmorMaterials.CREATION_ARMOR_MATERIAL, ArmorItem.Type.BOOTS,
-//                    new Item.Properties().durability(ArmorItem.Type.BOOTS.getDurability(42))));
-
     public static final DeferredItem<Item> RED_FACTON = ITEMS.register("red_facton",
             () -> new FactonItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> ORANGE_FACTON = ITEMS.register("orange_facton",
@@ -148,6 +135,34 @@ public class ModItems {
 
     public static final DeferredItem<Item> RELIC = ITEMS.register("relic",
             () -> new RelicItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> RUBY = ITEMS.register("ruby",
+            () -> new Item(new Item.Properties()));
+
+    public static final DeferredItem<Item> DAMAGED_OCULAR = ITEMS.register("damaged_ocular",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<ArmorItem> OCULAR_OF_OTHER_SIGHT = ITEMS.register("ocular_of_other_sight",
+            () -> new ModArmorItem(ModArmorMaterials.RUNE_ENGINEER_ARMOR_MATERIAL, ArmorItem.Type.HELMET,
+                    new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(19))));
+    public static final DeferredItem<Item> LIQUID_COPPER = ITEMS.register("liquid_copper",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> COPPER_WINDING = ITEMS.register("copper_winding",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> RUNE_CONTROLLER = ITEMS.register("rune_controller",
+            () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> REACTOR_CORE = ITEMS.register("reactor_core",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> REACTOR_CORPUS = ITEMS.register("reactor_corpus",
+            () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<ArmorItem> REACTOR = ITEMS.register("reactor",
+            () -> new ModArmorItem(ModArmorMaterials.RUNE_ENGINEER_ARMOR_MATERIAL, ArmorItem.Type.CHESTPLATE,
+                    new Item.Properties().durability(ArmorItem.Type.CHESTPLATE.getDurability(19))));
+    public static final DeferredItem<ArmorItem> RUNE_ENGINEER_LEGGINGS = ITEMS.register("rune_engineer_leggings",
+            () -> new ModArmorItem(ModArmorMaterials.RUNE_ENGINEER_ARMOR_MATERIAL, ArmorItem.Type.LEGGINGS,
+                    new Item.Properties().durability(ArmorItem.Type.LEGGINGS.getDurability(19))));
+    public static final DeferredItem<ArmorItem> RUNE_ENGINEER_BOOTS = ITEMS.register("rune_engineer_boots",
+            () -> new ModArmorItem(ModArmorMaterials.RUNE_ENGINEER_ARMOR_MATERIAL, ArmorItem.Type.BOOTS,
+                    new Item.Properties().durability(ArmorItem.Type.BOOTS.getDurability(19))));
 
 
 

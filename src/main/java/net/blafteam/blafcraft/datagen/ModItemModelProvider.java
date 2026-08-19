@@ -103,6 +103,18 @@ public class ModItemModelProvider extends ItemModelProvider {
 
         withExistingParent(ModItems.GECKO_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
 
+        basicItem(ModItems.RUBY.get());
+
+        basicItem(ModItems.DAMAGED_OCULAR.get());
+        basicItem(ModItems.OCULAR_OF_OTHER_SIGHT.get());
+        basicItem(ModItems.LIQUID_COPPER.get());
+        basicItem(ModItems.COPPER_WINDING.get());
+        basicItem(ModItems.RUNE_CONTROLLER.get());
+        basicItem(ModItems.REACTOR_CORE.get());
+        basicItem(ModItems.REACTOR_CORPUS.get());
+        basicItem(ModItems.REACTOR.get());
+        basicItem(ModItems.RUNE_ENGINEER_LEGGINGS.get());
+        basicItem(ModItems.RUNE_ENGINEER_BOOTS.get());
     }
 
     // Shoutout to El_Redstoniano for making this

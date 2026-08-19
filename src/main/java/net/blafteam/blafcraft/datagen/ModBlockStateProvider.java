@@ -50,6 +50,11 @@ public class ModBlockStateProvider extends BlockStateProvider {
         customLamp();
 
         blockWithItem(ModBlocks.SCULK_ORE);
+
+        blockWithItem(ModBlocks.RUBY_BLOCK);
+
+        blockWithItem(ModBlocks.RUBY_ORE);
+        blockWithItem(ModBlocks.RUBY_DEEPSLATE_ORE);
     }
 
     private void customLamp() {
