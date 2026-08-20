@@ -68,9 +68,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
         // simpleBlockWithItem(ModBlocks.CRAFTING_STATION.get(), craftingStationModel);
 
-        blockWithItem(ModBlocks.RUNE_STORE_BLOCK);
-        blockWithItem(ModBlocks.RUNE_ACTION_BLOCK);
-        blockWithItem(ModBlocks.RUNE_CRAFT_BLOCK);
+        blockWithItem(ModBlocks.RUNE_BLOCK);
     }
 
     private void customLamp() {

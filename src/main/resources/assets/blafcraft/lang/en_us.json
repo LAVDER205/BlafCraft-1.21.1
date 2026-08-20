@@ -140,9 +140,7 @@
   "block.blafcraft.ruby_ore": "Ruby Ore",
   "block.blafcraft.ruby_deepslate_ore": "Ruby Deepslate Ore",
 
-  "block.blafcraft.rune_store_block": "Rune Store Block",
-  "block.blafcraft.rune_action_block": "Rune Action Block",
-  "block.blafcraft.rune_craft_block": "Rune Craft Block",
+  "block.blafcraft.rune_block": "Rune Block",
 
   "creativetab.blafcraft.blafcraft_items": "BlafCraft Items",
   "creativetab.blafcraft.blafcraft_blocks": "BlafCraft Blocks",

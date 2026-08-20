@@ -16,7 +16,7 @@ import net.blafteam.blafcraft.particle.*;
 import net.blafteam.blafcraft.potion.ModPotions;
 import net.blafteam.blafcraft.screen.ModMenuTypes;
 import net.blafteam.blafcraft.screen.custom.RealizerScreen;
-import net.blafteam.blafcraft.screen.custom.RuneActionScreen;
+import net.blafteam.blafcraft.screen.custom.RuneScreen;
 import net.blafteam.blafcraft.sound.ModSounds;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
@@ -133,7 +133,7 @@ public class BlafCraft {
         @SubscribeEvent
         public static void RegisterScreens(RegisterMenuScreensEvent event) {
             event.register(ModMenuTypes.REALIZER_MENU.get(), RealizerScreen::new);
-            event.register(ModMenuTypes.RUNE_ACTION_MENU.get(), RuneActionScreen::new);
+            event.register(ModMenuTypes.RUNE_ACTION_MENU.get(), RuneScreen::new);
         }
     }
 }

@@ -6,7 +6,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.loot.BlockLootSubProvider;
-import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -67,9 +66,7 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
         add(ModBlocks.RUBY_DEEPSLATE_ORE.get(),
                 block -> createMultipleOreDrops(ModBlocks.RUBY_DEEPSLATE_ORE.get(), ModItems.RUBY.get(), 2, 3));
 
-        dropSelf(ModBlocks.RUNE_STORE_BLOCK.get());
-        dropSelf(ModBlocks.RUNE_ACTION_BLOCK.get());
-        dropSelf(ModBlocks.RUNE_CRAFT_BLOCK.get());
+        dropSelf(ModBlocks.RUNE_BLOCK.get());
     }
 
     protected LootTable.Builder createMultipleOreDrops(Block pBlock, Item item, float minDrops, float maxDrops) {

@@ -9,11 +9,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-public class RuneActionScreen extends AbstractContainerScreen<RuneActionMenu> {
+public class RuneScreen extends AbstractContainerScreen<RuneMenu> {
     private static final ResourceLocation GUI_TEXTURE =
-            ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "textures/gui/rune_action_block/rune_action_block_gui.png");
+            ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "textures/gui/rune_block/rune_block_gui.png");
 
-    public RuneActionScreen(RuneActionMenu menu, Inventory playerInventory, Component title) {
+    public RuneScreen(RuneMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
     }
 

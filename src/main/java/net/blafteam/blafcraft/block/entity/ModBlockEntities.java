@@ -21,9 +21,9 @@ public class ModBlockEntities {
 //            BLOCK_ENTITIES.register("rune_store_be", () -> BlockEntityType.Builder.of(
 //                    RuneStoreBlockEntity::new, ModBlocks.RUNE_STORE_BLOCK.get()).build(null));
 
-    public static final Supplier<BlockEntityType<RuneActionBlockEntity>> RUNE_ACTION_BE =
+    public static final Supplier<BlockEntityType<RuneBlockEntity>> RUNE_ACTION_BE =
             BLOCK_ENTITIES.register("rune_action_be", () -> BlockEntityType.Builder.of(
-                    RuneActionBlockEntity::new, ModBlocks.RUNE_ACTION_BLOCK.get()).build(null));
+                    RuneBlockEntity::new, ModBlocks.RUNE_BLOCK.get()).build(null));
 
 //    public static final Supplier<BlockEntityType<RuneCraftBlockEntity>> RUNE_CRAFT_BE =
 //            BLOCK_ENTITIES.register("rune_craft_be", () -> BlockEntityType.Builder.of(

@@ -2,20 +2,24 @@ package net.blafteam.blafcraft.block.entity;
 
 import net.blafteam.blafcraft.entity.custom.LargeArtilleryFireballEntity;
 import net.blafteam.blafcraft.entity.custom.SmallArtilleryFireballEntity;
+import net.blafteam.blafcraft.friend_system.FriendManager;
 import net.blafteam.blafcraft.item.ModItems;
-import net.blafteam.blafcraft.screen.custom.RuneActionMenu;
+import net.blafteam.blafcraft.screen.custom.RuneMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -30,15 +34,19 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
+import javax.annotation.Nullable;
 import java.util.Comparator;
-import java.util.List;
+import java.util.UUID;
 
-public class RuneActionBlockEntity extends BlockEntity implements MenuProvider, ContainerData {
+public class RuneBlockEntity extends BlockEntity implements MenuProvider, ContainerData {
 
-    private int tickCounter = 0;
+    private int ShootTickCounter = 0;
+    private int ParticleTickCounter = 0;
     private static final int SHOOT_INTERVAL_TICKS = 20; // раз в секунду
+    private static final int PARTICLE_INTERVAL_TICKS = 40;
     private static final int ENERGY_COST = 5;     // энергия за одну стрелу
     private static final double TARGET_RADIUS = 20.0;
+    private UUID ownerUUID = null;
 
     // ===== Энергия =====
     private int energy = 0;
@@ -73,7 +81,7 @@ public class RuneActionBlockEntity extends BlockEntity implements MenuProvider, 
         }
     };
 
-    public RuneActionBlockEntity(BlockPos pos, BlockState blockState) {
+    public RuneBlockEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.RUNE_ACTION_BE.get(), pos, blockState);
     }
 
@@ -118,11 +126,21 @@ public class RuneActionBlockEntity extends BlockEntity implements MenuProvider, 
         return false;
     }
 
+    public UUID getOwnerUUID() {
+        return ownerUUID;
+    }
+
+    public void setOwnerUUID(UUID uuid) {
+        this.ownerUUID = uuid;
+        setChanged();
+    }
+
     // ===== Тикер =====
-    public static void serverTick(Level level, BlockPos pos, BlockState state, RuneActionBlockEntity blockEntity) {
+    public static void serverTick(Level level, BlockPos pos, BlockState state, RuneBlockEntity blockEntity) {
         if (level.isClientSide()) return;
 
-        blockEntity.tickCounter++;
+        blockEntity.ShootTickCounter++;
+        blockEntity.ParticleTickCounter++;
 
         // Попытка пополнить энергию из слота 1, если она на нуле
         if (blockEntity.energy <= 0) {
@@ -134,11 +152,16 @@ public class RuneActionBlockEntity extends BlockEntity implements MenuProvider, 
             }
         }
 
+        if (blockEntity.ParticleTickCounter >= PARTICLE_INTERVAL_TICKS) {
+            blockEntity.ParticleTickCounter = 0;
+            blockEntity.spawnRadiusParticles((ServerLevel) level);
+        }
+
         // Стрельба по таймеру, если энергии достаточно
-        if (blockEntity.tickCounter >= SHOOT_INTERVAL_TICKS) {
-            blockEntity.tickCounter = 0;
+        if (blockEntity.ShootTickCounter >= SHOOT_INTERVAL_TICKS) {
+            blockEntity.ShootTickCounter = 0;
             if (blockEntity.energy >= ENERGY_COST) {
-                if (blockEntity.shootSmallFireballAtNearestTarget()) {
+                if (blockEntity.shootLargeFireballAtNearestTarget()) {
                     blockEntity.consumeEnergy(ENERGY_COST);
                     blockEntity.setChanged();
                 }
@@ -150,90 +173,106 @@ public class RuneActionBlockEntity extends BlockEntity implements MenuProvider, 
         level.sendBlockUpdated(pos, state, state, 3);
     }
 
-    private boolean shootLargeFireballAtNearestTarget() { // not working for now
+    private boolean shootLargeFireballAtNearestTarget() {
         if (this.level == null) return false;
-        ServerLevel serverLevel = (ServerLevel) this.level;
         BlockPos pos = this.getBlockPos();
-
         Vec3 startVec = new Vec3(pos.getX() + 0.5, pos.getY() + 2.0, pos.getZ() + 0.5);
-        AABB searchArea = new AABB(pos).inflate(TARGET_RADIUS);
-        List<LivingEntity> candidates = this.level.getEntitiesOfClass(LivingEntity.class, searchArea,
-                e -> e.isAlive() && !(e instanceof Player));
-
-        if (candidates.isEmpty()) return false;
-
-        LivingEntity target = candidates.stream()
-                .min(Comparator.comparingDouble(e -> e.distanceToSqr(startVec)))
-                .orElse(null);
+        LivingEntity target = findNearestTarget(pos, startVec);
         if (target == null) return false;
 
         LargeArtilleryFireballEntity fireball = new LargeArtilleryFireballEntity(
-                this.level,
-                target,
-                startVec.x, startVec.y, startVec.z
-        );
+                this.level, target, startVec.x, startVec.y, startVec.z);
         this.level.addFreshEntity(fireball);
-
         return true;
     }
 
     private boolean shootSmallFireballAtNearestTarget() {
         if (this.level == null) return false;
-        ServerLevel serverLevel = (ServerLevel) this.level;
         BlockPos pos = this.getBlockPos();
-
         Vec3 startVec = new Vec3(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5);
-        AABB searchArea = new AABB(pos).inflate(TARGET_RADIUS);
-        List<LivingEntity> candidates = this.level.getEntitiesOfClass(LivingEntity.class, searchArea,
-                e -> e.isAlive() && !(e instanceof Player)); // исключаем игрока, если нужно
-
-        if (candidates.isEmpty()) return false;
-
-        LivingEntity target = candidates.stream()
-                .min(Comparator.comparingDouble(e -> e.distanceToSqr(startVec)))
-                .orElse(null);
+        LivingEntity target = findNearestTarget(pos, startVec);
         if (target == null) return false;
 
         SmallArtilleryFireballEntity fireball = new SmallArtilleryFireballEntity(
-                this.level,
-                target,
-                startVec.x, startVec.y, startVec.z
-        );
+                this.level, target, startVec.x, startVec.y, startVec.z);
         this.level.addFreshEntity(fireball);
-
         return true;
     }
 
     private boolean shootArrowAtNearestTarget() {
         if (this.level == null) return false;
-        ServerLevel serverLevel = (ServerLevel) this.level;
         BlockPos pos = this.getBlockPos();
-
-        // Ищем ближайшую живую сущность (не игрока? можно исключить по желанию)
         Vec3 startVec = new Vec3(pos.getX() + 0.5, pos.getY() + 2.0, pos.getZ() + 0.5);
-        AABB searchArea = new AABB(pos).inflate(TARGET_RADIUS);
-        List<LivingEntity> candidates = this.level.getEntitiesOfClass(LivingEntity.class, searchArea,
-                e -> e.isAlive() && !e.equals(null)); // можно добавить фильтр: !(e instanceof Player)
-
-        if (candidates.isEmpty()) return false;
-
-        LivingEntity target = candidates.stream()
-                .min(Comparator.comparingDouble(e -> e.distanceToSqr(startVec)))
-                .orElse(null);
+        LivingEntity target = findNearestTarget(pos, startVec);
         if (target == null) return false;
 
-        // Создаём стрелу
         Arrow arrow = EntityType.ARROW.create(this.level);
         if (arrow == null) return false;
-
         arrow.setPos(startVec);
-        arrow.setOwner(null); // можно назначить "владельцем" блок, но тогда стрела будет иметь тег блока
         Vec3 targetVec = target.getEyePosition(1.0F);
         Vec3 direction = targetVec.subtract(startVec).normalize();
-        arrow.shoot(direction.x, direction.y, direction.z, 1.5f, 2.0f); // скорость и разброс
+        arrow.shoot(direction.x, direction.y, direction.z, 1.5f, 2.0f);
         this.level.addFreshEntity(arrow);
-
         return true;
+    }
+
+    private LivingEntity findNearestTarget(BlockPos pos, Vec3 startVec) {
+        AABB searchArea = new AABB(pos).inflate(TARGET_RADIUS);
+        return this.level.getEntitiesOfClass(LivingEntity.class, searchArea,
+                        e -> e.isAlive() && isValidTarget(e))
+                .stream()
+                .min(Comparator.comparingDouble(e -> e.distanceToSqr(startVec)))
+                .orElse(null);
+    }
+
+    private boolean isValidTarget(LivingEntity entity) {
+        if (entity instanceof ServerPlayer player) {
+            ServerPlayer owner = getOwner();
+            if (owner != null) {
+                // Исключаем владельца
+                if (player.getUUID().equals(ownerUUID)) {
+                    return false;
+                }
+                // Проверяем, является ли player другом владельца
+                if (FriendManager.isFriend(owner, player)) {
+                    return false;
+                }
+            }
+            // Если владелец офлайн или дружба не определена, решаем:
+            // например, атаковать всех (кроме владельца, если он онлайн)
+            // Можно вернуть false, чтобы не стрелять по игрокам без владельца
+            return owner != null; // атакуем игроков только если владелец онлайн
+        }
+        return true; // мобов всегда атакуем
+    }
+
+    private void spawnRadiusParticles(ServerLevel level) {
+        BlockPos pos = this.getBlockPos();
+        double centerX = pos.getX() + 0.5;
+        double centerZ = pos.getZ() + 0.5;
+        double y = pos.getY() + 1.2;
+        int particleCount = 24;
+
+        // Перебираем всех игроков на сервере, находящихся в разумном радиусе
+        for (ServerPlayer player : level.players()) {
+            // Проверяем, надет ли железный шлем (любой слот, но обычно голова)
+            ItemStack helmet = player.getItemBySlot(EquipmentSlot.HEAD);
+            if (!helmet.is(ModItems.OCULAR_OF_OTHER_SIGHT)) continue; // пропускаем без шлема
+
+            // Отправляем частицы этому игроку
+            for (int i = 0; i < particleCount; i++) {
+                double angle = 2 * Math.PI * i / particleCount;
+                double x = centerX + TARGET_RADIUS * Math.cos(angle);
+                double z = centerZ + TARGET_RADIUS * Math.sin(angle);
+                level.sendParticles(player, ParticleTypes.END_ROD, true, x, y, z, 1, 0, 0, 0, 0.01);
+            }
+        }
+    }
+
+    @Nullable
+    private ServerPlayer getOwner() {
+        if (ownerUUID == null || !(this.level instanceof ServerLevel serverLevel)) return null;
+        return serverLevel.getServer().getPlayerList().getPlayer(ownerUUID);
     }
 
     // ===== ContainerData =====
@@ -278,12 +317,20 @@ public class RuneActionBlockEntity extends BlockEntity implements MenuProvider, 
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.put("inventory", inventory.serializeNBT(registries));
+        if (ownerUUID != null) {
+            tag.putUUID("OwnerUUID", ownerUUID);
+        }
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         inventory.deserializeNBT(registries, tag.getCompound("inventory"));
+        if (tag.hasUUID("OwnerUUID")) {
+            ownerUUID = tag.getUUID("OwnerUUID");
+        } else {
+            ownerUUID = null;
+        }
     }
 
     @Override
@@ -293,7 +340,7 @@ public class RuneActionBlockEntity extends BlockEntity implements MenuProvider, 
 
     @Override
     public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
-        return new RuneActionMenu(containerId, playerInventory, this);
+        return new RuneMenu(containerId, playerInventory, this);
     }
 
     @javax.annotation.Nullable

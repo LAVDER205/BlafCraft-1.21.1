@@ -1,7 +1,7 @@
 package net.blafteam.blafcraft.screen.custom;
 
 import net.blafteam.blafcraft.block.ModBlocks;
-import net.blafteam.blafcraft.block.entity.RuneActionBlockEntity;
+import net.blafteam.blafcraft.block.entity.RuneBlockEntity;
 import net.blafteam.blafcraft.screen.ModMenuTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
@@ -15,18 +15,18 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
-public class RuneActionMenu extends AbstractContainerMenu {
-    public final RuneActionBlockEntity blockEntity;
+public class RuneMenu extends AbstractContainerMenu {
+    public final RuneBlockEntity blockEntity;
     private final Level level;
     private final ContainerData data;
 
-    public RuneActionMenu(int containerId, Inventory inv, FriendlyByteBuf extraData) {
+    public RuneMenu(int containerId, Inventory inv, FriendlyByteBuf extraData) {
         this(containerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
     }
 
-    public RuneActionMenu(int containerId, Inventory inv, BlockEntity blockEntity) {
+    public RuneMenu(int containerId, Inventory inv, BlockEntity blockEntity) {
         super(ModMenuTypes.RUNE_ACTION_MENU.get(), containerId);
-        this.blockEntity = ((RuneActionBlockEntity) blockEntity);
+        this.blockEntity = ((RuneBlockEntity) blockEntity);
         this.level = inv.player.level();
         this.data = (ContainerData) blockEntity;
 
@@ -99,7 +99,7 @@ public class RuneActionMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player player) {
         return stillValid(ContainerLevelAccess.create(level, blockEntity.getBlockPos()),
-                player, ModBlocks.RUNE_ACTION_BLOCK.get());
+                player, ModBlocks.RUNE_BLOCK.get());
     }
 
     private void addPlayerInventory(Inventory playerInventory) {

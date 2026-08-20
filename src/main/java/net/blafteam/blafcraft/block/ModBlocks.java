@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.state.properties.WoodType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import org.checkerframework.checker.units.qual.C;
 
 import java.util.function.Supplier;
 
@@ -88,12 +87,8 @@ public class ModBlocks {
             () -> new DropExperienceBlock(UniformInt.of(3, 6),
                     BlockBehaviour.Properties.of().strength(4f).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE)));
 
-    public static final DeferredBlock<Block> RUNE_STORE_BLOCK = registerBlock("rune_store_block",
-            () -> new Block(BlockBehaviour.Properties.of().strength(2f).sound(SoundType.AMETHYST)));
-    public static final DeferredBlock<Block> RUNE_ACTION_BLOCK = registerBlock("rune_action_block",
-            () -> new RuneActionBlock(BlockBehaviour.Properties.of().strength(2f).sound(SoundType.AMETHYST)));
-    public static final DeferredBlock<Block> RUNE_CRAFT_BLOCK = registerBlock("rune_craft_block",
-            () -> new Block(BlockBehaviour.Properties.of().strength(2f).sound(SoundType.AMETHYST)));
+    public static final DeferredBlock<Block> RUNE_BLOCK = registerBlock("rune_block",
+            () -> new RuneBlock(BlockBehaviour.Properties.of().strength(2f).sound(SoundType.AMETHYST)));
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
         DeferredBlock<T> toReturn = BLOCKS.register(name, block);
