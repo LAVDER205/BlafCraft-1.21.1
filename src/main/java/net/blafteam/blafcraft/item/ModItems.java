@@ -164,6 +164,22 @@ public class ModItems {
             () -> new UnbreakableArmorItem(ModArmorMaterials.RUNE_ENGINEER_ARMOR_MATERIAL, ArmorItem.Type.BOOTS,
                     new Item.Properties().durability(ArmorItem.Type.BOOTS.getDurability(19))));
 
+    public static final DeferredItem<Item> SHARP_RUNE = ITEMS.register("sharp_rune",
+            () -> new RuneItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> FIRE_RUNE = ITEMS.register("fire_rune",
+            () -> new RuneItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> EXPLOSIVE_RUNE = ITEMS.register("explosive_rune",
+            () -> new RuneItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> SPEED_RUNE = ITEMS.register("speed_rune",
+            () -> new RuneItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> STRENGTH_RUNE = ITEMS.register("strength_rune",
+            () -> new RuneItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> HEAL_RUNE = ITEMS.register("heal_rune",
+            () -> new RuneItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> DEFENCE_RUNE = ITEMS.register("defence_rune",
+            () -> new RuneItem(new Item.Properties().stacksTo(1)));
+
 
 
     public static void register(IEventBus eventBus) {

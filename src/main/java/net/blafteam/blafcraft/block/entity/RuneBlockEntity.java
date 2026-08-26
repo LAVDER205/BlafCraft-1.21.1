@@ -4,8 +4,10 @@ import net.blafteam.blafcraft.entity.custom.LargeArtilleryFireballEntity;
 import net.blafteam.blafcraft.entity.custom.SmallArtilleryFireballEntity;
 import net.blafteam.blafcraft.friend_system.FriendManager;
 import net.blafteam.blafcraft.item.ModItems;
+import net.blafteam.blafcraft.item.custom.RuneItem;
 import net.blafteam.blafcraft.screen.custom.RuneMenu;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -18,6 +20,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -26,6 +31,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -42,30 +48,52 @@ public class RuneBlockEntity extends BlockEntity implements MenuProvider, Contai
 
     private int ShootTickCounter = 0;
     private int ParticleTickCounter = 0;
-    private static final int SHOOT_INTERVAL_TICKS = 20; // раз в секунду
+    private int EffectTickCounter = 0;
+
+    private static final int ARROW_SHOOT_INTERVAL_TICKS = 10;
+    private static final int FIREBALL_SHOOT_INTERVAL_TICKS = 20;
+    private static final int LARGE_FIREBALL_SHOOT_INTERVAL_TICKS = 40;
     private static final int PARTICLE_INTERVAL_TICKS = 40;
-    private static final int ENERGY_COST = 5;     // энергия за одну стрелу
-    private static final double TARGET_RADIUS = 20.0;
+    private static final int EFFECT_INTERVAL_TICKS = 40;
+
+    private static final int ENERGY_COST_ARROW = 5;
+    private static final int ENERGY_COST_FIREBALL = 10;
+    private static final int ENERGY_COST_LARGE_FIREBALL = 20;
+
+    private static final double ARROW_TARGET_RADIUS = 10.0;
+    private static final double FIREBALL_TARGET_RADIUS = 20.0;
+    private static final double LARGE_FIREBALL_TARGET_RADIUS = 40.0;
+
+    private static final double EFFECT_RADIUS = 20.0;
+
     private UUID ownerUUID = null;
 
     // ===== Энергия =====
     private int energy = 0;
     private final int maxEnergy = 100; // например, максимальная ёмкость
 
-    public final ItemStackHandler inventory = new ItemStackHandler(2) {
+    public final ItemStackHandler inventory = new ItemStackHandler(3) {
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return slot == 0  ||
-                    (slot == 1 && stack.getItem().equals(ModItems.LIQUID_COPPER.get()));
+            return (slot == 0 && stack.getItem() instanceof RuneItem item && (item.equals(ModItems.SHARP_RUNE.get()) ||
+                                                                                item.equals(ModItems.FIRE_RUNE.get()) ||
+                                                                                item.equals(ModItems.EXPLOSIVE_RUNE.get())))  ||
+
+                    (slot == 1 && stack.getItem() instanceof RuneItem item2 && (item2.equals(ModItems.SPEED_RUNE.get()) ||
+                                                                                item2.equals(ModItems.STRENGTH_RUNE.get()) ||
+                                                                                item2.equals(ModItems.HEAL_RUNE.get()) ||
+                                                                                item2.equals(ModItems.DEFENCE_RUNE.get()))) ||
+
+                    (slot == 2 && stack.getItem().equals(ModItems.LIQUID_COPPER.get()));
         }
 
         @Override
         protected int getStackLimit(int slot, ItemStack stack) {
             switch (slot) {
-                case 0 -> {
+                case 0, 1 -> {
                     return 1;
                 }
-                case 1 -> {
+                case 2 -> {
                     return 64;
                 }
             }
@@ -109,21 +137,24 @@ public class RuneBlockEntity extends BlockEntity implements MenuProvider, Contai
     public boolean consumeEnergy(int amount) {
         if (this.energy >= amount) {
             this.energy -= amount;
-            setChanged();
-            if (level != null && !level.isClientSide()) {
-                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-            }
+            markEnergyChanged();
             return true;
-        } else if (!inventory.getStackInSlot(1).isEmpty()) {
-            inventory.getStackInSlot(1).shrink(1);
-            this.energy = this.maxEnergy - amount - this.energy;
-            setChanged();
-            if (level != null && !level.isClientSide()) {
-                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-            }
+        }
+        ItemStack fuelStack = inventory.getStackInSlot(2);
+        if (!fuelStack.isEmpty() && fuelStack.getItem() == ModItems.LIQUID_COPPER.get()) {
+            fuelStack.shrink(1);
+            this.energy = this.maxEnergy - amount;
+            markEnergyChanged();
             return true;
         }
         return false;
+    }
+
+    private void markEnergyChanged() {
+        setChanged();
+        if (level != null && !level.isClientSide()) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+        }
     }
 
     public UUID getOwnerUUID() {
@@ -141,10 +172,14 @@ public class RuneBlockEntity extends BlockEntity implements MenuProvider, Contai
 
         blockEntity.ShootTickCounter++;
         blockEntity.ParticleTickCounter++;
+        blockEntity.EffectTickCounter++;
 
-        // Попытка пополнить энергию из слота 1, если она на нуле
+        Item attackRune = blockEntity.inventory.getStackInSlot(0).getItem();
+        Item effectRune = blockEntity.inventory.getStackInSlot(1).getItem();
+
+        // Пополнение энергии, если она на нуле и есть топливо
         if (blockEntity.energy <= 0) {
-            ItemStack fuelStack = blockEntity.inventory.getStackInSlot(1);
+            ItemStack fuelStack = blockEntity.inventory.getStackInSlot(2);
             if (!fuelStack.isEmpty() && fuelStack.getItem() == ModItems.LIQUID_COPPER.get()) {
                 fuelStack.shrink(1);
                 blockEntity.energy = blockEntity.maxEnergy;
@@ -152,58 +187,56 @@ public class RuneBlockEntity extends BlockEntity implements MenuProvider, Contai
             }
         }
 
+        // Частицы радиуса
         if (blockEntity.ParticleTickCounter >= PARTICLE_INTERVAL_TICKS) {
             blockEntity.ParticleTickCounter = 0;
-            blockEntity.spawnRadiusParticles((ServerLevel) level);
-        }
-
-        // Стрельба по таймеру, если энергии достаточно
-        if (blockEntity.ShootTickCounter >= SHOOT_INTERVAL_TICKS) {
-            blockEntity.ShootTickCounter = 0;
-            if (blockEntity.energy >= ENERGY_COST) {
-                if (blockEntity.shootLargeFireballAtNearestTarget()) {
-                    blockEntity.consumeEnergy(ENERGY_COST);
-                    blockEntity.setChanged();
+            if (!blockEntity.inventory.getStackInSlot(0).isEmpty()) {
+                if (attackRune == ModItems.SHARP_RUNE.get()) {
+                    blockEntity.spawnRadiusParticles((ServerLevel) level, ARROW_TARGET_RADIUS);
+                } else if (attackRune == ModItems.FIRE_RUNE.get()) {
+                    blockEntity.spawnRadiusParticles((ServerLevel) level, FIREBALL_TARGET_RADIUS);
+                } else if (attackRune == ModItems.EXPLOSIVE_RUNE.get()) {
+                    blockEntity.spawnRadiusParticles((ServerLevel) level, LARGE_FIREBALL_TARGET_RADIUS);
                 }
+            }
+            if (!blockEntity.inventory.getStackInSlot(1).isEmpty()) {
+                blockEntity.spawnRadiusParticles((ServerLevel) level, EFFECT_RADIUS);
             }
         }
 
-        // Обновляем блок (синхронизация с клиентом)
+        // Эффекты для союзников с нагрудником REACTOR
+        if (blockEntity.EffectTickCounter >= EFFECT_INTERVAL_TICKS) {
+            blockEntity.EffectTickCounter = 0;
+            applyEffectToNearbyPlayers((ServerLevel) level, pos, blockEntity.inventory);
+        }
+
+        // Стрельба в зависимости от атакующей руны
+        if (attackRune == ModItems.SHARP_RUNE.get() && blockEntity.ShootTickCounter >= ARROW_SHOOT_INTERVAL_TICKS) {
+            blockEntity.ShootTickCounter = 0;
+            if (blockEntity.shootArrowAtNearestTarget()) {
+                blockEntity.consumeEnergy(ENERGY_COST_ARROW);
+            }
+        } else if (attackRune == ModItems.FIRE_RUNE.get() && blockEntity.ShootTickCounter >= FIREBALL_SHOOT_INTERVAL_TICKS) {
+            blockEntity.ShootTickCounter = 0;
+            if (blockEntity.shootSmallFireballAtNearestTarget()) {
+                blockEntity.consumeEnergy(ENERGY_COST_FIREBALL);
+            }
+        } else if (attackRune == ModItems.EXPLOSIVE_RUNE.get() && blockEntity.ShootTickCounter >= LARGE_FIREBALL_SHOOT_INTERVAL_TICKS) {
+            blockEntity.ShootTickCounter = 0;
+            if (blockEntity.shootLargeFireballAtNearestTarget()) {
+                blockEntity.consumeEnergy(ENERGY_COST_LARGE_FIREBALL);
+            }
+        }
+
         blockEntity.setChanged();
         level.sendBlockUpdated(pos, state, state, 3);
-    }
-
-    private boolean shootLargeFireballAtNearestTarget() {
-        if (this.level == null) return false;
-        BlockPos pos = this.getBlockPos();
-        Vec3 startVec = new Vec3(pos.getX() + 0.5, pos.getY() + 2.0, pos.getZ() + 0.5);
-        LivingEntity target = findNearestTarget(pos, startVec);
-        if (target == null) return false;
-
-        LargeArtilleryFireballEntity fireball = new LargeArtilleryFireballEntity(
-                this.level, target, startVec.x, startVec.y, startVec.z);
-        this.level.addFreshEntity(fireball);
-        return true;
-    }
-
-    private boolean shootSmallFireballAtNearestTarget() {
-        if (this.level == null) return false;
-        BlockPos pos = this.getBlockPos();
-        Vec3 startVec = new Vec3(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5);
-        LivingEntity target = findNearestTarget(pos, startVec);
-        if (target == null) return false;
-
-        SmallArtilleryFireballEntity fireball = new SmallArtilleryFireballEntity(
-                this.level, target, startVec.x, startVec.y, startVec.z);
-        this.level.addFreshEntity(fireball);
-        return true;
     }
 
     private boolean shootArrowAtNearestTarget() {
         if (this.level == null) return false;
         BlockPos pos = this.getBlockPos();
         Vec3 startVec = new Vec3(pos.getX() + 0.5, pos.getY() + 2.0, pos.getZ() + 0.5);
-        LivingEntity target = findNearestTarget(pos, startVec);
+        LivingEntity target = findNearestTarget(pos, startVec, ARROW_TARGET_RADIUS);
         if (target == null) return false;
 
         Arrow arrow = EntityType.ARROW.create(this.level);
@@ -216,8 +249,55 @@ public class RuneBlockEntity extends BlockEntity implements MenuProvider, Contai
         return true;
     }
 
-    private LivingEntity findNearestTarget(BlockPos pos, Vec3 startVec) {
-        AABB searchArea = new AABB(pos).inflate(TARGET_RADIUS);
+    private boolean shootSmallFireballAtNearestTarget() {
+        if (this.level == null) return false;
+        BlockPos pos = this.getBlockPos();
+        Vec3 startVec = new Vec3(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5);
+        LivingEntity target = findNearestTarget(pos, startVec, FIREBALL_TARGET_RADIUS);
+        if (target == null) return false;
+
+        SmallArtilleryFireballEntity fireball = new SmallArtilleryFireballEntity(
+                this.level, target, startVec.x, startVec.y, startVec.z);
+        this.level.addFreshEntity(fireball);
+        return true;
+    }
+
+    private boolean shootLargeFireballAtNearestTarget() {
+        if (this.level == null) return false;
+        BlockPos pos = this.getBlockPos();
+        Vec3 startVec = new Vec3(pos.getX() + 0.5, pos.getY() + 2.0, pos.getZ() + 0.5);
+        LivingEntity target = findNearestTarget(pos, startVec, LARGE_FIREBALL_TARGET_RADIUS);
+        if (target == null) return false;
+
+        LargeArtilleryFireballEntity fireball = new LargeArtilleryFireballEntity(
+                this.level, target, startVec.x, startVec.y, startVec.z);
+        this.level.addFreshEntity(fireball);
+        return true;
+    }
+
+    private static void applyEffectToNearbyPlayers(ServerLevel level, BlockPos pos, ItemStackHandler inventory) {
+        double radiusSq = EFFECT_RADIUS * EFFECT_RADIUS;
+        Vec3 center = pos.getCenter();
+        Item rune = inventory.getStackInSlot(1).getItem();
+
+        Holder<MobEffect> effect = null;
+        if (rune == ModItems.SPEED_RUNE.get()) effect = MobEffects.MOVEMENT_SPEED;
+        else if (rune == ModItems.STRENGTH_RUNE.get()) effect = MobEffects.DAMAGE_BOOST;
+        else if (rune == ModItems.HEAL_RUNE.get()) effect = MobEffects.REGENERATION;
+        else if (rune == ModItems.DEFENCE_RUNE.get()) effect = MobEffects.DAMAGE_RESISTANCE;
+
+        if (effect == null) return;
+
+        for (ServerPlayer sp : level.players()) {
+            if (sp.getItemBySlot(EquipmentSlot.CHEST).is(ModItems.REACTOR) &&
+                    sp.position().distanceToSqr(center) <= radiusSq) {
+                sp.addEffect(new MobEffectInstance(effect, 60, 1, true, false, true));
+            }
+        }
+    }
+
+    private LivingEntity findNearestTarget(BlockPos pos, Vec3 startVec, double radius) {
+        AABB searchArea = new AABB(pos).inflate(radius);
         return this.level.getEntitiesOfClass(LivingEntity.class, searchArea,
                         e -> e.isAlive() && isValidTarget(e))
                 .stream()
@@ -246,7 +326,7 @@ public class RuneBlockEntity extends BlockEntity implements MenuProvider, Contai
         return true; // мобов всегда атакуем
     }
 
-    private void spawnRadiusParticles(ServerLevel level) {
+    private void spawnRadiusParticles(ServerLevel level, double radius) {
         BlockPos pos = this.getBlockPos();
         double centerX = pos.getX() + 0.5;
         double centerZ = pos.getZ() + 0.5;
@@ -262,8 +342,8 @@ public class RuneBlockEntity extends BlockEntity implements MenuProvider, Contai
             // Отправляем частицы этому игроку
             for (int i = 0; i < particleCount; i++) {
                 double angle = 2 * Math.PI * i / particleCount;
-                double x = centerX + TARGET_RADIUS * Math.cos(angle);
-                double z = centerZ + TARGET_RADIUS * Math.sin(angle);
+                double x = centerX + radius * Math.cos(angle);
+                double z = centerZ + radius * Math.sin(angle);
                 level.sendParticles(player, ParticleTypes.END_ROD, true, x, y, z, 1, 0, 0, 0, 0.01);
             }
         }
@@ -317,20 +397,17 @@ public class RuneBlockEntity extends BlockEntity implements MenuProvider, Contai
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.put("inventory", inventory.serializeNBT(registries));
-        if (ownerUUID != null) {
-            tag.putUUID("OwnerUUID", ownerUUID);
-        }
+        if (ownerUUID != null) tag.putUUID("OwnerUUID", ownerUUID);
+        tag.putInt("Energy", energy);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         inventory.deserializeNBT(registries, tag.getCompound("inventory"));
-        if (tag.hasUUID("OwnerUUID")) {
-            ownerUUID = tag.getUUID("OwnerUUID");
-        } else {
-            ownerUUID = null;
-        }
+        if (tag.hasUUID("OwnerUUID")) ownerUUID = tag.getUUID("OwnerUUID");
+        else ownerUUID = null;
+        energy = tag.getInt("Energy");
     }
 
     @Override

@@ -115,6 +115,14 @@ public class ModItemModelProvider extends ItemModelProvider {
         basicItem(ModItems.REACTOR.get());
         basicItem(ModItems.RUNE_ENGINEER_LEGGINGS.get());
         basicItem(ModItems.RUNE_ENGINEER_BOOTS.get());
+
+        basicItem(ModItems.SHARP_RUNE.get());
+        basicItem(ModItems.FIRE_RUNE.get());
+        basicItem(ModItems.EXPLOSIVE_RUNE.get());
+        basicItem(ModItems.SPEED_RUNE.get());
+        basicItem(ModItems.STRENGTH_RUNE.get());
+        basicItem(ModItems.HEAL_RUNE.get());
+        basicItem(ModItems.DEFENCE_RUNE.get());
     }
 
     // Shoutout to El_Redstoniano for making this

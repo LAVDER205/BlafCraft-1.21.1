@@ -84,6 +84,14 @@ public class ModCreativeModeTabs {
                         output.accept(ModItems.RUNE_ENGINEER_LEGGINGS);
                         output.accept(ModItems.RUNE_ENGINEER_BOOTS);
 
+                        output.accept(ModItems.SHARP_RUNE);
+                        output.accept(ModItems.FIRE_RUNE);
+                        output.accept(ModItems.EXPLOSIVE_RUNE);
+                        output.accept(ModItems.SPEED_RUNE);
+                        output.accept(ModItems.STRENGTH_RUNE);
+                        output.accept(ModItems.HEAL_RUNE);
+                        output.accept(ModItems.DEFENCE_RUNE);
+
                     }).build());
 
     public static final Supplier<CreativeModeTab> BLAFCRAFT_BLOCKS_TAB = CREATIVE_MODE_TAB .register("blafcraft_blocks_tab",

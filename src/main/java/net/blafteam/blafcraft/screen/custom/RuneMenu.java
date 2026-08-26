@@ -34,8 +34,9 @@ public class RuneMenu extends AbstractContainerMenu {
         addPlayerHotbar(inv);
         addDataSlots(data);
 
-        this.addSlot(new SlotItemHandler(this.blockEntity.inventory, 0, 31, 37));
-        this.addSlot(new SlotItemHandler(this.blockEntity.inventory, 1, 84, 37));
+        this.addSlot(new SlotItemHandler(this.blockEntity.inventory, 0, 30, 22));
+        this.addSlot(new SlotItemHandler(this.blockEntity.inventory, 1, 76, 51));
+        this.addSlot(new SlotItemHandler(this.blockEntity.inventory, 2, 111, 20));
     }
 
     public int getEnergy() {
@@ -62,7 +63,7 @@ public class RuneMenu extends AbstractContainerMenu {
     private static final int TE_INVENTORY_FIRST_SLOT_INDEX = VANILLA_FIRST_SLOT_INDEX + VANILLA_SLOT_COUNT;
 
     // THIS YOU HAVE TO DEFINE!
-    private static final int TE_INVENTORY_SLOT_COUNT = 2;  // must be the number of slots you have!
+    private static final int TE_INVENTORY_SLOT_COUNT = 3;  // must be the number of slots you have!
     @Override
     public ItemStack quickMoveStack(Player playerIn, int pIndex) {
         Slot sourceSlot = slots.get(pIndex);
