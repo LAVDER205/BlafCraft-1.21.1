@@ -244,7 +244,7 @@ public class RuneBlockEntity extends BlockEntity implements MenuProvider, Contai
         arrow.setPos(startVec);
         Vec3 targetVec = target.getEyePosition(1.0F);
         Vec3 direction = targetVec.subtract(startVec).normalize();
-        arrow.shoot(direction.x, direction.y, direction.z, 1.5f, 2.0f);
+        arrow.shoot(direction.x, direction.y, direction.z, 2.5f, 2.0f);
         this.level.addFreshEntity(arrow);
         return true;
     }

@@ -11,7 +11,8 @@ public enum ActionType {
     TIME_BOMB(400, 0, 0),
     FLIGHT(200,0,0),
     SCULK_MARK(1200,0,0),
-    MORPH(6000,0,0);
+    MORPH(6000,0,0),
+    OVERDOSE_ABILITY(1,0,0);
 
     private final int cooldownTicks;
     private final int exp_price;

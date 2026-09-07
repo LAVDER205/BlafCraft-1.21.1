@@ -82,7 +82,12 @@ public class ModEffects {
 
     public static final Holder<MobEffect> IMMORTAL_EFFECT = MOB_EFFECTS.register("immortal",
             () -> new ImmortalEffect(MobEffectCategory.BENEFICIAL, 0x83A2A8).addAttributeModifier(Attributes.KNOCKBACK_RESISTANCE,
-                    ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "immortal_attack"), 1,
+                    ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "immortal"), 1,
+                    AttributeModifier.Operation.ADD_VALUE));
+
+    public static final Holder<MobEffect> RAM_EFFECT = MOB_EFFECTS.register("ram",
+            () -> new RamEffect(MobEffectCategory.NEUTRAL, 0xBDBDBD).addAttributeModifier(Attributes.KNOCKBACK_RESISTANCE,
+                    ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "ram"), 1,
                     AttributeModifier.Operation.ADD_VALUE));
 
 

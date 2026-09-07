@@ -13,6 +13,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.Arrow;
@@ -193,6 +194,36 @@ public class ServerHandler {
                     case MORPH -> {
                         player.addEffect(new MobEffectInstance(ModEffects.MORPH_EFFECT, 1200, 0, false, false, true));
                         debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
+                    }
+
+                    case OVERDOSE_ABILITY -> {
+                        if (player.hasEffect(ModEffects.OVERDOSE_EFFECT)) {
+                            if (player.hasEffect(MobEffects.MOVEMENT_SPEED) &&
+                                    Objects.requireNonNull(player.getEffect(MobEffects.MOVEMENT_SPEED)).getAmplifier() >= 4) {
+
+                                Vec3 look = player.getViewVector(1.0F);
+                                Vec3 horizontalLook = new Vec3(look.x, 0, look.z).normalize();
+                                double power = 1.6;
+
+                                player.setDeltaMovement(horizontalLook.x * power, player.getDeltaMovement().y, horizontalLook.z * power);
+                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+
+                                player.addEffect(new MobEffectInstance(ModEffects.RAM_EFFECT, -1, 0, false, false, true));
+                            } else if (player.hasEffect(MobEffects.DAMAGE_BOOST) &&
+                                    Objects.requireNonNull(player.getEffect(MobEffects.DAMAGE_BOOST)).getAmplifier() >= 4) {
+
+                            } else if (player.hasEffect(MobEffects.REGENERATION) &&
+                                    Objects.requireNonNull(player.getEffect(MobEffects.REGENERATION)).getAmplifier() >= 4) {
+                                player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 10, 4, false, false, true));
+                            } else if (player.hasEffect(MobEffects.JUMP) &&
+                                    Objects.requireNonNull(player.getEffect(MobEffects.JUMP)).getAmplifier() >= 4) {
+
+                            } else if (player.hasEffect(MobEffects.DAMAGE_RESISTANCE) &&
+                                    Objects.requireNonNull(player.getEffect(MobEffects.DAMAGE_RESISTANCE)).getAmplifier() >= 4) {
+                                player.addEffect(new MobEffectInstance(ModEffects.IMMORTAL_EFFECT, 5, 0, false, false, true));
+                            }
+                            debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
+                        }
                     }
                 }
 

@@ -51,7 +51,7 @@ public class ClientSetup {
                     action = ActionType.BLOODLUST;
                 }
                 case "Dev" -> {
-                    action = ActionType.TEST;
+                    action = ActionType.OVERDOSE_ABILITY;
                 }
             }
         }
