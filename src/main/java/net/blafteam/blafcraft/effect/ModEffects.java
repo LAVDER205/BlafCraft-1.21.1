@@ -90,6 +90,11 @@ public class ModEffects {
                     ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "ram"), 1,
                     AttributeModifier.Operation.ADD_VALUE));
 
+    public static final Holder<MobEffect> STUN_EFFECT = MOB_EFFECTS.register("stun",
+            () -> new StunEffect(MobEffectCategory.HARMFUL, 0x959E91).addAttributeModifier(Attributes.MOVEMENT_SPEED,
+                    ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "stun"), -0.99,
+                    AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL));
+
 
     public static void register(IEventBus eventBus) {
         MOB_EFFECTS.register(eventBus);

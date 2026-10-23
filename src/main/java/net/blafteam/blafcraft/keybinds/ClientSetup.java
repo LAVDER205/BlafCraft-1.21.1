@@ -67,7 +67,7 @@ public class ClientSetup {
                 action = ActionType.BLOODLUST;
             }
             case "Dev" -> {
-                action = ActionType.SCULK_MARK;
+                action = ActionType.TEST;
             }
         }
         else if (event.getKey() == GLFW.GLFW_KEY_C)
@@ -82,7 +82,7 @@ public class ClientSetup {
                 action = ActionType.BLOODLUST;
             }
             case "Dev" -> {
-                action = ActionType.FLIGHT;
+                action = ActionType.TEST;
             }
         } else if (event.getKey() == GLFW.GLFW_KEY_B) {
             if (mc.hitResult instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof Player target) {

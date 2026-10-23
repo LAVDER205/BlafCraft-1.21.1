@@ -725,6 +725,8 @@ public class ModEvents {
         }
     }
 
+    //-------------------------------- IRON WILL LOGIC -------------------------------
+
     @SubscribeEvent
     public static void onIronWillDamaged(LivingDamageEvent.Pre event) {
         LivingEntity targetEntity = event.getEntity();
@@ -735,10 +737,66 @@ public class ModEvents {
         }
     }
 
+    //-------------------------------- IMMORTAL LOGIC -------------------------------
+
     @SubscribeEvent
     public static void onImmortalDamaged(LivingDamageEvent.Pre event) {
         if (event.getEntity().hasEffect(ModEffects.IMMORTAL_EFFECT)) {
             event.setNewDamage(0);
+        }
+    }
+
+    //-------------------------------- STUN LOGIC -------------------------------
+
+    @SubscribeEvent
+    public static void onStunnedAttack(AttackEntityEvent event) {
+        if (event.getEntity().hasEffect(ModEffects.STUN_EFFECT)) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onStunnedRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        if (event.getEntity().hasEffect(ModEffects.STUN_EFFECT)) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onStunnedRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+        if (event.getEntity().hasEffect(ModEffects.STUN_EFFECT)) {
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onStunnedLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
+        if (event.getEntity().hasEffect(ModEffects.STUN_EFFECT)) {
+            event.setCanceled(true);
+        }
+    }
+
+    private static final ResourceLocation STUN_ID =
+            ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "stun");
+
+    @SubscribeEvent
+    public static void onStunRemoved(MobEffectEvent.Remove event) {
+        Holder<MobEffect> holder = event.getEffect();
+        if (holder.getKey() != null && holder.getKey().location().equals(STUN_ID)) {
+            if (event.getEntity() instanceof Mob mob) {
+                mob.setNoAi(false);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onStunExpired(MobEffectEvent.Expired event) {
+        if (event.getEffectInstance() == null) return;
+        Holder<MobEffect> holder = event.getEffectInstance().getEffect();
+        if (holder.getKey() != null && holder.getKey().location().equals(STUN_ID)) {
+            if (event.getEntity() instanceof Mob mob) {
+                mob.setNoAi(false);
+            }
         }
     }
 }
