@@ -3,6 +3,7 @@ package net.blafteam.blafcraft.component;
 import com.mojang.serialization.Codec;
 import net.blafteam.blafcraft.BlafCraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
@@ -14,7 +15,7 @@ import java.util.function.UnaryOperator;
 
 public class ModDataComponents {
     public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENT_TYPES =
-            DeferredRegister.createDataComponents(BlafCraft.MODID);
+            DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, BlafCraft.MODID);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<BlockPos>> COORDINATES = register("coordinates",
             builder -> builder.persistent(BlockPos.CODEC));

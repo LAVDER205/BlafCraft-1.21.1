@@ -18,7 +18,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-@EventBusSubscriber(modid = BlafCraft.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = BlafCraft.MODID, value = Dist.CLIENT)
 public class ClientModBusEvents { // регистрация пакета на клиенте
 
     @SubscribeEvent

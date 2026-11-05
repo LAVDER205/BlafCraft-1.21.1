@@ -13,11 +13,11 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.api.distmarker.Dist;
 import org.lwjgl.glfw.GLFW;
 
-@EventBusSubscriber(modid = BlafCraft.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@EventBusSubscriber(modid = BlafCraft.MODID, value = Dist.CLIENT)
 public class ClientSetup {
 
     // Регистрация пакета (без изменений, но используем новый ActionPacket)
-    @EventBusSubscriber(modid = BlafCraft.MODID, bus = EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(modid = BlafCraft.MODID)
     public static class ModBusEvents {
         @SubscribeEvent
         public static void registerPayloads(RegisterPayloadHandlersEvent event) {
