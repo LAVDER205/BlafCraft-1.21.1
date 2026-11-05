@@ -184,3 +184,18 @@ idea {
         downloadJavadoc = true
     }
 }
+
+sourceSets {
+    persistenceCheck {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+
+tasks.register('verifyManaPersistence', JavaExec) {
+    group = 'verification'
+    description = 'Checks mana NBT persistence with non-default player values.'
+    classpath = sourceSets.persistenceCheck.runtimeClasspath
+    mainClass = 'net.blafteam.blafcraft.mana.ManaPersistenceCheck'
+}
+tasks.named('check') { dependsOn 'verifyManaPersistence' }

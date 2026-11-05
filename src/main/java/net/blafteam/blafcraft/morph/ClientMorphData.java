@@ -16,6 +16,10 @@ public class ClientMorphData {
         return morphId;
     }
 
+    public static void clear() {
+        morphId = null;
+    }
+
     public static boolean hasMorph() {
         return morphId != null;
     }
