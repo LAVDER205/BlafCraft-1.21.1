@@ -11,7 +11,7 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.*;
 
-@EventBusSubscriber(modid = BlafCraft.MODID, bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(modid = BlafCraft.MODID)
 public class HighlightManager {
     // Активные подсветки: игрок -> множество entityId
     private static final Map<UUID, Set<Integer>> playerHighlights = new HashMap<>();

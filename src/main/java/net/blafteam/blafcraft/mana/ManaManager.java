@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@EventBusSubscriber(modid = BlafCraft.MODID, bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(modid = BlafCraft.MODID)
 public class ManaManager {
     // Хранилище: UUID игрока -> его данные маны
     private static final Map<UUID, ManaData> playerMana = new HashMap<>();
