@@ -243,7 +243,7 @@ public class ServerHandler {
         player.setExperienceLevels(player.experienceLevel - exp_price); // цена exp
 
         PacketDistributor.sendToPlayer(player, new ManaSyncPayload( // синхронизация нового значения маны
-                ManaManager.getMana(player), 100));
+                ManaManager.getMana(player), ManaManager.getMaxMana(player)));
 
         ClientCooldowns.startCooldown(action);// кд
 

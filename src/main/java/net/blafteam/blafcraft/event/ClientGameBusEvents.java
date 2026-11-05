@@ -29,6 +29,12 @@ import java.util.Objects;
 @EventBusSubscriber(modid = BlafCraft.MODID, value = Dist.CLIENT)
 public class ClientGameBusEvents {
 
+    @SubscribeEvent
+    public static void onLogout(net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) {
+        ClientMorphData.clear();
+        CACHED_ENTITIES.clear();
+    }
+
     private static final Map<EntityType<?>, Entity> CACHED_ENTITIES = new HashMap<>();
 
     //-------------------------------- DISABLING NAMETAGS LOGIC -------------------------------
