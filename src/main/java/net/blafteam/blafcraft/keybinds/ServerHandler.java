@@ -33,7 +33,7 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-@EventBusSubscriber(modid = BlafCraft.MODID, bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(modid = BlafCraft.MODID)
 public class ServerHandler {
     public static final Set<UUID> playersWantToFly = new HashSet<>();
 

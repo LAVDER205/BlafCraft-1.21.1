@@ -65,7 +65,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-@EventBusSubscriber(modid = BlafCraft.MODID, bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(modid = BlafCraft.MODID)
 public class ModEvents {
     private static final Set<BlockPos> HARVESTED_BLOCKS = new HashSet<>();
 

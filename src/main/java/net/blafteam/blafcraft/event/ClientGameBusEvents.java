@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-@EventBusSubscriber(modid = BlafCraft.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@EventBusSubscriber(modid = BlafCraft.MODID, value = Dist.CLIENT)
 public class ClientGameBusEvents {
 
     private static final Map<EntityType<?>, Entity> CACHED_ENTITIES = new HashMap<>();
