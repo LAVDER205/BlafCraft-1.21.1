@@ -2,7 +2,11 @@ package net.blafteam.blafcraft.network;
 
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.keybinds.ActionPacket;
+import net.blafteam.blafcraft.keybinds.ClientCooldowns;
+import net.blafteam.blafcraft.keybinds.CooldownSyncPayload;
 import net.blafteam.blafcraft.keybinds.ServerHandler;
+import net.blafteam.blafcraft.mana.ClientManaHandler;
+import net.blafteam.blafcraft.mana.ManaSyncPayload;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -13,5 +17,9 @@ public class AbilityNetworking {
     public static void register(RegisterPayloadHandlersEvent event) {
         // Этот пакет нужен обеим сторонам, в том числе выделенному серверу без клиента Minecraft.
         event.registrar("2").playToServer(ActionPacket.TYPE, ActionPacket.STREAM_CODEC, ServerHandler::handle);
+        // Выделенный сервер тоже регистрирует пакет, хотя обработка выполняется на клиенте.
+        event.registrar("1").playToClient(ManaSyncPayload.TYPE, ManaSyncPayload.STREAM_CODEC, ClientManaHandler::handle);
+        event.registrar("1").playToClient(
+                CooldownSyncPayload.TYPE, CooldownSyncPayload.STREAM_CODEC, ClientCooldowns::handle);
     }
 }
