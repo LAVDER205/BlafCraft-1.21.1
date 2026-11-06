@@ -92,7 +92,11 @@ public class ServerHandler {
             if (manaCost > 0) ManaManager.consumeMana(player, manaCost);
             playerCooldowns.put(action, now);
             ManaManager.sync(player);
-            ClientCooldowns.startCooldown(action);
+            // Сетевой клиент запускает отсчёт только после подтверждения сервера.
+            int cooldownTicks = action.getCooldownTicks();
+            if (cooldownTicks > 0) {
+                PacketDistributor.sendToPlayer(player, new CooldownSyncPayload(action, cooldownTicks));
+            }
         });
     }
 

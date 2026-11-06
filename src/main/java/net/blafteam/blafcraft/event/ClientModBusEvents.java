@@ -6,8 +6,6 @@ import net.blafteam.blafcraft.morph.ClientMorphData;
 import net.blafteam.blafcraft.morph.MorphSyncPayload;
 import net.blafteam.blafcraft.highlight.ClientHighlightHandler;
 import net.blafteam.blafcraft.highlight.HighlightEntityPacket;
-import net.blafteam.blafcraft.mana.ClientManaHandler;
-import net.blafteam.blafcraft.mana.ManaSyncPayload;
 import net.blafteam.blafcraft.sound.ClientPacketHandler;
 import net.blafteam.blafcraft.sound.LoopingSoundPayload;
 import net.minecraft.resources.ResourceLocation;
@@ -30,12 +28,6 @@ public class ClientModBusEvents { // регистрация пакета на к
                 LoopingSoundPayload.TYPE,
                 LoopingSoundPayload.STREAM_CODEC,
                 ClientPacketHandler::handleLoopingSound
-        );
-
-        registrar.playToClient(
-                ManaSyncPayload.TYPE,
-                ManaSyncPayload.STREAM_CODEC,
-                ClientManaHandler::handle
         );
 
         registrar.playToClient(

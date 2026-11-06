@@ -6,7 +6,6 @@ import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.keybinds.ActionType;
 import net.blafteam.blafcraft.keybinds.ClientCooldowns;
 import net.blafteam.blafcraft.mana.ClientManaHandler;
-import net.blafteam.blafcraft.nickname.Nicknames;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
@@ -15,6 +14,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 
 @EventBusSubscriber(modid = BlafCraft.MODID, value = Dist.CLIENT)
@@ -65,8 +65,8 @@ public class ModHUDs {
             RenderSystem.disableBlend();
         }
 
-        // Mana bar
-        if (player.getDisplayName().getString().equals(Nicknames.Dev)) {
+        // Сервер передаёт положительный максимум только для набора с маной.
+        if (ClientManaHandler.getMaxMana() > 0) {
             float mana = ClientManaHandler.getMana();
             int maxMana = ClientManaHandler.getMaxMana();
 
@@ -92,6 +92,12 @@ public class ModHUDs {
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Pre event) {
-        ClientCooldowns.tick();
+        if (!Minecraft.getInstance().isPaused()) ClientCooldowns.tick();
+    }
+
+    @SubscribeEvent
+    public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
+        ClientManaHandler.clear();
+        ClientCooldowns.clear();
     }
 }
