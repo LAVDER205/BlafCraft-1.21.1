@@ -194,5 +194,10 @@
 
   "block.blafcraft.sculk_ore": "Sculk Ore",
 
-  "entity.mccourse.gecko": "Gecko"
+  "entity.mccourse.gecko": "Gecko",
+  "key.categories.blafcraft": "BlafCraft",
+  "key.blafcraft.ability_1": "Ability slot 1",
+  "key.blafcraft.ability_2": "Ability slot 2",
+  "key.blafcraft.ability_3": "Ability slot 3",
+  "key.blafcraft.ability_4": "Ability slot 4"
 }
