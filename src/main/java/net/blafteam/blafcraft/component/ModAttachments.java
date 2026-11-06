@@ -1,5 +1,6 @@
 package net.blafteam.blafcraft.component;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.UUIDUtil;
 import net.blafteam.blafcraft.mana.ManaData;
@@ -16,6 +17,11 @@ import java.util.UUID;
 public class ModAttachments {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES =
             DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, "blafcraft");
+
+    // Пустая строка означает старого игрока без явного назначения. "none" отключает набор.
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<String>> CHARACTER_ID =
+            ATTACHMENT_TYPES.register("character_id", () -> AttachmentType.builder(() -> "")
+                    .serialize(Codec.STRING, id -> !id.isEmpty()).copyOnDeath().build());
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<ManaData>> MANA =
             ATTACHMENT_TYPES.register("mana", () -> AttachmentType.builder(ManaData::defaults).serialize(ManaData.CODEC).copyOnDeath().build());

@@ -1,6 +1,7 @@
 package net.blafteam.blafcraft.keybinds;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.character.CharacterAssignments;
 import net.blafteam.blafcraft.friend_system.FriendManager;
 import net.blafteam.blafcraft.friend_system.FriendUpdatePacket;
 import net.blafteam.blafcraft.effect.ModEffects;
@@ -74,7 +75,9 @@ public class ServerHandler {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer player) {
                 UUID playerId = player.getUUID();
-                ActionType action = packet.action();
+                // Пустой или неизвестный слот не должен списывать ресурсы и запускать кулдаун.
+                ActionType action = CharacterAssignments.get(player).actionForSlot(packet.slot());
+                if (action == null) return;
                 long currentTime = player.level().getGameTime(); // серверное время в тиках
                 ServerLevel serverLevel = (ServerLevel) player.level();
 
