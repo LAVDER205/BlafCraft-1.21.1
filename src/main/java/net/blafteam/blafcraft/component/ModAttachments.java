@@ -29,6 +29,7 @@ public class ModAttachments {
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<ResourceLocation>> ENTITY =
             ATTACHMENT_TYPES.register("morph_entity", () -> AttachmentType.builder(() -> (ResourceLocation) null).serialize(ResourceLocation.CODEC, Objects::nonNull).copyOnDeath().build());
 
+    // Старые односторонние списки остаются читаемыми. Новая взаимная дружба хранится в SocialData.
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<List<UUID>>> FRIEND_LIST =
             ATTACHMENT_TYPES.register("friend_list",
                     () -> AttachmentType.<List<UUID>>builder(() -> new ArrayList<>()).serialize(UUIDUtil.CODEC.listOf().xmap(ArrayList::new, ArrayList::new)).copyOnDeath().build());

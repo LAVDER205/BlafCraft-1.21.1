@@ -1,6 +1,8 @@
 package net.blafteam.blafcraft.network;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.friend_system.FriendUpdatePacket;
+import net.blafteam.blafcraft.social.SocialInteractions;
 import net.blafteam.blafcraft.keybinds.ActionPacket;
 import net.blafteam.blafcraft.keybinds.ServerHandler;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -13,5 +15,7 @@ public class AbilityNetworking {
     public static void register(RegisterPayloadHandlersEvent event) {
         // Этот пакет нужен обеим сторонам, в том числе выделенному серверу без клиента Minecraft.
         event.registrar("2").playToServer(ActionPacket.TYPE, ActionPacket.STREAM_CODEC, ServerHandler::handle);
+        event.registrar("2").playToServer(FriendUpdatePacket.TYPE, FriendUpdatePacket.STREAM_CODEC,
+                SocialInteractions::handleFriendShortcut);
     }
 }

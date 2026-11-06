@@ -4,6 +4,7 @@ import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.item.custom.FactonItem;
 import net.blafteam.blafcraft.screen.custom.RealizerMenu;
+import net.blafteam.blafcraft.social.SocialData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -32,9 +33,11 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 public class RealizerBlockEntity extends BlockEntity implements MenuProvider {
     private int tickCounter = 0;
+    private UUID factionKey;
     private int effect_interval = 40;
 
     public final ItemStackHandler inventory = new ItemStackHandler(1) {
@@ -63,6 +66,13 @@ public class RealizerBlockEntity extends BlockEntity implements MenuProvider {
         super(ModBlockEntities.REALIZER_BE.get(), pos, blockState);
     }
 
+    public void setFactionKey(@Nullable UUID factionKey) {
+        // Запоминаем фракцию при установке. Удаление и повторное создание с тем же ID
+        // не передаст старый реализатор новой фракции.
+        this.factionKey = factionKey;
+        setChanged();
+    }
+
     public void clearContents() {
         inventory.setStackInSlot(0, ItemStack.EMPTY);
     }
@@ -88,27 +98,30 @@ public class RealizerBlockEntity extends BlockEntity implements MenuProvider {
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.put("inventory", inventory.serializeNBT(registries));
+        if (factionKey != null) tag.putUUID("FactionKey", factionKey);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         inventory.deserializeNBT(registries, tag.getCompound("inventory"));
+        factionKey = tag.hasUUID("FactionKey") ? tag.getUUID("FactionKey") : null;
     }
 
     // Статический метод, который будет вызываться каждый серверный тик для всех BE этого типа
     public static void serverTick(Level level, BlockPos pos, BlockState state, RealizerBlockEntity entity) {
-        if (level.isClientSide || entity.inventory.getStackInSlot(0).isEmpty()) return;
+        if (!(level instanceof ServerLevel serverLevel) || entity.factionKey == null
+                || entity.inventory.getStackInSlot(0).isEmpty()) return;
 
         entity.tickCounter++;
 
         if (entity.tickCounter >= 40) {
             entity.tickCounter = 0;
-            applyEffectToNearbyPlayers((ServerLevel) level, pos, entity.inventory);
+            applyEffectToNearbyPlayers(serverLevel, pos, entity.inventory, entity.factionKey);
         }
     }
 
-    private static void applyEffectToNearbyPlayers(ServerLevel level, BlockPos pos, ItemStackHandler inventory) {
+    private static void applyEffectToNearbyPlayers(ServerLevel level, BlockPos pos, ItemStackHandler inventory, UUID factionKey) {
         double radius = 20.0;
         double radiusSq = radius * radius; // квадрат радиуса для быстрой проверки
         Vec3 center = pos.getCenter(); // центр блока
@@ -137,13 +150,12 @@ public class RealizerBlockEntity extends BlockEntity implements MenuProvider {
             effect = MobEffects.DARKNESS;
         }
 
-        for (Player player : level.players()) {
-            if (player instanceof ServerPlayer sp) {
-                // Проверяем расстояние от игрока до центра блока
-                if (sp.position().distanceToSqr(center) <= radiusSq) {
-                    assert effect != null;
-                    sp.addEffect(new MobEffectInstance(effect, 60, 0, true, false, true));
-                }
+        if (effect == null) return;
+        SocialData social = SocialData.get(level.getServer());
+        for (ServerPlayer player : level.players()) {
+            if (player.position().distanceToSqr(center) <= radiusSq
+                    && factionKey.equals(social.factionKeyOf(player.getUUID()))) {
+                player.addEffect(new MobEffectInstance(effect, 60, 0, true, false, true));
             }
         }
     }

@@ -11,7 +11,6 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -20,6 +19,8 @@ import org.lwjgl.glfw.GLFW;
 @EventBusSubscriber(modid = BlafCraft.MODID, value = Dist.CLIENT)
 public class ClientSetup {
     private static final KeyMapping[] ABILITY_KEYS = createAbilityKeys();
+    private static final KeyMapping SOCIAL_KEY = new KeyMapping("key.blafcraft.social",
+            KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.categories.blafcraft");
 
     private static KeyMapping[] createAbilityKeys() {
         KeyMapping[] keys = new KeyMapping[AbilitySlots.COUNT];
@@ -39,6 +40,7 @@ public class ClientSetup {
 
     @SubscribeEvent
     public static void registerKeys(RegisterKeyMappingsEvent event) {
+        event.register(SOCIAL_KEY);
         for (KeyMapping key : ABILITY_KEYS) {
             event.register(key);
         }
@@ -54,16 +56,15 @@ public class ClientSetup {
                 if (inWorld) PacketDistributor.sendToServer(new ActionPacket(slot));
             }
         }
-    }
-
-    @SubscribeEvent
-    public static void onKeyPress(InputEvent.Key event) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.screen != null || event.getAction() != GLFW.GLFW_PRESS) return;
-
-        if (event.getKey() == GLFW.GLFW_KEY_B
-                && mc.hitResult instanceof EntityHitResult hit && hit.getEntity() instanceof Player target) {
-            PacketDistributor.sendToServer(new FriendUpdatePacket(target.getUUID(), true));
+        while (SOCIAL_KEY.consumeClick()) {
+            if (!inWorld) continue;
+            // С приседанием всегда открываем список, даже если перед игроком кто-то стоит.
+            if (!mc.player.isShiftKeyDown() && mc.hitResult instanceof EntityHitResult hit
+                    && hit.getEntity() instanceof Player target) {
+                PacketDistributor.sendToServer(new FriendUpdatePacket(target.getUUID(), true));
+            } else {
+                PacketDistributor.sendToServer(new FriendUpdatePacket(mc.player.getUUID(), false));
+            }
         }
     }
 }
