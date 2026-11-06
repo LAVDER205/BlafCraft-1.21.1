@@ -7,21 +7,12 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 
-public record ActionPacket(ActionType action) implements CustomPacketPayload {
-
+public record ActionPacket(int slot) implements CustomPacketPayload {
+    // Новый ID отделяет формат слота от старого формата с именем способности.
     public static final Type<ActionPacket> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "action"));
-
-    // Кодек: записываем имя enum как строку (очень просто)
+            new Type<>(ResourceLocation.fromNamespaceAndPath(BlafCraft.MODID, "ability_slot"));
     public static final StreamCodec<RegistryFriendlyByteBuf, ActionPacket> STREAM_CODEC =
-            StreamCodec.composite(
-                    ByteBufCodecs.STRING_UTF8.map(
-                            name -> ActionType.valueOf(name),   // из строки → enum
-                            action -> action.name()             // из enum → строка
-                    ),
-                    ActionPacket::action,
-                    ActionPacket::new
-            );
+            StreamCodec.composite(ByteBufCodecs.VAR_INT, ActionPacket::slot, ActionPacket::new);
 
     @Override
     public Type<? extends CustomPacketPayload> type() {
