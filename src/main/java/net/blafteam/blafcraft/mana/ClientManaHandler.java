@@ -1,11 +1,15 @@
 package net.blafteam.blafcraft.mana;
 
-import net.minecraft.client.Minecraft;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class ClientManaHandler {
-    private static float clientMana = 100;
-    private static int clientMaxMana = ManaConfig.MAX_MANA;
+    private static float clientMana;
+    private static int clientMaxMana;
+
+    public static void clear() {
+        clientMana = 0;
+        clientMaxMana = 0;
+    }
 
     public static void handle(ManaSyncPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
