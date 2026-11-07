@@ -1,7 +1,6 @@
 package net.blafteam.blafcraft.event;
 
 import net.blafteam.blafcraft.BlafCraft;
-import net.blafteam.blafcraft.friend_system.FriendManager;
 import net.blafteam.blafcraft.component.ModAttachments;
 import net.blafteam.blafcraft.morph.MorphSyncPayload;
 import net.blafteam.blafcraft.effect.ModEffects;
@@ -117,20 +116,6 @@ public class ModEvents {
         builder.addMix(Potions.AWKWARD, item, normal_p);
         builder.addMix(ModPotions.FIERY_TOUCH_POTION, Items.GLOWSTONE_DUST, strong_p);
         builder.addMix(ModPotions.FIERY_TOUCH_POTION, Items.REDSTONE, long_p);
-    }
-
-    //-------------------------------- FRIEND SYSTEM LOGIC -------------------------------
-    @SubscribeEvent
-    public static void onFriendPlayerAttack(AttackEntityEvent event) {
-        Player attacker = event.getEntity();
-        Entity target = event.getTarget();
-        if (target instanceof Player victim) {
-            if (attacker instanceof ServerPlayer serverAttacker && victim instanceof ServerPlayer serverVictim) {
-                if (FriendManager.isFriend(serverAttacker, serverVictim)) {
-                    event.setCanceled(true);
-                }
-            }
-        }
     }
 
     // --------------------------------SCULK SWORD LOGIC -------------------------------

@@ -1,6 +1,7 @@
 package net.blafteam.blafcraft.mana;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.character.CharacterAssignments;
 import net.blafteam.blafcraft.component.ModAttachments;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -51,7 +52,11 @@ public class ManaManager {
     }
 
     public static void sync(ServerPlayer player) {
-        PacketDistributor.sendToPlayer(player, new ManaSyncPayload(getMana(player), getMaxMana(player)));
+        // Нулевой максимум в пакете скрывает шкалу. Сохранённую ману игрока не меняем.
+        ManaSyncPayload payload = CharacterAssignments.get(player).usesMana()
+                ? new ManaSyncPayload(getMana(player), getMaxMana(player))
+                : new ManaSyncPayload(0, 0);
+        PacketDistributor.sendToPlayer(player, payload);
     }
 
     @SubscribeEvent

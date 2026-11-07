@@ -13,10 +13,10 @@ import java.util.Optional;
  */
 public enum CharacterKit {
     NONE("none"),
-    FRIGBY("frigby", ActionType.CREATION_STEP, ActionType.FIREBALL, ActionType.ARROW, ActionType.CREATION_STEP),
-    FRYNOTE("frynote", ActionType.TELEPORT_DASH, ActionType.TELEPORT_DASH, ActionType.TELEPORT_DASH),
-    LAVDER("lavder", ActionType.BLOODLUST, ActionType.BLOODLUST, ActionType.BLOODLUST),
-    DEV("dev", ActionType.OVERDOSE_ABILITY, ActionType.TEST, ActionType.TEST);
+    FRIGBY("frigby", ActionType.CREATION_STEP, ActionType.FIREBALL, ActionType.ARROW),
+    FRYNOTE("frynote", ActionType.TELEPORT_DASH, ActionType.TELEPORT_GLANCE),
+    LAVDER("lavder", ActionType.OVERDOSE_ABILITY),
+    DEV("dev", ActionType.TEST, ActionType.TEST, ActionType.TEST, ActionType.TEST);
 
     private final String id;
     private final ActionType[] actions;
@@ -35,6 +35,14 @@ public enum CharacterKit {
 
     public ActionType actionForSlot(int slot) {
         return slot >= 0 && slot < actions.length ? actions[slot] : null;
+    }
+
+    // Добавил в набор способность с ценой маны — шкала появится автоматически.
+    public boolean usesMana() {
+        for (ActionType action : actions) {
+            if (action != null && action.getMana_price() > 0) return true;
+        }
+        return false;
     }
 
     public static Optional<CharacterKit> byId(String id) {

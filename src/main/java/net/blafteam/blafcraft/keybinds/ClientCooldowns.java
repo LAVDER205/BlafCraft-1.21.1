@@ -1,20 +1,32 @@
 package net.blafteam.blafcraft.keybinds;
 
-import java.util.HashMap;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+
+import java.util.EnumMap;
 import java.util.Map;
 
 public class ClientCooldowns {
-        // Для каждого ActionType храним оставшееся число тиков (0 = готово)
-        private static final Map<ActionType, Integer> remaining = new HashMap<>();
+    // Отсчёт для HUD. Решение о повторном применении всегда принимает сервер.
+    private static final Map<ActionType, Integer> remaining = new EnumMap<>(ActionType.class);
 
-        public static void startCooldown(ActionType action) { remaining.put(action, action.getCooldownTicks()); } // запуск кд
-
-        public static int getRemaining(ActionType action) {
-            return remaining.getOrDefault(action, 0);
-        } // вывод
-
-        // Вызывать каждый клиентский тик
-        public static void tick() {
-            remaining.replaceAll((k, v) -> Math.max(0, v - 1));
-        } // уменьшаем кд на 1
+    public static void handle(CooldownSyncPayload payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (payload.ticks() > 0) {
+                remaining.put(payload.action(), payload.ticks());
+            }
+        });
     }
+
+    public static int getRemaining(ActionType action) {
+        return remaining.getOrDefault(action, 0);
+    }
+
+    public static void tick() {
+        remaining.replaceAll((action, ticks) -> ticks - 1);
+        remaining.values().removeIf(ticks -> ticks <= 0);
+    }
+
+    public static void clear() {
+        remaining.clear();
+    }
+}

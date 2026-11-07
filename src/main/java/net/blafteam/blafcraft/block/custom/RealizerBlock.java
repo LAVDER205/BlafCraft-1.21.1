@@ -8,6 +8,7 @@ import net.blafteam.blafcraft.item.custom.FactonItem;
 import net.blafteam.blafcraft.particle.ModParticles;
 import net.blafteam.blafcraft.particle.PetalParticleOptions;
 import net.blafteam.blafcraft.particle.SparkleParticleOptions;
+import net.blafteam.blafcraft.social.SocialData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -20,6 +21,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -65,6 +67,14 @@ public class RealizerBlock extends BaseEntityBlock {
         return new RealizerBlockEntity(pos, state);
     }
 
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (placer instanceof ServerPlayer player && level.getBlockEntity(pos) instanceof RealizerBlockEntity realizer) {
+            realizer.setFactionKey(SocialData.get(player.serverLevel().getServer()).factionKeyOf(player.getUUID()));
+        }
+    }
+
     // BLOCK ENTITY
 
     @Override
@@ -82,6 +92,8 @@ public class RealizerBlock extends BaseEntityBlock {
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
                                               Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (level.getBlockEntity(pos) instanceof RealizerBlockEntity realizerBlockEntity) {
+            // Инвентарь и предмет в руке меняет только сервер.
+            if (level.isClientSide) return ItemInteractionResult.SUCCESS;
             if (player.isCrouching() && !level.isClientSide) {
                 ((ServerPlayer) player).openMenu(new SimpleMenuProvider(realizerBlockEntity, Component.literal("Realizer")), pos);
                 return ItemInteractionResult.SUCCESS;
@@ -92,7 +104,7 @@ public class RealizerBlock extends BaseEntityBlock {
                 level.playSound(player, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1f, 2f);
             } else if (stack.isEmpty() && !realizerBlockEntity.inventory.getStackInSlot(0).isEmpty()) {
                 ItemStack stackInRealizer = realizerBlockEntity.inventory.extractItem(0, 1, false);
-                player.setItemInHand(InteractionHand.MAIN_HAND, stackInRealizer);
+                player.setItemInHand(hand, stackInRealizer);
                 realizerBlockEntity.clearContents();
                 level.playSound(player, pos, SoundEvents.ITEM_PICKUP, SoundSource.BLOCKS, 1f, 1f);
             }

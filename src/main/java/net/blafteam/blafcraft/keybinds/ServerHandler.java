@@ -2,11 +2,8 @@ package net.blafteam.blafcraft.keybinds;
 
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.character.CharacterAssignments;
-import net.blafteam.blafcraft.friend_system.FriendManager;
-import net.blafteam.blafcraft.friend_system.FriendUpdatePacket;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.mana.ManaManager;
-import net.blafteam.blafcraft.mana.ManaSyncPayload;
 import net.blafteam.blafcraft.particle.ModParticles;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
@@ -55,224 +52,161 @@ public class ServerHandler {
     // Храним для каждого игрока (UUID) и для каждого типа действия время последнего использования
     private static final Map<UUID, Map<ActionType, Long>> cooldowns = new HashMap<>();
 
-    public static void handleFriendUpdate(FriendUpdatePacket packet, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            if (context.player() instanceof ServerPlayer player) {
-                ServerLevel level = player.serverLevel();
-                Entity target = level.getEntity(packet.targetUUID());
-                if (target instanceof ServerPlayer friend) {
-                    if (packet.add()) {
-                        FriendManager.addFriend(player, friend);
-                    } else {
-                        FriendManager.removeFriend(player, friend);
-                    }
-                }
-            }
-        });
-    }
-
     public static void handle(ActionPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
-            if (context.player() instanceof ServerPlayer player) {
-                UUID playerId = player.getUUID();
-                // Пустой или неизвестный слот не должен списывать ресурсы и запускать кулдаун.
-                ActionType action = CharacterAssignments.get(player).actionForSlot(packet.slot());
-                if (action == null) return;
-                long currentTime = player.level().getGameTime(); // серверное время в тиках
-                ServerLevel serverLevel = (ServerLevel) player.level();
+            if (!(context.player() instanceof ServerPlayer player) || !player.isAlive()) return;
+            ActionType action = CharacterAssignments.get(player).actionForSlot(packet.slot());
+            if (action == null) return;
 
-                // Получаем или создаём запись для игрока
-                Map<ActionType, Long> playerCooldowns = cooldowns.computeIfAbsent(playerId, k -> new HashMap<>());
-                long lastUsed = playerCooldowns.getOrDefault(action, 0L);
-                int cooldown = action.getCooldownTicks();
-                int exp_price = action.getExp_price();
-                int mana_price = action.getMana_price();
+            long now = player.level().getGameTime();
+            Map<ActionType, Long> playerCooldowns = cooldowns.computeIfAbsent(player.getUUID(), id -> new HashMap<>());
+            Long lastUsed = playerCooldowns.get(action);
+            if (lastUsed != null && now - lastUsed < action.getCooldownTicks()) return;
 
-                // Если кулдаун не прошёл — просто выходим
-                if (currentTime - lastUsed < cooldown || player.experienceLevel < exp_price || !ManaManager.consumeMana(player, mana_price)) {
-                    return; // можно также отправить сообщение игроку о необходимости подождать
-                }
+            int experienceCost = action.getExp_price();
+            int manaCost = action.getMana_price();
+            // Проверка ресурсов ничего не списывает. Весь запуск идёт в серверном потоке.
+            if (player.experienceLevel < experienceCost || ManaManager.getMana(player) < manaCost) return;
+            if (!executeAbility(player, action)) return;
 
-                // Выполняем действие
-                switch (action) {
-                    case TEST -> {
-
-                    }
-                    case ARROW -> {
-                        shootArrow(player);
-                        debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
-
-                        pendingActions.add(new PendingAction(player.getUUID(), ActionType.ARROW, 5));
-                        pendingActions.add(new PendingAction(player.getUUID(), ActionType.ARROW, 10));
-                    }
-
-                    case FIREBALL -> {
-                        shootLargeFireball(player);
-
-                        // FIREBALL JUMP
-                        BlockPos posBelow = player.blockPosition().below();
-                        BlockPos posBelowBelow = player.blockPosition().below().below();
-                        BlockState stateBelow = player.level().getBlockState(posBelow);
-                        BlockState stateBelowBelow = player.level().getBlockState(posBelowBelow);
-                        boolean hasSolidGroundBelow = !(stateBelow.getCollisionShape(player.level(), posBelow).isEmpty());
-                        boolean hasSolidGroundBelowBelow = !(stateBelowBelow.getCollisionShape(player.level(), posBelowBelow).isEmpty());
-
-                        if (player.getXRot() >= 60 && (hasSolidGroundBelow || hasSolidGroundBelowBelow)) {
-                            player.addDeltaMovement(new Vec3(0, 1, 0));
-                            player.connection.send(new ClientboundSetEntityMotionPacket(player)); // sync server and client
-                        }
-                        debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
-                    }
-
-                    case CREATION_STEP -> {
-                        if (player.hasEffect(ModEffects.CREATION_STEP_EFFECT)) {
-                            player.removeEffect(ModEffects.CREATION_STEP_EFFECT);
-                        } else if (player.totalExperience >= 1){
-                            player.addEffect(new MobEffectInstance(ModEffects.CREATION_STEP_EFFECT, -1, 0, false, false, false));
-                            debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
-                        }
-                    }
-
-                    case TELEPORT_DASH -> {
-                        serverLevel.sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false, player.getX(), player.getY() + player.getBbHeight() / 2.0, player.getZ(), 10, 0.2, 0.5, 0.2, 5);
-
-                        Vec3 look = player.getViewVector(1.0F);
-                        double strength = 6.0;
-
-                        player.teleportRelative(look.x * strength, 0, look.z * strength);
-
-                        serverLevel.sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false, player.getX(), player.getY() + player.getBbHeight() / 2.0, player.getZ(), 10, 0.2, 0.5, 0.2, 5);
-
-                        debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
-                    }
-
-                    case TELEPORT_GLANCE -> {
-                        HitResult hitResult = player.pick(50.0, 1.0F, false);
-
-                        if (hitResult.getType() == HitResult.Type.BLOCK) {
-                            BlockHitResult blockHitResult = (BlockHitResult) hitResult;
-                            BlockPos targetBlock = blockHitResult.getBlockPos();
-
-                            BlockPos posAbove = targetBlock.above();
-                            BlockState stateAbove = player.level().getBlockState(posAbove);
-                            boolean hasSolidGroundAbove = stateAbove.getCollisionShape(player.level(), posAbove).isEmpty();
-
-                            if (hasSolidGroundAbove) {
-                                serverLevel.sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false, player.getX(), player.getY() + player.getBbHeight() / 2.0, player.getZ(), 10, 0.2, 0.5, 0.2, 5);
-                                player.teleportTo(targetBlock.getX() + 0.5, targetBlock.getY() + 1, targetBlock.getZ() + 0.5);
-                                serverLevel.sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false, player.getX(), player.getY() + player.getBbHeight() / 2.0, player.getZ(), 10, 0.2, 0.5, 0.2, 5);
-
-                                debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
-                            }
-                        }
-                    }
-
-                    case BLOODLUST -> {
-                        player.addEffect(new MobEffectInstance(ModEffects.BLOODLUST_EFFECT, 1200, 0));
-                        debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
-                    }
-                    case TIME_BOMB -> {
-                        player.addEffect(new MobEffectInstance(ModEffects.TIME_BOMB_EFFECT, 200, 1, false, true, true));
-                        debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
-                    }
-
-                    case FLIGHT -> {
-                        Vec3 look = player.getViewVector(1.0F);
-                        double power = 1.5;
-                        if (!player.onGround() && !player.isFallFlying()) {
-                            player.setDeltaMovement(
-                                    player.getDeltaMovement().add(look.x * power, look.y * power, look.z * power)
-                            );
-                            player.connection.send(new ClientboundSetEntityMotionPacket(player));
-                            player.addEffect(new MobEffectInstance(ModEffects.FREE_FLIGHT_EFFECT, -1, 0, false ,false, false));
-                            debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
-                        }
-                    }
-
-                    case SCULK_MARK -> {
-                        player.addEffect(new MobEffectInstance(ModEffects.SCULK_MARK_EFFECT, 200, 1, false, false, true));
-                        debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
-                    }
-
-                    case MORPH -> {
-                        player.addEffect(new MobEffectInstance(ModEffects.MORPH_EFFECT, 1200, 0, false, false, true));
-                        debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
-                    }
-
-                    case OVERDOSE_ABILITY -> {
-                        if (player.hasEffect(ModEffects.OVERDOSE_EFFECT)) {
-                            if (player.hasEffect(MobEffects.MOVEMENT_SPEED) &&
-                                    Objects.requireNonNull(player.getEffect(MobEffects.MOVEMENT_SPEED)).getAmplifier() >= 4) {
-
-                                Vec3 look = player.getViewVector(1.0F);
-                                Vec3 horizontalLook = new Vec3(look.x, 0, look.z).normalize();
-                                double power = 1.6;
-
-                                player.setDeltaMovement(horizontalLook.x * power, player.getDeltaMovement().y, horizontalLook.z * power);
-                                player.connection.send(new ClientboundSetEntityMotionPacket(player));
-
-                                player.addEffect(new MobEffectInstance(ModEffects.RAM_EFFECT, -1, 0, false, false, true));
-                            } else if (player.hasEffect(MobEffects.DAMAGE_BOOST) &&
-                                    Objects.requireNonNull(player.getEffect(MobEffects.DAMAGE_BOOST)).getAmplifier() >= 4) {
-
-                            } else if (player.hasEffect(MobEffects.REGENERATION) &&
-                                    Objects.requireNonNull(player.getEffect(MobEffects.REGENERATION)).getAmplifier() >= 4) {
-                                player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 10, 4, false, false, true));
-                            } else if (player.hasEffect(MobEffects.JUMP) &&
-                                    Objects.requireNonNull(player.getEffect(MobEffects.JUMP)).getAmplifier() >= 4) {
-
-                            } else if (player.hasEffect(MobEffects.DAMAGE_RESISTANCE) &&
-                                    Objects.requireNonNull(player.getEffect(MobEffects.DAMAGE_RESISTANCE)).getAmplifier() >= 4) {
-                                player.addEffect(new MobEffectInstance(ModEffects.IMMORTAL_EFFECT, 5, 0, false, false, true));
-                            }
-                            debitAndCooldown(player, playerCooldowns, currentTime, action, exp_price, mana_price);
-                        }
-                    }
-                }
-
-//                int currentMaxMana = ManaManager.getMaxMana(player); // change max mana
-//                ManaManager.setMaxMana(player, currentMaxMana + 50); // change max mana
-//
-//                float currentManaRegen = ManaManager.getMaxMana(player); // change mana regen
-//                ManaManager.setManaRegen(player, currentManaRegen + 1); // change mana regen
+            // Успешное действие оплачивается один раз. Отложенные стрелы входят в этот же залп.
+            if (experienceCost > 0) player.setExperienceLevels(player.experienceLevel - experienceCost);
+            if (manaCost > 0) ManaManager.consumeMana(player, manaCost);
+            playerCooldowns.put(action, now);
+            ManaManager.sync(player);
+            // Сетевой клиент запускает отсчёт только после подтверждения сервера.
+            int cooldownTicks = action.getCooldownTicks();
+            if (cooldownTicks > 0) {
+                PacketDistributor.sendToPlayer(player, new CooldownSyncPayload(action, cooldownTicks));
             }
         });
     }
 
-    private static void debitAndCooldown(ServerPlayer player, Map<ActionType, Long> playerCooldowns, long currentTime, ActionType action, int exp_price, int mana_price) {
-        // Сохраняем время использования
-        playerCooldowns.put(action, currentTime);
-
-        player.setExperienceLevels(player.experienceLevel - exp_price); // цена exp
-
-        PacketDistributor.sendToPlayer(player, new ManaSyncPayload( // синхронизация нового значения маны
-                ManaManager.getMana(player), ManaManager.getMaxMana(player)));
-
-        ClientCooldowns.startCooldown(action);// кд
-
+    /**
+     * Добавляя способность, возвращай true только после выполнения.
+     * false означает отказ без списания ресурсов и запуска кулдауна.
+     */
+    private static boolean executeAbility(ServerPlayer player, ActionType action) {
+        return switch (action) {
+            case TEST -> false;
+            case ARROW -> {
+                if (!shootArrow(player)) yield false;
+                pendingActions.add(new PendingAction(player.getUUID(), action, 5));
+                pendingActions.add(new PendingAction(player.getUUID(), action, 10));
+                yield true;
+            }
+            case FIREBALL -> castFireball(player);
+            case CREATION_STEP -> {
+                if (player.hasEffect(ModEffects.CREATION_STEP_EFFECT)) {
+                    yield player.removeEffect(ModEffects.CREATION_STEP_EFFECT);
+                }
+                yield player.totalExperience > 0 && player.addEffect(
+                        new MobEffectInstance(ModEffects.CREATION_STEP_EFFECT, -1, 0, false, false, false));
+            }
+            case TELEPORT_DASH -> {
+                Vec3 look = player.getViewVector(1.0F);
+                Vec3 origin = player.position();
+                player.teleportRelative(look.x * 6.0, 0, look.z * 6.0);
+                yield finishTeleport(player, origin);
+            }
+            case TELEPORT_GLANCE -> castTeleportGlance(player);
+            case BLOODLUST -> player.addEffect(new MobEffectInstance(ModEffects.BLOODLUST_EFFECT, 1200, 0));
+            case TIME_BOMB -> player.addEffect(new MobEffectInstance(ModEffects.TIME_BOMB_EFFECT, 200, 1, false, true, true));
+            case FLIGHT -> {
+                if (player.onGround() || player.isFallFlying()) yield false;
+                Vec3 look = player.getViewVector(1.0F);
+                player.addDeltaMovement(look.scale(1.5));
+                player.connection.send(new ClientboundSetEntityMotionPacket(player));
+                player.addEffect(new MobEffectInstance(ModEffects.FREE_FLIGHT_EFFECT, -1, 0, false, false, false));
+                yield true;
+            }
+            case SCULK_MARK -> player.addEffect(new MobEffectInstance(ModEffects.SCULK_MARK_EFFECT, 200, 1, false, false, true));
+            case MORPH -> player.addEffect(new MobEffectInstance(ModEffects.MORPH_EFFECT, 1200, 0, false, false, true));
+            case OVERDOSE_ABILITY -> castOverdose(player);
+        };
     }
 
-    private static void shootArrow(ServerPlayer player) {
+    private static boolean castFireball(ServerPlayer player) {
+        LargeFireball fireball = EntityType.FIREBALL.create(player.level());
+        if (fireball == null) return false;
+        fireball.setOwner(player);
+        fireball.setPos(player.getEyePosition());
+        Vec3 look = player.getViewVector(1.0F);
+        fireball.shoot(look.x, look.y, look.z, 1.5f, 0.0f);
+        if (!player.level().addFreshEntity(fireball)) return false;
+
+        BlockPos below = player.blockPosition().below();
+        BlockPos twoBelow = below.below();
+        BlockState stateBelow = player.level().getBlockState(below);
+        BlockState stateTwoBelow = player.level().getBlockState(twoBelow);
+        if (player.getXRot() >= 60 && (!stateBelow.getCollisionShape(player.level(), below).isEmpty()
+                || !stateTwoBelow.getCollisionShape(player.level(), twoBelow).isEmpty())) {
+            player.addDeltaMovement(new Vec3(0, 1, 0));
+            player.connection.send(new ClientboundSetEntityMotionPacket(player));
+        }
+        return true;
+    }
+
+    private static boolean castTeleportGlance(ServerPlayer player) {
+        if (!(player.pick(50.0, 1.0F, false) instanceof BlockHitResult hit)
+                || hit.getType() != HitResult.Type.BLOCK) return false;
+        BlockPos destination = hit.getBlockPos().above();
+        if (!player.level().getBlockState(destination).getCollisionShape(player.level(), destination).isEmpty()) return false;
+
+        Vec3 origin = player.position();
+        player.teleportTo(destination.getX() + 0.5, destination.getY(), destination.getZ() + 0.5);
+        return finishTeleport(player, origin);
+    }
+
+    private static boolean finishTeleport(ServerPlayer player, Vec3 origin) {
+        if (player.position().equals(origin)) return false;
+        sendTeleportParticles(player, origin);
+        sendTeleportParticles(player, player.position());
+        return true;
+    }
+
+    private static void sendTeleportParticles(ServerPlayer player, Vec3 position) {
+        player.serverLevel().sendParticles(player, ModParticles.TELEPORT_PARTICLES.get(), false,
+                position.x, position.y + player.getBbHeight() / 2.0, position.z, 10, 0.2, 0.5, 0.2, 5);
+    }
+
+    private static boolean castOverdose(ServerPlayer player) {
+        if (!player.hasEffect(ModEffects.OVERDOSE_EFFECT)) return false;
+
+        var speed = player.getEffect(MobEffects.MOVEMENT_SPEED);
+        var strength = player.getEffect(MobEffects.DAMAGE_BOOST);
+        var regeneration = player.getEffect(MobEffects.REGENERATION);
+        var jump = player.getEffect(MobEffects.JUMP);
+        var resistance = player.getEffect(MobEffects.DAMAGE_RESISTANCE);
+        if (speed != null && speed.getAmplifier() >= 4) {
+            Vec3 look = player.getViewVector(1.0F);
+            Vec3 dash = new Vec3(look.x, 0, look.z).normalize().scale(1.6);
+            player.setDeltaMovement(dash.x, player.getDeltaMovement().y, dash.z);
+            player.connection.send(new ClientboundSetEntityMotionPacket(player));
+            player.addEffect(new MobEffectInstance(ModEffects.RAM_EFFECT, -1, 0, false, false, true));
+            return true;
+        }
+        // Для силы и прыжка активное действие ещё не реализовано. Сохраняем приоритет стимуляторов.
+        if (strength != null && strength.getAmplifier() >= 4) return false;
+        if (regeneration != null && regeneration.getAmplifier() >= 4) {
+            return player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 10, 4, false, false, true));
+        }
+        if (jump != null && jump.getAmplifier() >= 4) return false;
+        if (resistance != null && resistance.getAmplifier() >= 4) {
+            return player.addEffect(new MobEffectInstance(ModEffects.IMMORTAL_EFFECT, 5, 0, false, false, true));
+        }
+        return false;
+    }
+
+    private static boolean shootArrow(ServerPlayer player) {
         Arrow arrow = EntityType.ARROW.create(player.level());
-        if (arrow == null) return;
+        if (arrow == null) return false;
         arrow.setOwner(player);
         arrow.setPos(player.getEyePosition());
         Vec3 look = player.getViewVector(1.0F);
         arrow.shoot(look.x, look.y, look.z, 3.0f, 0.0f);
-        player.level().addFreshEntity(arrow);
+        return player.level().addFreshEntity(arrow);
     }
-
-    private static void shootLargeFireball(ServerPlayer player) {
-        LargeFireball largeFireball = EntityType.FIREBALL.create(player.level());
-        if (largeFireball != null) {
-            largeFireball.setOwner(player);
-            largeFireball.setPos(player.getEyePosition());
-            Vec3 look = player.getViewVector(1.0F);
-            largeFireball.shoot(look.x, look.y, look.z, 1.5f, 0.0f);
-            player.level().addFreshEntity(largeFireball);
-        }
-    }
-
 
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
@@ -305,6 +239,9 @@ public class ServerHandler {
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) { // сброс кд при выходе
         cooldowns.remove(event.getEntity().getUUID());
     }
+
+    public static void cancelPendingActions(UUID player) {
+        // Отложенный залп не должен продолжаться после окончания поединка.
+        pendingActions.removeIf(action -> action.playerId.equals(player));
+    }
 }
-
-
