@@ -1,6 +1,7 @@
 package net.blafteam.blafcraft.keybinds;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.duel.DuelShortcutPayload;
 import net.blafteam.blafcraft.friend_system.FriendUpdatePacket;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
@@ -21,6 +22,8 @@ public class ClientSetup {
     private static final KeyMapping[] ABILITY_KEYS = createAbilityKeys();
     private static final KeyMapping SOCIAL_KEY = new KeyMapping("key.blafcraft.social",
             KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.categories.blafcraft");
+    private static final KeyMapping DUEL_KEY = new KeyMapping("key.blafcraft.duel",
+            KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, "key.categories.blafcraft");
 
     private static KeyMapping[] createAbilityKeys() {
         KeyMapping[] keys = new KeyMapping[AbilitySlots.COUNT];
@@ -41,6 +44,7 @@ public class ClientSetup {
     @SubscribeEvent
     public static void registerKeys(RegisterKeyMappingsEvent event) {
         event.register(SOCIAL_KEY);
+        event.register(DUEL_KEY);
         for (KeyMapping key : ABILITY_KEYS) {
             event.register(key);
         }
@@ -65,6 +69,13 @@ public class ClientSetup {
             } else {
                 PacketDistributor.sendToServer(new FriendUpdatePacket(mc.player.getUUID(), false));
             }
+        }
+        while (DUEL_KEY.consumeClick()) {
+            if (!inWorld) continue;
+            // Без цели или с приседанием клавиша открывает управление текущей дуэлью.
+            var target = !mc.player.isShiftKeyDown() && mc.hitResult instanceof EntityHitResult hit
+                    && hit.getEntity() instanceof Player player ? player.getUUID() : mc.player.getUUID();
+            PacketDistributor.sendToServer(new DuelShortcutPayload(target));
         }
     }
 }

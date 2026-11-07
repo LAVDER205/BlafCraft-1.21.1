@@ -3,6 +3,7 @@ package net.blafteam.blafcraft.block.entity;
 import net.blafteam.blafcraft.entity.custom.LargeArtilleryFireballEntity;
 import net.blafteam.blafcraft.entity.custom.SmallArtilleryFireballEntity;
 import net.blafteam.blafcraft.social.SocialData;
+import net.blafteam.blafcraft.duel.DuelService;
 import net.blafteam.blafcraft.item.ModItems;
 import net.blafteam.blafcraft.item.custom.RuneItem;
 import net.blafteam.blafcraft.screen.custom.RuneMenu;
@@ -240,6 +241,7 @@ public class RuneBlockEntity extends BlockEntity implements MenuProvider, Contai
 
         Arrow arrow = EntityType.ARROW.create(this.level);
         if (arrow == null) return false;
+        arrow.setOwner(getOwner());
         arrow.setPos(startVec);
         Vec3 targetVec = target.getEyePosition(1.0F);
         Vec3 direction = targetVec.subtract(startVec).normalize();
@@ -257,6 +259,7 @@ public class RuneBlockEntity extends BlockEntity implements MenuProvider, Contai
 
         SmallArtilleryFireballEntity fireball = new SmallArtilleryFireballEntity(
                 this.level, target, startVec.x, startVec.y, startVec.z);
+        fireball.setOwner(getOwner());
         this.level.addFreshEntity(fireball);
         return true;
     }
@@ -270,6 +273,7 @@ public class RuneBlockEntity extends BlockEntity implements MenuProvider, Contai
 
         LargeArtilleryFireballEntity fireball = new LargeArtilleryFireballEntity(
                 this.level, target, startVec.x, startVec.y, startVec.z);
+        fireball.setOwner(getOwner());
         this.level.addFreshEntity(fireball);
         return true;
     }
@@ -309,6 +313,7 @@ public class RuneBlockEntity extends BlockEntity implements MenuProvider, Contai
             if (ownerUUID == null || ownerUUID.equals(player.getUUID()) || player.isSpectator()) return false;
             // Состав и друзья доступны по UUID, даже когда владелец турели офлайн.
             SocialData social = SocialData.get(player.serverLevel().getServer());
+            if (DuelService.opponents(player.serverLevel().getServer(), ownerUUID, player.getUUID())) return true;
             return !social.areFriends(ownerUUID, player.getUUID()) && !social.sameFaction(ownerUUID, player.getUUID());
         }
         return true; // мобов всегда атакуем
@@ -335,6 +340,11 @@ public class RuneBlockEntity extends BlockEntity implements MenuProvider, Contai
                 level.sendParticles(player, ParticleTypes.END_ROD, true, x, y, z, 1, 0, 0, 0, 0.01);
             }
         }
+    }
+
+    private ServerPlayer getOwner() {
+        if (ownerUUID == null || !(level instanceof ServerLevel serverLevel)) return null;
+        return serverLevel.getServer().getPlayerList().getPlayer(ownerUUID);
     }
 
     // ===== ContainerData =====

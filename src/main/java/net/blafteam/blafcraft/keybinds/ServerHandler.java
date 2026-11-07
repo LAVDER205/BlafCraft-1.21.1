@@ -239,4 +239,9 @@ public class ServerHandler {
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) { // сброс кд при выходе
         cooldowns.remove(event.getEntity().getUUID());
     }
+
+    public static void cancelPendingActions(UUID player) {
+        // Отложенный залп не должен продолжаться после окончания поединка.
+        pendingActions.removeIf(action -> action.playerId.equals(player));
+    }
 }

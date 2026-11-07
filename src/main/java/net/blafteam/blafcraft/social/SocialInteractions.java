@@ -1,6 +1,7 @@
 package net.blafteam.blafcraft.social;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.duel.DuelService;
 import net.blafteam.blafcraft.friend_system.FriendUpdatePacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
@@ -115,7 +116,8 @@ public final class SocialInteractions {
                 .append(button("Моя фракция", ACTION + "roster")));
         for (SocialData.Friend friend : friends) {
             player.sendSystemMessage(Component.literal(friend.name() + " ")
-                    .append(button("Удалить", ACTION + "friend_confirm " + friend.id())));
+                    .append(button("Удалить", ACTION + "friend_confirm " + friend.id()))
+                    .append(" ").append(button("Дуэль", "/duel challenge " + friend.name())));
         }
     }
 
@@ -151,6 +153,8 @@ public final class SocialInteractions {
     }
 
     private static boolean areFriends(ServerPlayer attacker, ServerPlayer target) {
-        return SocialData.get(attacker.serverLevel().getServer()).areFriends(attacker.getUUID(), target.getUUID());
+        var server = attacker.serverLevel().getServer();
+        return SocialData.get(server).areFriends(attacker.getUUID(), target.getUUID())
+                && !DuelService.opponents(server, attacker.getUUID(), target.getUUID());
     }
 }

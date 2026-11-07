@@ -120,6 +120,9 @@ public final class SocialCommands {
                     String presence = server.getPlayerList().getPlayer(member.id()) == null ? " (офлайн)" : "";
                     var line = Component.literal(member.name() + presence + (member.leader() ? " — глава" : " "));
                     if (!member.leader()) line.append(button("Исключить", ACTION + "kick_confirm " + member.id()));
+                    if (!member.id().equals(id) && server.getPlayerList().getPlayer(member.id()) != null) {
+                        line.append(" ").append(button("Дуэль", "/duel challenge " + member.name()));
+                    }
                     player.sendSystemMessage(line);
                 });
         return 1;

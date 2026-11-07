@@ -1,6 +1,7 @@
 package net.blafteam.blafcraft.network;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.duel.DuelShortcutPayload;
 import net.blafteam.blafcraft.friend_system.FriendUpdatePacket;
 import net.blafteam.blafcraft.social.SocialInteractions;
 import net.blafteam.blafcraft.keybinds.ActionPacket;
@@ -17,6 +18,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 public class AbilityNetworking {
     @SubscribeEvent
     public static void register(RegisterPayloadHandlersEvent event) {
+        event.registrar("1").playToServer(DuelShortcutPayload.TYPE, DuelShortcutPayload.STREAM_CODEC, DuelShortcutPayload::handle);
         // Этот пакет нужен обеим сторонам, в том числе выделенному серверу без клиента Minecraft.
         event.registrar("2").playToServer(ActionPacket.TYPE, ActionPacket.STREAM_CODEC, ServerHandler::handle);
         event.registrar("2").playToServer(FriendUpdatePacket.TYPE, FriendUpdatePacket.STREAM_CODEC,

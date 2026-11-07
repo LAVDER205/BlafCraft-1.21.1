@@ -207,3 +207,11 @@ tasks.register('verifySocialPersistence', JavaExec) {
     mainClass = 'net.blafteam.blafcraft.social.SocialPersistenceCheck'
 }
 tasks.named('check') { dependsOn 'verifySocialPersistence' }
+
+tasks.register('verifyDuels', JavaExec) {
+    group = 'verification'
+    description = 'Checks duel invitations, consent, sessions and recovery.'
+    classpath = sourceSets.persistenceCheck.runtimeClasspath
+    mainClass = 'net.blafteam.blafcraft.duel.DuelStateCheck'
+}
+tasks.named('check') { dependsOn 'verifyDuels' }

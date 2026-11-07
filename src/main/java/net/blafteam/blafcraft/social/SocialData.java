@@ -1,6 +1,7 @@
 package net.blafteam.blafcraft.social;
 
 import net.minecraft.core.HolderLookup;
+import net.blafteam.blafcraft.duel.DuelState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -34,6 +35,12 @@ public final class SocialData extends SavedData {
     private final Map<String, Faction> factions = new LinkedHashMap<>();
     private final Map<UUID, String> membership = new HashMap<>();
     private final Map<UUID, Map<UUID, Friend>> friends = new HashMap<>();
+    // Активные поединки не записываются в NBT и принадлежат именно этому миру.
+    private final DuelState duels = new DuelState();
+
+    public DuelState duels() {
+        return duels;
+    }
     // Приглашения действуют только в текущем запуске сервера. По одному каждого вида на получателя.
     private final Map<UUID, Invite> factionInvites = new HashMap<>();
     private final Map<UUID, Invite> friendInvites = new HashMap<>();
