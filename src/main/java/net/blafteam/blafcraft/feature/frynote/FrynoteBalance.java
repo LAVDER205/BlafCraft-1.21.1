@@ -8,12 +8,12 @@ public final class FrynoteBalance {
     public static final double DASH_DISTANCE = 5;
     public static final int GLANCE_MANA = 30;
     public static final int GLANCE_COOLDOWN = 8 * 20;
-    public static final double GLANCE_DISTANCE = 24;
+    public static final double GLANCE_DISTANCE = 30;
     public static final int ANCHOR_SET_MANA = 10;
     public static final int ANCHOR_RETURN_MANA = 15;
     public static final int ANCHOR_LIFETIME = 8 * 20;
     public static final int ANCHOR_COOLDOWN = 16 * 20;
-    public static final double ANCHOR_DISTANCE = 24;
+    public static final double ANCHOR_DISTANCE = 100;
     public static final int COMBAT_TICKS = 6 * 20;
     public static final float COMBAT_REGEN = 2.0F / 20;
     public static final float REST_REGEN = 5.0F / 20;
