@@ -2,6 +2,7 @@ package net.blafteam.blafcraft.keybinds;
 
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.character.CharacterAssignments;
+import net.blafteam.blafcraft.feature.frynote.FrynoteController;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.mana.ManaManager;
 import net.blafteam.blafcraft.particle.ModParticles;
@@ -57,6 +58,11 @@ public class ServerHandler {
             if (!(context.player() instanceof ServerPlayer player) || !player.isAlive()) return;
             ActionType action = CharacterAssignments.get(player).actionForSlot(packet.slot());
             if (action == null) return;
+            // Заряды и якорь имеют собственное состояние. Их правила находятся в модуле персонажа.
+            if (FrynoteController.isFrynote(player) && FrynoteController.handles(action)) {
+                FrynoteController.cast(player, action);
+                return;
+            }
 
             long now = player.level().getGameTime();
             Map<ActionType, Long> playerCooldowns = cooldowns.computeIfAbsent(player.getUUID(), id -> new HashMap<>());
@@ -88,6 +94,7 @@ public class ServerHandler {
      */
     private static boolean executeAbility(ServerPlayer player, ActionType action) {
         return switch (action) {
+            case TELEPORT_ANCHOR -> false;
             case TEST -> false;
             case ARROW -> {
                 if (!shootArrow(player)) yield false;

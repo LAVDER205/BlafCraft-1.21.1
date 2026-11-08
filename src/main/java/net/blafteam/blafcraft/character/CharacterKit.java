@@ -14,7 +14,7 @@ import java.util.Optional;
 public enum CharacterKit {
     NONE("none"),
     FRIGBY("frigby", ActionType.CREATION_STEP, ActionType.FIREBALL, ActionType.ARROW),
-    FRYNOTE("frynote", ActionType.TELEPORT_DASH, ActionType.TELEPORT_GLANCE),
+    FRYNOTE("frynote", ActionType.TELEPORT_DASH, ActionType.TELEPORT_GLANCE, ActionType.TELEPORT_ANCHOR),
     LAVDER("lavder", ActionType.OVERDOSE_ABILITY),
     DEV("dev", ActionType.TEST, ActionType.TEST, ActionType.TEST, ActionType.TEST);
 

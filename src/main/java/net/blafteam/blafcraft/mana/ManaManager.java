@@ -2,6 +2,7 @@ package net.blafteam.blafcraft.mana;
 
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.character.CharacterAssignments;
+import net.blafteam.blafcraft.feature.frynote.FrynoteController;
 import net.blafteam.blafcraft.component.ModAttachments;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -47,6 +48,15 @@ public class ManaManager {
     }
 
     public static void tick(ServerPlayer player) {
+        if (FrynoteController.isFrynote(player)) {
+            // Боевые правила регенерации этого персонажа заданы в FrynoteBalance.
+            FrynoteController.tick(player);
+            return;
+        }
+        if (player.hasData(ModAttachments.FRYNOTE.get())) {
+            player.getData(ModAttachments.FRYNOTE.get()).cancelAnchor();
+            if (player.tickCount % 5 == 0) FrynoteController.syncHud(player);
+        }
         ManaData data = getOrCreate(player);
         if (data.currentMana() < data.maxMana()) setMana(player, data.currentMana() + data.manaRegen());
     }
