@@ -45,7 +45,7 @@ public final class FrynoteController {
             case TELEPORT_ANCHOR -> anchor(player, state);
             default -> false;
         };
-        if (!success) player.displayClientMessage(Component.literal("Перенос недоступен: проверь ману, заряды и место назначения."), true);
+        if (!success) player.displayClientMessage(Component.literal("Перенос недоступен"), true);
         ManaManager.sync(player);
         syncHud(player);
     }

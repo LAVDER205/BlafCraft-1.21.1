@@ -45,7 +45,7 @@ public final class SafeTeleport {
 
     public static Vec3 dashDestination(ServerPlayer player) {
         Vec3 origin = player.position();
-        Vec3 look = player.getLookAngle();
+        Vec3 look = dashDirection(player.getLookAngle(), player.getYRot(), player.onGround());
         // Можно пересечь стену, но конечный объём обязан быть свободным.
         // Если полные 5 блоков недоступны, ищем более близкую точку до 1 блока.
         for (double distance = FrynoteBalance.DASH_DISTANCE; distance >= 1; distance -= 0.25) {
@@ -53,6 +53,16 @@ public final class SafeTeleport {
             if (isSafe(player, point, false)) return point;
         }
         return null;
+    }
+
+    static Vec3 dashDirection(Vec3 look, float yaw, boolean onGround) {
+        // На земле взгляд вниз означает движение вдоль поверхности, иначе все
+        // проверяемые точки окажутся под полом. В воздухе сохраняем вертикальный рывок.
+        if (onGround && look.y < 0) {
+            Vec3 horizontal = new Vec3(look.x, 0, look.z);
+            return horizontal.lengthSqr() > 0.0001 ? horizontal.normalize() : Vec3.directionFromRotation(0, yaw);
+        }
+        return look;
     }
 
     public static Vec3 glanceDestination(ServerPlayer player) {

@@ -8,6 +8,14 @@ import java.util.UUID;
 
 public final class FrynoteCheck {
     public static void main(String[] args) {
+        Vec3 downward = new Vec3(0, -0.2, 1).normalize();
+        Vec3 groundDash = SafeTeleport.dashDirection(downward, 0, true);
+        check(groundDash.y == 0 && Math.abs(groundDash.length() - 1) < 0.0001, "ground dash with downward camera");
+        check(SafeTeleport.dashDirection(downward, 0, false).equals(downward), "air dash keeps downward direction");
+        Vec3 upward = new Vec3(0, 0.5, 1).normalize();
+        check(SafeTeleport.dashDirection(upward, 0, true).equals(upward), "upward dash stays available");
+        Vec3 straightDown = SafeTeleport.dashDirection(new Vec3(0, -1, 0), 90, true);
+        check(straightDown.y == 0 && straightDown.lengthSqr() > 0.99, "straight-down camera uses player yaw");
         FrynoteData state = new FrynoteData();
         state.spendCharge();
         tick(state, 20);
