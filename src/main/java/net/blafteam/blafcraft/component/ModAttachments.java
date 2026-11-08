@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.UUIDUtil;
 import net.blafteam.blafcraft.mana.ManaData;
+import net.blafteam.blafcraft.feature.frynote.FrynoteData;
 import java.util.Objects;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -17,6 +18,9 @@ import java.util.UUID;
 public class ModAttachments {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES =
             DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, "blafcraft");
+
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<FrynoteData>> FRYNOTE =
+            ATTACHMENT_TYPES.register("frynote", () -> AttachmentType.serializable(FrynoteData::new).copyOnDeath().build());
 
     // Пустая строка означает старого игрока без явного назначения. "none" отключает набор.
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<String>> CHARACTER_ID =
