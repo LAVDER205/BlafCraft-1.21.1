@@ -1,11 +1,12 @@
 package net.blafteam.blafcraft.keybinds;
 
+import net.blafteam.blafcraft.feature.frigby.FrigbyBalance;
 import net.blafteam.blafcraft.feature.frynote.FrynoteBalance;
 
 public enum ActionType {
     TEST(60, 0, 0),
-    ARROW(40, 1, 0),
-    FIREBALL(80, 2, 0),
+    ARROW(40, FrigbyBalance.ARROW_VOLLEY_XP, 0),
+    FIREBALL(80, FrigbyBalance.FIREBALL_XP, 0),
     CREATION_STEP(0, 0, 0),
     TELEPORT_DASH(FrynoteBalance.CHARGE_TICKS, 0, FrynoteBalance.DASH_MANA),
     TELEPORT_GLANCE(FrynoteBalance.GLANCE_COOLDOWN, 0, FrynoteBalance.GLANCE_MANA),
@@ -18,12 +19,12 @@ public enum ActionType {
     OVERDOSE_ABILITY(1,0,0);
 
     private final int cooldownTicks;
-    private final int exp_price;
+    private final int experiencePointCost;
     private final int mana_price;
 
-    ActionType(int cooldownTicks, int exp_price, int mana_price) {
+    ActionType(int cooldownTicks, int experiencePointCost, int mana_price) {
         this.cooldownTicks = cooldownTicks;
-        this.exp_price = exp_price;
+        this.experiencePointCost = experiencePointCost;
         this.mana_price = mana_price;
     }
 
@@ -31,8 +32,8 @@ public enum ActionType {
         return cooldownTicks;
     }
 
-    public int getExp_price() {
-        return exp_price;
+    public int getExperiencePointCost() {
+        return experiencePointCost;
     }
 
     public int getMana_price() {

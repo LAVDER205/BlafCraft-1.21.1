@@ -1,6 +1,6 @@
 package net.blafteam.blafcraft.duel;
 
-import net.blafteam.blafcraft.keybinds.ServerHandler;
+import net.blafteam.blafcraft.feature.frigby.FrigbyController;
 import net.blafteam.blafcraft.social.SocialData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
@@ -121,7 +121,7 @@ public final class DuelService {
 
     private static void cleanUp(ServerPlayer player, DuelState.Match match, int now) {
         if (player == null) return;
-        ServerHandler.cancelPendingActions(player.getUUID());
+        FrigbyController.cancelPendingArrows(player.getUUID());
         player.clearFire();
         // Убираем вредные состояния боя, чтобы кровотечение не убило сразу после поражения.
         // Состояния, которые были до дуэли, восстанавливаем с учётом прошедшего времени.
