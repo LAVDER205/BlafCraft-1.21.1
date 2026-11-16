@@ -6,6 +6,7 @@ import net.blafteam.blafcraft.friend_system.FriendUpdatePacket;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.EntityHitResult;
 import net.neoforged.api.distmarker.Dist;
@@ -24,6 +25,10 @@ public class ClientSetup {
             KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.categories.blafcraft");
     private static final KeyMapping DUEL_KEY = new KeyMapping("key.blafcraft.duel",
             KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, "key.categories.blafcraft");
+
+    public static Component abilityKeyLabel(int slot) {
+        return ABILITY_KEYS[slot].getTranslatedKeyMessage();
+    }
 
     private static KeyMapping[] createAbilityKeys() {
         KeyMapping[] keys = new KeyMapping[AbilitySlots.COUNT];

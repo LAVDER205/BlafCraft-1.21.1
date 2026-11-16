@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
@@ -26,6 +27,8 @@ import java.util.UUID;
 
 @EventBusSubscriber(modid = BlafCraft.MODID)
 public final class FrigbyController {
+    private static final String PROTECTED_SHOOTER = "blafcraft_frigby_protected_shooter";
+
     private record PendingArrow(UUID playerId, ServerLevel level, long fireAt) {}
 
     private static final List<PendingArrow> pendingArrows = new ArrayList<>();
@@ -51,8 +54,8 @@ public final class FrigbyController {
         // Весь залп оплачивается сразу. Следующие стрелы летят по текущему взгляду игрока.
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        pendingArrows.add(new PendingArrow(player.getUUID(), level, now + 5));
-        pendingArrows.add(new PendingArrow(player.getUUID(), level, now + 10));
+        pendingArrows.add(new PendingArrow(player.getUUID(), level, now + FrigbyBalance.ARROW_INTERVAL_TICKS));
+        pendingArrows.add(new PendingArrow(player.getUUID(), level, now + 2L * FrigbyBalance.ARROW_INTERVAL_TICKS));
         return true;
     }
 
@@ -71,14 +74,17 @@ public final class FrigbyController {
         fireball.setPos(player.getEyePosition());
         Vec3 look = player.getViewVector(1.0F);
         fireball.shoot(look.x, look.y, look.z, 1.5f, 0.0f);
-        if (!player.level().addFreshEntity(fireball)) return false;
 
         BlockPos below = player.blockPosition().below();
         BlockPos twoBelow = below.below();
         BlockState stateBelow = player.level().getBlockState(below);
         BlockState stateTwoBelow = player.level().getBlockState(twoBelow);
-        if (player.getXRot() >= 60 && (!stateBelow.getCollisionShape(player.level(), below).isEmpty()
-                || !stateTwoBelow.getCollisionShape(player.level(), twoBelow).isEmpty())) {
+        boolean boosting = player.getXRot() >= 60 && (!stateBelow.getCollisionShape(player.level(), below).isEmpty()
+                || !stateTwoBelow.getCollisionShape(player.level(), twoBelow).isEmpty());
+        if (boosting) fireball.getPersistentData().putUUID(PROTECTED_SHOOTER, player.getUUID());
+        if (!player.level().addFreshEntity(fireball)) return false;
+
+        if (boosting) {
             player.addDeltaMovement(new Vec3(0, 1, 0));
             player.connection.send(new ClientboundSetEntityMotionPacket(player));
         }
@@ -89,10 +95,26 @@ public final class FrigbyController {
         Arrow arrow = EntityType.ARROW.create(player.level());
         if (arrow == null) return false;
         arrow.setOwner(player);
+        arrow.getPersistentData().putUUID(PROTECTED_SHOOTER, player.getUUID());
         arrow.setPos(player.getEyePosition());
         Vec3 look = player.getViewVector(1.0F);
         arrow.shoot(look.x, look.y, look.z, 3.0f, 0.0f);
         return player.level().addFreshEntity(arrow);
+    }
+
+    @SubscribeEvent
+    public static void protectShooter(LivingIncomingDamageEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        var projectile = event.getSource().getDirectEntity();
+        if (!(projectile instanceof Arrow) && !(projectile instanceof LargeFireball)) return;
+
+        // Защита действует только для этого снаряда и только на выпустившего его игрока.
+        // Стрела может отскочить от щита или цели, уже получившей другой удар.
+        var data = projectile.getPersistentData();
+        if (data.hasUUID(PROTECTED_SHOOTER) && data.getUUID(PROTECTED_SHOOTER).equals(player.getUUID())) {
+            event.setCanceled(true);
+            if (projectile instanceof Arrow) projectile.discard();
+        }
     }
 
     @SubscribeEvent

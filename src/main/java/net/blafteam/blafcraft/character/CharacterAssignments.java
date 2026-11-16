@@ -10,6 +10,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(modid = BlafCraft.MODID)
 public class CharacterAssignments {
@@ -29,6 +31,15 @@ public class CharacterAssignments {
             case "Dev" -> CharacterKit.DEV;
             default -> CharacterKit.NONE;
         };
+    }
+
+    private static void syncHud(ServerPlayer player) {
+        PacketDistributor.sendToPlayer(player, new CharacterHudPayload(get(player).id()));
+    }
+
+    @SubscribeEvent
+    public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) syncHud(player);
     }
 
     @SubscribeEvent
@@ -52,6 +63,7 @@ public class CharacterAssignments {
                                                 return 0;
                                             }
                                             player.setData(ModAttachments.CHARACTER_ID.get(), id);
+                                            syncHud(player);
                                             context.getSource().sendSuccess(() -> Component.literal(
                                                     player.getGameProfile().getName() + " → " + id), true);
                                             return 1;
