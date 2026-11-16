@@ -27,6 +27,11 @@ public class ModAttachments {
             ATTACHMENT_TYPES.register("king_call_ready_at", () -> AttachmentType.builder(() -> 0L)
                     .serialize(Codec.LONG, time -> time > 0).copyOnDeath().build());
 
+    // Запас привязан к игроку. Поднятая или заново изготовленная реликвия использует тот же заряд.
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<Integer>> RELIC_CHARGE =
+            ATTACHMENT_TYPES.register("relic_charge", () -> AttachmentType.builder(() -> 0)
+                    .serialize(Codec.INT, charge -> charge > 0).copyOnDeath().build());
+
     // Пустая строка означает старого игрока без явного назначения. "none" отключает набор.
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<String>> CHARACTER_ID =
             ATTACHMENT_TYPES.register("character_id", () -> AttachmentType.builder(() -> "")

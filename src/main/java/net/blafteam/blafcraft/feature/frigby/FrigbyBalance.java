@@ -11,5 +11,13 @@ public final class FrigbyBalance {
     public static final int KING_CALL_DURATION = 10 * 20;
     public static final int KING_CALL_COOLDOWN = 5 * 60 * 20;
 
+    public static final int RELIC_CAPACITY = 30;
+    public static final int RELIC_STARTUP_TICKS = 10;
+    public static final int RELIC_TRANSFER_INTERVAL = 2;
+    // Скорость зарядки в сотых долях очка за тик.
+    public static final int RELIC_BASE_CHARGE_RATE = 8;
+    public static final int RELIC_MIN_CHARGE_RATE = 1;
+    public static final int RELIC_LEVELS_PER_SLOWDOWN = 4;
+
     private FrigbyBalance() {}
 }
