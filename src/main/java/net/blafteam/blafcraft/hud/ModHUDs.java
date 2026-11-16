@@ -3,7 +3,6 @@ package net.blafteam.blafcraft.hud;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.effect.ModEffects;
-import net.blafteam.blafcraft.keybinds.ActionType;
 import net.blafteam.blafcraft.keybinds.ClientCooldowns;
 import net.blafteam.blafcraft.mana.ClientManaHandler;
 import net.minecraft.client.Minecraft;
@@ -31,21 +30,6 @@ public class ModHUDs {
 
         int w = mc.getWindow().getGuiScaledWidth();
         int h = mc.getWindow().getGuiScaledHeight();
-
-        int x = 20;
-        int y = 20;
-
-        // Cooldowns
-        for (ActionType action : ActionType.values()) {
-
-            int remain = ClientCooldowns.getRemaining(action);
-
-            if (remain > 0) {
-                String text = action.name() + ": " + String.format("%.1f", remain / 20.0);
-                graphics.drawString(mc.font, text, x + 16, y, 0xFFFFFF);
-                y += 10; // сдвиг чтоб не было наслоения
-            }
-        }
 
         // OVERLAYS
         // Bloodlust Overlay

@@ -2,53 +2,32 @@ package net.blafteam.blafcraft.keybinds;
 
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.character.CharacterAssignments;
+import net.blafteam.blafcraft.feature.frigby.ExperiencePoints;
+import net.blafteam.blafcraft.feature.frigby.FrigbyController;
 import net.blafteam.blafcraft.feature.frynote.FrynoteController;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.mana.ManaManager;
 import net.blafteam.blafcraft.particle.ModParticles;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.projectile.Arrow;
-import net.minecraft.world.entity.projectile.LargeFireball;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 @EventBusSubscriber(modid = BlafCraft.MODID)
 public class ServerHandler {
     public static final Set<UUID> playersWantToFly = new HashSet<>();
-
-    private static class PendingAction {
-        final UUID playerId; // игрок
-        final ActionType action; // действие
-        int ticksLeft; // кд
-
-        PendingAction(UUID playerId, ActionType action, int ticksLeft) {
-            this.playerId = playerId;
-            this.action = action;
-            this.ticksLeft = ticksLeft;
-        }
-    }
-
-    private static final Queue<PendingAction> pendingActions = new ConcurrentLinkedQueue<>();
 
     // Храним для каждого игрока (UUID) и для каждого типа действия время последнего использования
     private static final Map<UUID, Map<ActionType, Long>> cooldowns = new HashMap<>();
@@ -69,14 +48,18 @@ public class ServerHandler {
             Long lastUsed = playerCooldowns.get(action);
             if (lastUsed != null && now - lastUsed < action.getCooldownTicks()) return;
 
-            int experienceCost = action.getExp_price();
+            int experienceCost = action.getExperiencePointCost();
             int manaCost = action.getMana_price();
             // Проверка ресурсов ничего не списывает. Весь запуск идёт в серверном потоке.
-            if (player.experienceLevel < experienceCost || ManaManager.getMana(player) < manaCost) return;
+            if (!ExperiencePoints.canAfford(player, experienceCost)) {
+                player.displayClientMessage(Component.literal("Нужно опыта: " + experienceCost), true);
+                return;
+            }
+            if (ManaManager.getMana(player) < manaCost) return;
             if (!executeAbility(player, action)) return;
 
             // Успешное действие оплачивается один раз. Отложенные стрелы входят в этот же залп.
-            if (experienceCost > 0) player.setExperienceLevels(player.experienceLevel - experienceCost);
+            if (experienceCost > 0) player.giveExperiencePoints(-experienceCost);
             if (manaCost > 0) ManaManager.consumeMana(player, manaCost);
             playerCooldowns.put(action, now);
             ManaManager.sync(player);
@@ -96,20 +79,7 @@ public class ServerHandler {
         return switch (action) {
             case TELEPORT_ANCHOR -> false;
             case TEST -> false;
-            case ARROW -> {
-                if (!shootArrow(player)) yield false;
-                pendingActions.add(new PendingAction(player.getUUID(), action, 5));
-                pendingActions.add(new PendingAction(player.getUUID(), action, 10));
-                yield true;
-            }
-            case FIREBALL -> castFireball(player);
-            case CREATION_STEP -> {
-                if (player.hasEffect(ModEffects.CREATION_STEP_EFFECT)) {
-                    yield player.removeEffect(ModEffects.CREATION_STEP_EFFECT);
-                }
-                yield player.totalExperience > 0 && player.addEffect(
-                        new MobEffectInstance(ModEffects.CREATION_STEP_EFFECT, -1, 0, false, false, false));
-            }
+            case ARROW, FIREBALL, CREATION_STEP -> FrigbyController.cast(player, action);
             case TELEPORT_DASH -> {
                 Vec3 look = player.getViewVector(1.0F);
                 Vec3 origin = player.position();
@@ -131,27 +101,6 @@ public class ServerHandler {
             case MORPH -> player.addEffect(new MobEffectInstance(ModEffects.MORPH_EFFECT, 1200, 0, false, false, true));
             case OVERDOSE_ABILITY -> castOverdose(player);
         };
-    }
-
-    private static boolean castFireball(ServerPlayer player) {
-        LargeFireball fireball = EntityType.FIREBALL.create(player.level());
-        if (fireball == null) return false;
-        fireball.setOwner(player);
-        fireball.setPos(player.getEyePosition());
-        Vec3 look = player.getViewVector(1.0F);
-        fireball.shoot(look.x, look.y, look.z, 1.5f, 0.0f);
-        if (!player.level().addFreshEntity(fireball)) return false;
-
-        BlockPos below = player.blockPosition().below();
-        BlockPos twoBelow = below.below();
-        BlockState stateBelow = player.level().getBlockState(below);
-        BlockState stateTwoBelow = player.level().getBlockState(twoBelow);
-        if (player.getXRot() >= 60 && (!stateBelow.getCollisionShape(player.level(), below).isEmpty()
-                || !stateTwoBelow.getCollisionShape(player.level(), twoBelow).isEmpty())) {
-            player.addDeltaMovement(new Vec3(0, 1, 0));
-            player.connection.send(new ClientboundSetEntityMotionPacket(player));
-        }
-        return true;
     }
 
     private static boolean castTeleportGlance(ServerPlayer player) {
@@ -205,50 +154,8 @@ public class ServerHandler {
         return false;
     }
 
-    private static boolean shootArrow(ServerPlayer player) {
-        Arrow arrow = EntityType.ARROW.create(player.level());
-        if (arrow == null) return false;
-        arrow.setOwner(player);
-        arrow.setPos(player.getEyePosition());
-        Vec3 look = player.getViewVector(1.0F);
-        arrow.shoot(look.x, look.y, look.z, 3.0f, 0.0f);
-        return player.level().addFreshEntity(arrow);
-    }
-
     @SubscribeEvent
-    public static void onServerTick(ServerTickEvent.Post event) {
-        // Получаем сервер (можно через ServerLifecycleHooks.getCurrentServer())
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (server == null) return;
-
-        // Обрабатываем все запланированные действия
-        Iterator<ServerHandler.PendingAction> iterator = ServerHandler.pendingActions.iterator();
-        while (iterator.hasNext()) {
-            ServerHandler.PendingAction pa = iterator.next();
-            pa.ticksLeft--;
-
-            if (pa.ticksLeft <= 0) {
-                // Время вышло, выполняем действие
-                ServerPlayer player = server.getPlayerList().getPlayer(pa.playerId);
-                if (player != null) {
-                    switch (pa.action) {
-                        case ARROW -> ServerHandler.shootArrow(player);
-                        // Можно добавить другие действия с задержкой
-                        default -> {} // на случай других действий
-                    }
-                }
-                iterator.remove();
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) { // сброс кд при выходе
+    public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         cooldowns.remove(event.getEntity().getUUID());
-    }
-
-    public static void cancelPendingActions(UUID player) {
-        // Отложенный залп не должен продолжаться после окончания поединка.
-        pendingActions.removeIf(action -> action.playerId.equals(player));
     }
 }

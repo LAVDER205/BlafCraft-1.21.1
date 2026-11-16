@@ -2,13 +2,13 @@ package net.blafteam.blafcraft.feature.frynote;
 
 import net.blafteam.blafcraft.BlafCraft;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.blafteam.blafcraft.hud.AbilityHud;
+import net.blafteam.blafcraft.keybinds.ActionType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 @EventBusSubscriber(modid = BlafCraft.MODID, value = Dist.CLIENT)
@@ -32,22 +32,20 @@ public final class FrynoteClientHud {
     @SubscribeEvent
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) { snapshot = null; }
 
-    @SubscribeEvent
-    public static void render(RenderGuiLayerEvent.Post event) {
-        // Событие вызывается для каждого слоя. Рисуем текст ровно один раз за кадр.
-        if (!event.getName().equals(net.neoforged.neoforge.client.gui.VanillaGuiLayers.HOTBAR)
-                || snapshot == null || Minecraft.getInstance().player == null) return;
-        var mc = Minecraft.getInstance();
-        GuiGraphics graphics = event.getGuiGraphics();
-        int y = mc.getWindow().getGuiScaledHeight() - 72;
-        String charges = "Рывок: " + snapshot.charges() + "/" + FrynoteBalance.MAX_CHARGES;
-        if (snapshot.recharge() > 0) charges += "  +" + seconds(snapshot.recharge());
-        graphics.drawString(mc.font, charges, 10, y, 0x99CCFF);
-        graphics.drawString(mc.font, "Взгляд: " + ready(snapshot.glance()), 10, y + 12, 0x99CCFF);
-        String anchor = snapshot.anchorLife() > 0 ? "Возврат: " + seconds(snapshot.anchorLife()) : ready(snapshot.anchorCooldown());
-        graphics.drawString(mc.font, "Якорь: " + anchor, 10, y + 24, 0x99CCFF);
+    public static String status(ActionType action) {
+        var state = snapshot;
+        if (state == null) return "…";
+        return switch (action) {
+            case TELEPORT_DASH -> {
+                String charges = state.charges() + "/" + FrynoteBalance.MAX_CHARGES;
+                if (state.recharge() > 0) charges += "  +" + AbilityHud.seconds(state.recharge());
+                yield charges;
+            }
+            case TELEPORT_GLANCE -> AbilityHud.ready(state.glance());
+            case TELEPORT_ANCHOR -> state.anchorLife() > 0
+                    ? "возврат " + AbilityHud.seconds(state.anchorLife())
+                    : AbilityHud.ready(state.anchorCooldown());
+            default -> AbilityHud.ready(0);
+        };
     }
-
-    private static String ready(int ticks) { return ticks > 0 ? seconds(ticks) : "готов"; }
-    private static String seconds(int ticks) { return String.format(java.util.Locale.ROOT, "%.1f с", ticks / 20.0); }
 }

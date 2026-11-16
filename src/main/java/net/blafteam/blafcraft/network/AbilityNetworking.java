@@ -1,6 +1,8 @@
 package net.blafteam.blafcraft.network;
 
 import net.blafteam.blafcraft.BlafCraft;
+import net.blafteam.blafcraft.character.CharacterHudPayload;
+import net.blafteam.blafcraft.hud.AbilityHud;
 import net.blafteam.blafcraft.feature.frynote.FrynoteHudPayload;
 import net.blafteam.blafcraft.feature.frynote.FrynoteClientHud;
 import net.blafteam.blafcraft.duel.DuelShortcutPayload;
@@ -20,6 +22,8 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 public class AbilityNetworking {
     @SubscribeEvent
     public static void register(RegisterPayloadHandlersEvent event) {
+        event.registrar("1").playToClient(CharacterHudPayload.TYPE, CharacterHudPayload.STREAM_CODEC,
+                (payload, context) -> AbilityHud.handle(payload, context));
         event.registrar("1").playToClient(FrynoteHudPayload.TYPE, FrynoteHudPayload.STREAM_CODEC,
                 (payload, context) -> FrynoteClientHud.handle(payload, context));
         event.registrar("1").playToServer(DuelShortcutPayload.TYPE, DuelShortcutPayload.STREAM_CODEC, DuelShortcutPayload::handle);
