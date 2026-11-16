@@ -74,12 +74,12 @@ public class ServerHandler {
             if (ManaManager.getMana(player) < manaCost) return;
             if (!executeAbility(player, action)) return;
             playAbilitySound(player, action);
-            if (kit == CharacterKit.FRIGBY) FrigbyActivity.mark(player);
 
             // Успешное действие оплачивается один раз. Отложенные стрелы входят в этот же залп.
             if (experienceCost > 0) player.giveExperiencePoints(-experienceCost);
             if (manaCost > 0) ManaManager.consumeMana(player, manaCost);
             playerCooldowns.put(action, now);
+            if (kit == CharacterKit.FRIGBY) FrigbyActivity.mark(player);
             ManaManager.sync(player);
             // Сетевой клиент запускает отсчёт только после подтверждения сервера.
             int cooldownTicks = action.getCooldownTicks();
@@ -87,6 +87,15 @@ public class ServerHandler {
                 PacketDistributor.sendToPlayer(player, new CooldownSyncPayload(action, cooldownTicks));
             }
         });
+    }
+
+    public static int remainingCooldown(ServerPlayer player, ActionType action) {
+        Map<ActionType, Long> playerCooldowns = cooldowns.get(player.getUUID());
+        if (playerCooldowns == null) return 0;
+        Long lastUsed = playerCooldowns.get(action);
+        if (lastUsed == null) return 0;
+        long elapsed = player.level().getGameTime() - lastUsed;
+        return (int) Math.clamp(action.getCooldownTicks() - elapsed, 0, action.getCooldownTicks());
     }
 
     /**

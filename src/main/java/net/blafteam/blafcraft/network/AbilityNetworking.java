@@ -26,7 +26,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 public class AbilityNetworking {
     @SubscribeEvent
     public static void register(RegisterPayloadHandlersEvent event) {
-        event.registrar("1").playBidirectional(FrigbyLoadoutPayload.TYPE, FrigbyLoadoutPayload.STREAM_CODEC,
+        event.registrar("2").playBidirectional(FrigbyLoadoutPayload.TYPE, FrigbyLoadoutPayload.STREAM_CODEC,
                 (payload, context) -> {
                     if (context.flow().isClientbound()) FrigbyLoadoutClient.handle(payload, context);
                     else FrigbyLoadoutPayload.handleChange(payload, context);

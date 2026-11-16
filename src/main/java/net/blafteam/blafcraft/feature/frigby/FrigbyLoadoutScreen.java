@@ -16,6 +16,7 @@ import java.util.List;
 public final class FrigbyLoadoutScreen extends Screen {
     private final List<CycleButton<ActionType>> choices = new ArrayList<>(3);
     private Button apply;
+    private Button cancelPlan;
 
     public FrigbyLoadoutScreen() {
         super(Component.literal("Созидание Фригби"));
@@ -23,7 +24,8 @@ public final class FrigbyLoadoutScreen extends Screen {
 
     @Override
     protected void init() {
-        FrigbyLoadout current = choices.size() == 3 ? selected() : FrigbyLoadoutClient.get();
+        var queued = FrigbyLoadoutClient.queued();
+        FrigbyLoadout current = choices.size() == 3 ? selected() : (queued != null ? queued : FrigbyLoadoutClient.get());
         choices.clear();
         int left = width / 2 - 122;
         int top = height / 2 - 63;
@@ -36,15 +38,19 @@ public final class FrigbyLoadoutScreen extends Screen {
             choices.add(addRenderableWidget(choice));
         }
         apply = addRenderableWidget(Button.builder(Component.literal("Сохранить"), button -> save())
-                .bounds(width / 2 - 108, top + 114, 104, 20).build());
+                .bounds(left, top + 114, 76, 20).build());
         apply.active = selected().isValid();
-        addRenderableWidget(Button.builder(Component.literal("Отмена"), button -> onClose())
-                .bounds(width / 2 + 4, top + 114, 104, 20).build());
+        cancelPlan = addRenderableWidget(Button.builder(Component.literal("Отменить план"), button -> submit(""))
+                .bounds(left + 80, top + 114, 92, 20).build());
+        cancelPlan.active = queued != null;
+        addRenderableWidget(Button.builder(Component.literal("Закрыть"), button -> onClose())
+                .bounds(left + 176, top + 114, 68, 20).build());
     }
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(graphics, mouseX, mouseY, partialTick);
+        cancelPlan.active = FrigbyLoadoutClient.queued() != null;
         super.render(graphics, mouseX, mouseY, partialTick);
         int top = height / 2 - 63;
         graphics.drawCenteredString(font, title, width / 2, top - 16, 0xFFFFFF);
@@ -55,7 +61,9 @@ public final class FrigbyLoadoutScreen extends Screen {
                     : action.getExperiencePointCost() + " опыта · КД " + AbilityHud.seconds(action.getCooldownTicks());
             graphics.drawCenteredString(font, details, width / 2, top + slot * 36 + 23, 0xC0D8F0);
         }
-        String note = selected().isValid() ? "Зов короля остаётся в четвёртом слоте" : "Выбери три разные конструкции";
+        String note = "Зов короля остаётся в четвёртом слоте";
+        if (cancelPlan.active) note = "Смена набора запланирована";
+        if (!selected().isValid()) note = "Выбери три разные конструкции";
         graphics.drawCenteredString(font, note, width / 2, top + 140, selected().isValid() ? 0xC0D8F0 : 0xFF9B9B);
     }
 
@@ -66,7 +74,11 @@ public final class FrigbyLoadoutScreen extends Screen {
     private void save() {
         FrigbyLoadout loadout = selected();
         if (!loadout.isValid()) return;
-        PacketDistributor.sendToServer(new FrigbyLoadoutPayload(loadout.encode()));
+        submit(loadout.encode());
+    }
+
+    private void submit(String choices) {
+        PacketDistributor.sendToServer(FrigbyLoadoutPayload.request(choices));
         onClose();
     }
 

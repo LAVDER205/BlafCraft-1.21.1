@@ -16,6 +16,13 @@ public final class ConstructionCheck {
         check(FrigbyLoadout.decode("ARROW,KING_CALL,CANNON") == null, "keep King's Call separate");
         check(FrigbyLoadout.decode("ARROW,UNKNOWN,CANNON") == null, "reject unknown abilities");
 
+        var rearranged = new FrigbyLoadout(ActionType.FIREBALL, ActionType.CREATION_STEP, ActionType.ARROW);
+        check(FrigbyLoadout.DEFAULT.affectedBy(rearranged).equals(Set.of(ActionType.FIREBALL, ActionType.CREATION_STEP)),
+                "unchanged slot does not block a swap");
+        var replacement = new FrigbyLoadout(ActionType.STONE_WALL, ActionType.FIREBALL, ActionType.ARROW);
+        check(FrigbyLoadout.DEFAULT.affectedBy(replacement).equals(Set.of(ActionType.CREATION_STEP, ActionType.STONE_WALL)),
+                "replacing a slot respects both constructions' cooldowns");
+
         var anchor = new BlockPos(-7, 64, 13);
         check(Set.copyOf(ConstructionAim.wallBlocks(anchor, Direction.NORTH)).equals(Set.of(
                 anchor.west(), anchor.west().above(), anchor, anchor.above(), anchor.east(), anchor.east().above())),

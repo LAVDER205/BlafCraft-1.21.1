@@ -6,7 +6,9 @@ import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.keybinds.ActionType;
 import net.minecraft.server.level.ServerPlayer;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 public record FrigbyLoadout(ActionType first, ActionType second, ActionType third) {
     public static final List<ActionType> CONSTRUCTIONS = List.of(ActionType.CREATION_STEP, ActionType.FIREBALL,
@@ -25,6 +27,18 @@ public record FrigbyLoadout(ActionType first, ActionType second, ActionType thir
 
     public boolean includes(ActionType action) {
         return first == action || second == action || third == action;
+    }
+
+    public Set<ActionType> affectedBy(FrigbyLoadout next) {
+        var affected = EnumSet.noneOf(ActionType.class);
+        for (int slot = 0; slot < 3; slot++) {
+            ActionType current = forSlot(slot);
+            ActionType replacement = next.forSlot(slot);
+            if (current == replacement) continue;
+            affected.add(current);
+            affected.add(replacement);
+        }
+        return affected;
     }
 
     public boolean isValid() {

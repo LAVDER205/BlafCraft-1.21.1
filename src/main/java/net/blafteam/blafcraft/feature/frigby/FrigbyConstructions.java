@@ -14,7 +14,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.LargeFireball;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -176,8 +175,7 @@ public final class FrigbyConstructions {
         if (y > rain.center.y + 24 || y >= level.getMaxBuildHeight()) return;
         var arrow = EntityType.ARROW.create(level);
         if (arrow == null) return;
-        arrow.setOwner(caster);
-        arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
+        FrigbyController.configureCreatedArrow(arrow, caster);
         arrow.setPos(column.getX() + 0.5, y, column.getZ() + 0.5);
         arrow.shoot(0, -1, 0, 2.0F, 0);
         level.addFreshEntity(arrow);
@@ -262,9 +260,8 @@ public final class FrigbyConstructions {
 
     private static void detonate(ServerLevel level, LargeFireball shot, Vec3 center) {
         if (shot.isRemoved()) return;
-        // Урон и отбрасывание остаются ванильными. Крупная вспышка не требует разрушать блоки.
-        level.explode(shot, center.x, center.y, center.z, FrigbyBalance.CANNON_POWER, false, Level.ExplosionInteraction.NONE);
-        level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, center.x, center.y, center.z, 1, 0, 0, 0, 0);
+        // Разрушаем блоки по правилам взрыва динамита, без поджигания местности.
+        level.explode(shot, center.x, center.y, center.z, FrigbyBalance.CANNON_POWER, false, Level.ExplosionInteraction.TNT);
         shot.discard();
     }
 
