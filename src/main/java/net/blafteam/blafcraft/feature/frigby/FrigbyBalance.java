@@ -8,5 +8,8 @@ public final class FrigbyBalance {
     public static final int FIREBALL_XP = 16;
     public static final int STEP_XP_PER_TICK = 1; // 20 очков за секунду на воздушной опоре.
 
+    public static final int KING_CALL_DURATION = 10 * 20;
+    public static final int KING_CALL_COOLDOWN = 5 * 60 * 20;
+
     private FrigbyBalance() {}
 }

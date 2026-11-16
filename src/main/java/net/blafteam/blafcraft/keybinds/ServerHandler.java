@@ -4,6 +4,7 @@ import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.character.CharacterAssignments;
 import net.blafteam.blafcraft.feature.frigby.ExperiencePoints;
 import net.blafteam.blafcraft.feature.frigby.FrigbyController;
+import net.blafteam.blafcraft.feature.frigby.KingCall;
 import net.blafteam.blafcraft.feature.frynote.FrynoteController;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.mana.ManaManager;
@@ -43,6 +44,12 @@ public class ServerHandler {
                 return;
             }
 
+            // У Зова сохраняется перезарядка между входами в мир.
+            if (action == ActionType.KING_CALL) {
+                KingCall.cast(player);
+                return;
+            }
+
             long now = player.level().getGameTime();
             Map<ActionType, Long> playerCooldowns = cooldowns.computeIfAbsent(player.getUUID(), id -> new HashMap<>());
             Long lastUsed = playerCooldowns.get(action);
@@ -77,7 +84,7 @@ public class ServerHandler {
      */
     private static boolean executeAbility(ServerPlayer player, ActionType action) {
         return switch (action) {
-            case TELEPORT_ANCHOR -> false;
+            case TELEPORT_ANCHOR, KING_CALL -> false;
             case TEST -> false;
             case ARROW, FIREBALL, CREATION_STEP -> FrigbyController.cast(player, action);
             case TELEPORT_DASH -> {

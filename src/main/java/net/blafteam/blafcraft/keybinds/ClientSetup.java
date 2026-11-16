@@ -37,6 +37,7 @@ public class ClientSetup {
                 case 0 -> GLFW.GLFW_KEY_Z;
                 case 1 -> GLFW.GLFW_KEY_X;
                 case 2 -> GLFW.GLFW_KEY_C;
+                case 3 -> GLFW.GLFW_KEY_V;
                 default -> GLFW.GLFW_KEY_UNKNOWN;
             };
             // Имя настройки и номер в пакете должны оставаться стабильными между версиями.
