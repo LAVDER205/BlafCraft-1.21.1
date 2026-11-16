@@ -28,17 +28,16 @@ public final class FrigbyBalance {
     public static final int RAIN_XP = 35;
     public static final int RAIN_COOLDOWN = 18 * 20;
     public static final int RAIN_RANGE = 24;
-    public static final double RAIN_RADIUS = 3;
-    public static final int RAIN_WARNING_TICKS = 30;
-    public static final int RAIN_WAVES = 3;
-    public static final int RAIN_WAVE_INTERVAL = 12;
-    public static final int RAIN_ARROWS_PER_WAVE = 7;
+    public static final int RAIN_RADIUS = 4;
+    public static final int RAIN_WARNING_TICKS = 24;
+    public static final int RAIN_DURATION_TICKS = 3 * 20;
 
     public static final int CANNON_XP = 45;
     public static final int CANNON_COOLDOWN = 25 * 20;
     public static final int CANNON_WINDUP = 2 * 20;
-    public static final int CANNON_SHOT_TICKS = 24;
-    public static final float CANNON_POWER = 2.0F;
+    public static final double CANNON_SHOT_RANGE = 30.0;
+    public static final int CANNON_MAX_FLIGHT_TICKS = 40; // Запасной взрыв, если снаряд замедлился.
+    public static final float CANNON_POWER = 3.2F;
 
     private FrigbyBalance() {}
 }

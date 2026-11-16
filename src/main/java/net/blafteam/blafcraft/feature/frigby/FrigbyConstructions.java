@@ -30,12 +30,16 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 @EventBusSubscriber(modid = BlafCraft.MODID)
 public final class FrigbyConstructions {
     private static final String CANNON_SHOT = "blafcraft_frigby_cannon";
+    private static final String CANNON_ORIGIN = "blafcraft_frigby_cannon_origin";
+    private static final String CANNON_FUSE = "blafcraft_frigby_cannon_fuse";
     private static final List<Rain> rains = new ArrayList<>();
     private static final List<Cannon> cannons = new ArrayList<>();
 
@@ -43,14 +47,24 @@ public final class FrigbyConstructions {
         final ServerLevel level;
         final UUID caster;
         final Vec3 center;
-        long nextWave;
-        int wavesLeft = FrigbyBalance.RAIN_WAVES;
+        final long startsAt;
+        final List<BlockPos> columns;
+        int shotCount;
+        int nextColumn;
 
-        Rain(ServerLevel level, UUID caster, Vec3 center, long nextWave) {
+        Rain(ServerLevel level, UUID caster, Vec3 center, long startsAt) {
             this.level = level;
             this.caster = caster;
             this.center = center;
-            this.nextWave = nextWave;
+            this.startsAt = startsAt;
+            columns = rainColumns(BlockPos.containing(center));
+            Collections.shuffle(columns, new Random(level.random.nextLong()));
+        }
+
+        BlockPos nextTarget() {
+            // Периодически повторяем центр, между этими выстрелами обходим всю площадку.
+            if (shotCount % 12 == 0) return BlockPos.containing(center);
+            return columns.get(nextColumn++ % columns.size());
         }
     }
 
@@ -128,13 +142,11 @@ public final class FrigbyConstructions {
         long now = rain.level.getGameTime();
         ServerPlayer caster = activeCaster(rain.level, rain.caster);
         if (caster == null || !rain.level.hasChunkAt(BlockPos.containing(rain.center))) return true;
-        if (now < rain.nextWave) {
-            if (rain.wavesLeft == FrigbyBalance.RAIN_WAVES && now % 5 == 0) warningCircle(rain.level, rain.center);
-            return false;
-        }
-        spawnRainWave(rain, caster);
-        rain.nextWave = now + FrigbyBalance.RAIN_WAVE_INTERVAL;
-        return --rain.wavesLeft <= 0;
+        if (now % 5 == 0) warningCircle(rain.level, rain.center);
+        if (now < rain.startsAt) return false;
+        if (rain.shotCount % 6 == 0) AbilitySounds.play(rain.level, rain.center, SoundEvents.ARROW_SHOOT, 0.47F, 1.3F);
+        spawnRainArrow(rain, caster, rain.nextTarget());
+        return ++rain.shotCount >= FrigbyBalance.RAIN_DURATION_TICKS;
     }
 
     private static void warningCircle(ServerLevel level, Vec3 center) {
@@ -143,30 +155,32 @@ public final class FrigbyConstructions {
         }
     }
 
-    private static void spawnRainWave(Rain rain, ServerPlayer caster) {
-        AbilitySounds.play(rain.level, rain.center, SoundEvents.ARROW_SHOOT, 0.7F, 1.3F);
-        int wave = FrigbyBalance.RAIN_WAVES - rain.wavesLeft;
-        for (int i = 0; i < FrigbyBalance.RAIN_ARROWS_PER_WAVE; i++) {
-            // Стрела в центре каждой волны, остальные расходятся по двум кольцам.
-            double angle = (i + wave / 3.0) * Math.TAU / (FrigbyBalance.RAIN_ARROWS_PER_WAVE - 1);
-            double radius = i == 0 ? 0 : FrigbyBalance.RAIN_RADIUS * (0.5 + (i % 2) * 0.35);
-            double x = rain.center.x + Math.cos(angle) * radius;
-            double z = rain.center.z + Math.sin(angle) * radius;
-            BlockPos column = BlockPos.containing(x, rain.center.y, z);
-            if (!rain.level.hasChunkAt(column) || !rain.level.getWorldBorder().isWithinBounds(column)) continue;
-
-            // Спавним над крышей, чтобы она действительно закрывала цели от стрел.
-            int roof = rain.level.getHeight(Heightmap.Types.MOTION_BLOCKING, column.getX(), column.getZ());
-            double y = Math.max(rain.center.y + 8, roof + 1);
-            if (y > rain.center.y + 24 || y >= rain.level.getMaxBuildHeight()) continue;
-            var arrow = EntityType.ARROW.create(rain.level);
-            if (arrow == null) continue;
-            arrow.setOwner(caster);
-            arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
-            arrow.setPos(x, y, z);
-            arrow.shoot(0, -1, 0, 2.0F, 0);
-            rain.level.addFreshEntity(arrow);
+    static List<BlockPos> rainColumns(BlockPos center) {
+        int radius = FrigbyBalance.RAIN_RADIUS;
+        List<BlockPos> columns = new ArrayList<>();
+        for (int x = -radius; x <= radius; x++) {
+            for (int z = -radius; z <= radius; z++) {
+                if (x * x + z * z <= radius * radius) columns.add(center.offset(x, 0, z));
+            }
         }
+        return columns;
+    }
+
+    private static void spawnRainArrow(Rain rain, ServerPlayer caster, BlockPos column) {
+        ServerLevel level = rain.level;
+        if (!level.hasChunkAt(column) || !level.getWorldBorder().isWithinBounds(column)) return;
+
+        // Стрела начинается над крышей. Под слишком высокой крышей не создаём снаряд.
+        int roof = level.getHeight(Heightmap.Types.MOTION_BLOCKING, column.getX(), column.getZ());
+        double y = Math.max(rain.center.y + 8, roof + 1);
+        if (y > rain.center.y + 24 || y >= level.getMaxBuildHeight()) return;
+        var arrow = EntityType.ARROW.create(level);
+        if (arrow == null) return;
+        arrow.setOwner(caster);
+        arrow.pickup = AbstractArrow.Pickup.DISALLOWED;
+        arrow.setPos(column.getX() + 0.5, y, column.getZ() + 0.5);
+        arrow.shoot(0, -1, 0, 2.0F, 0);
+        level.addFreshEntity(arrow);
     }
 
     private static boolean tickCannon(Cannon cannon) {
@@ -189,7 +203,12 @@ public final class FrigbyConstructions {
         var shot = EntityType.FIREBALL.create(level);
         if (shot == null) return true;
         shot.setOwner(caster);
-        shot.getPersistentData().putBoolean(CANNON_SHOT, true);
+        var data = shot.getPersistentData();
+        data.putBoolean(CANNON_SHOT, true);
+        data.putDouble(CANNON_ORIGIN + "_x", muzzle.x);
+        data.putDouble(CANNON_ORIGIN + "_y", muzzle.y);
+        data.putDouble(CANNON_ORIGIN + "_z", muzzle.z);
+        data.putLong(CANNON_FUSE, level.getGameTime() + FrigbyBalance.CANNON_MAX_FLIGHT_TICKS);
         shot.setPos(muzzle);
         shot.shoot(cannon.facing().getStepX(), 0, cannon.facing().getStepZ(), 1.5F, 0);
         if (level.addFreshEntity(shot)) AbilitySounds.play(level, muzzle, SoundEvents.BLAZE_SHOOT, 0.95F, 0.7F);
@@ -212,18 +231,41 @@ public final class FrigbyConstructions {
         if (!(event.getProjectile() instanceof LargeFireball shot) || !(shot.level() instanceof ServerLevel level)
                 || !shot.getPersistentData().getBoolean(CANNON_SHOT)) return;
         event.setCanceled(true);
-        Vec3 hit = event.getRayTraceResult().getLocation();
-        // Взрыв с уроном и отбрасыванием, без огня и разрушения блоков.
-        level.explode(shot, hit.x, hit.y, hit.z, FrigbyBalance.CANNON_POWER, false, Level.ExplosionInteraction.NONE);
-        shot.discard();
+        detonate(level, shot, capBlastPosition(shotOrigin(shot), event.getRayTraceResult().getLocation()));
     }
 
     @SubscribeEvent
-    public static void expireCannonShot(EntityTickEvent.Post event) {
-        if (event.getEntity() instanceof LargeFireball shot && !shot.level().isClientSide
-                && shot.tickCount >= FrigbyBalance.CANNON_SHOT_TICKS && shot.getPersistentData().getBoolean(CANNON_SHOT)) {
-            shot.discard();
+    public static void checkCannonFuse(EntityTickEvent.Post event) {
+        if (!(event.getEntity() instanceof LargeFireball shot) || shot.isRemoved()
+                || !(shot.level() instanceof ServerLevel level) || !shot.getPersistentData().getBoolean(CANNON_SHOT)) return;
+        Vec3 origin = shotOrigin(shot);
+        Vec3 current = shot.position();
+        if (origin.distanceToSqr(current) >= FrigbyBalance.CANNON_SHOT_RANGE * FrigbyBalance.CANNON_SHOT_RANGE
+                || level.getGameTime() >= shot.getPersistentData().getLong(CANNON_FUSE)) {
+            detonate(level, shot, capBlastPosition(origin, current));
         }
+    }
+
+    private static Vec3 shotOrigin(LargeFireball shot) {
+        var data = shot.getPersistentData();
+        if (!data.contains(CANNON_ORIGIN + "_x")) return shot.position(); // Снаряд остался с предыдущей сборки.
+        return new Vec3(data.getDouble(CANNON_ORIGIN + "_x"), data.getDouble(CANNON_ORIGIN + "_y"),
+                data.getDouble(CANNON_ORIGIN + "_z"));
+    }
+
+    static Vec3 capBlastPosition(Vec3 origin, Vec3 point) {
+        // За тик снаряд может пересечь границу дальности. Взрыв остаётся на границе.
+        Vec3 offset = point.subtract(origin);
+        double range = FrigbyBalance.CANNON_SHOT_RANGE;
+        return offset.lengthSqr() <= range * range ? point : origin.add(offset.normalize().scale(range));
+    }
+
+    private static void detonate(ServerLevel level, LargeFireball shot, Vec3 center) {
+        if (shot.isRemoved()) return;
+        // Урон и отбрасывание остаются ванильными. Крупная вспышка не требует разрушать блоки.
+        level.explode(shot, center.x, center.y, center.z, FrigbyBalance.CANNON_POWER, false, Level.ExplosionInteraction.NONE);
+        level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, center.x, center.y, center.z, 1, 0, 0, 0, 0);
+        shot.discard();
     }
 
     public static void cancelPending(UUID caster) {

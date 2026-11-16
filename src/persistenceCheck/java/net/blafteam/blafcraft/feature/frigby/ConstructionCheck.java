@@ -3,6 +3,7 @@ package net.blafteam.blafcraft.feature.frigby;
 import net.blafteam.blafcraft.keybinds.ActionType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Set;
 
@@ -22,7 +23,21 @@ public final class ConstructionCheck {
         check(Set.copyOf(ConstructionAim.wallBlocks(anchor, Direction.WEST)).equals(Set.of(
                 anchor.north(), anchor.north().above(), anchor, anchor.above(), anchor.south(), anchor.south().above())),
                 "wall rotates with the caster");
-        System.out.println("Frigby construction loadout and wall geometry checks passed.");
+        var rain = FrigbyConstructions.rainColumns(anchor);
+        int dedicatedCenterShots = (FrigbyBalance.RAIN_DURATION_TICKS + 11) / 12;
+        check(FrigbyBalance.RAIN_DURATION_TICKS - dedicatedCenterShots >= rain.size(),
+                "one cast covers every column in addition to repeated center shots");
+        check(rain.contains(anchor.east(4)) && rain.contains(anchor.north(4)) && !rain.contains(anchor.east(4).south(4))
+                && Set.copyOf(rain).size() == rain.size(), "rain covers a circle without duplicate columns");
+
+        Vec3 muzzle = new Vec3(-3, 64, 8);
+        Vec3 nearHit = muzzle.add(5, 0, 0);
+        Vec3 overshoot = muzzle.add(100, 0, 0);
+        check(FrigbyConstructions.capBlastPosition(muzzle, nearHit).equals(nearHit), "collision before fuse range");
+        check(Math.abs(FrigbyConstructions.capBlastPosition(muzzle, overshoot).distanceTo(muzzle)
+                - FrigbyBalance.CANNON_SHOT_RANGE) < 0.0001, "blast stays at fuse range even when a tick overshoots");
+
+        System.out.println("Frigby loadout, wall geometry, rain coverage and cannon range checks passed.");
     }
 
     private static void check(boolean condition, String description) {
