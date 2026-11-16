@@ -10,9 +10,11 @@ import net.minecraft.world.level.saveddata.SavedData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /** Общие данные мира. UUID позволяет управлять составом и дружбой, пока игрок офлайн. */
@@ -33,6 +35,8 @@ public final class SocialData extends SavedData {
     }
 
     private final Map<String, Faction> factions = new LinkedHashMap<>();
+    // Рецепт должен работать для соклановцев, даже когда Фригби не в сети.
+    private final Set<UUID> frigbyPlayers = new HashSet<>();
     private final Map<UUID, String> membership = new HashMap<>();
     private final Map<UUID, Map<UUID, Friend>> friends = new HashMap<>();
     // Активные поединки не записываются в NBT и принадлежат именно этому миру.
@@ -82,6 +86,21 @@ public final class SocialData extends SavedData {
     public String factionName(String id) {
         Faction faction = factions.get(id);
         return faction == null ? id : faction.name;
+    }
+
+    public void rememberFrigby(UUID player, boolean isFrigby) {
+        boolean changed = isFrigby ? frigbyPlayers.add(player) : frigbyPlayers.remove(player);
+        if (changed) setDirty();
+    }
+
+    public boolean canCraftFrigbyRelic(UUID player) {
+        String faction = factionOf(player);
+        if (faction == null) return false;
+        for (UUID frigby : frigbyPlayers) {
+            // Проверяем живое членство, чтобы выход игрока или упразднение фракции сразу закрывали рецепт.
+            if (faction.equals(factionOf(frigby))) return true;
+        }
+        return false;
     }
 
     public boolean isLeader(UUID player) {
@@ -220,6 +239,10 @@ public final class SocialData extends SavedData {
                         pair.getUUID("Second"), pair.getString("SecondName"));
             }
         }
+        for (Tag tag : root.getList("FrigbyPlayers", Tag.TAG_COMPOUND)) {
+            CompoundTag record = (CompoundTag) tag;
+            if (record.hasUUID("UUID")) data.frigbyPlayers.add(record.getUUID("UUID"));
+        }
         data.setDirty(false);
         return data;
     }
@@ -257,6 +280,14 @@ public final class SocialData extends SavedData {
             pairs.add(pair);
         }));
         root.put("Friendships", pairs);
+
+        ListTag frigbyList = new ListTag();
+        for (UUID player : frigbyPlayers) {
+            CompoundTag record = new CompoundTag();
+            record.putUUID("UUID", player);
+            frigbyList.add(record);
+        }
+        root.put("FrigbyPlayers", frigbyList);
         return root;
     }
 }

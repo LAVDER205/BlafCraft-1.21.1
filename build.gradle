@@ -231,3 +231,11 @@ tasks.register('verifyKingCall', JavaExec) {
     mainClass = 'net.blafteam.blafcraft.feature.frigby.KingCallCheck'
 }
 tasks.named('check') { dependsOn 'verifyKingCall' }
+
+tasks.register('verifyRelic', JavaExec) {
+    group = 'verification'
+    description = 'Checks faction access and charge rate for the relic.'
+    classpath = sourceSets.persistenceCheck.runtimeClasspath
+    mainClass = 'net.blafteam.blafcraft.feature.frigby.RelicCheck'
+}
+tasks.named('check') { dependsOn 'verifyRelic' }

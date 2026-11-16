@@ -6,6 +6,7 @@ import net.blafteam.blafcraft.block.entity.renderer.RealizerBlockEntityRenderer;
 import net.blafteam.blafcraft.component.ModAttachments;
 import net.blafteam.blafcraft.component.ModDataComponents;
 import net.blafteam.blafcraft.effect.ModEffects;
+import net.blafteam.blafcraft.feature.frigby.RelicRecipe;
 import net.blafteam.blafcraft.entity.ModEntities;
 import net.blafteam.blafcraft.entity.client.ChairRenderer;
 import net.blafteam.blafcraft.entity.client.GeckoRenderer;
@@ -76,6 +77,7 @@ public class BlafCraft {
         ModMenuTypes.register(modEventBus);
 
         ModAttachments.ATTACHMENT_TYPES.register(modEventBus);
+        RelicRecipe.SERIALIZERS.register(modEventBus);
 
         // Register the item to a creative tab
         modEventBus.addListener(this::addCreative);
