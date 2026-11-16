@@ -1,11 +1,11 @@
 package net.blafteam.blafcraft.feature.frigby;
 
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 public final class ExperiencePoints {
     private ExperiencePoints() {}
 
-    public static boolean canAfford(ServerPlayer player, int cost) {
+    public static boolean canAfford(Player player, int cost) {
         if (cost == 0) return true;
 
         // Зачарование и команды могут менять уровень без обновления totalExperience.

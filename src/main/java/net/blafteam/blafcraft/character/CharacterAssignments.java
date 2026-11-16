@@ -3,6 +3,7 @@ package net.blafteam.blafcraft.character;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.component.ModAttachments;
+import net.blafteam.blafcraft.feature.frigby.FrigbyActivity;
 import net.blafteam.blafcraft.feature.frigby.RelicCharge;
 import net.blafteam.blafcraft.social.SocialData;
 import net.minecraft.commands.Commands;
@@ -39,6 +40,7 @@ public class CharacterAssignments {
         CharacterKit kit = get(player);
         SocialData.get(player.serverLevel().getServer()).rememberFrigby(player.getUUID(), kit == CharacterKit.FRIGBY);
         PacketDistributor.sendToPlayer(player, new CharacterHudPayload(kit.id()));
+        FrigbyActivity.syncLoadout(player);
         RelicCharge.sync(player);
     }
 

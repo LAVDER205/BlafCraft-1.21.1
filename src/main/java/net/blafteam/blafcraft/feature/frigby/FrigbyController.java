@@ -152,5 +152,6 @@ public final class FrigbyController {
     public static void cancelPendingArrows(UUID playerId) {
         // После завершения дуэли оставшиеся стрелы не должны вылететь.
         pendingArrows.removeIf(shot -> shot.playerId().equals(playerId));
+        FrigbyConstructions.cancelPending(playerId);
     }
 }

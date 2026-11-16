@@ -3,9 +3,14 @@ package net.blafteam.blafcraft.keybinds;
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.duel.DuelShortcutPayload;
 import net.blafteam.blafcraft.friend_system.FriendUpdatePacket;
+import net.blafteam.blafcraft.feature.frigby.ConstructionAim;
+import net.blafteam.blafcraft.feature.frigby.ConstructionPreview;
+import net.blafteam.blafcraft.feature.frigby.FrigbyLoadoutScreen;
+import net.blafteam.blafcraft.hud.AbilityHud;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.EntityHitResult;
@@ -21,6 +26,12 @@ import org.lwjgl.glfw.GLFW;
 @EventBusSubscriber(modid = BlafCraft.MODID, value = Dist.CLIENT)
 public class ClientSetup {
     private static final KeyMapping[] ABILITY_KEYS = createAbilityKeys();
+    private static final KeyMapping LOADOUT_KEY = new KeyMapping("key.blafcraft.frigby_loadout",
+            KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, "key.categories.blafcraft");
+    private static AimInput aiming;
+
+    private record AimInput(int slot, ActionType action, ClientLevel level) {}
+
     private static final KeyMapping SOCIAL_KEY = new KeyMapping("key.blafcraft.social",
             KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_B, "key.categories.blafcraft");
     private static final KeyMapping DUEL_KEY = new KeyMapping("key.blafcraft.duel",
@@ -57,6 +68,7 @@ public class ClientSetup {
     @SubscribeEvent
     public static void registerKeys(RegisterKeyMappingsEvent event) {
         event.register(SOCIAL_KEY);
+        event.register(LOADOUT_KEY);
         event.register(DUEL_KEY);
         for (KeyMapping key : ABILITY_KEYS) {
             event.register(key);
@@ -66,13 +78,32 @@ public class ClientSetup {
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
         Minecraft mc = Minecraft.getInstance();
-        boolean inWorld = mc.player != null && mc.getConnection() != null && mc.screen == null && !mc.isPaused();
-        for (int slot = 0; slot < ABILITY_KEYS.length; slot++) {
-            // Считываем назначение Minecraft, включая кнопки мыши. В меню поглощаем нажатия.
-            while (ABILITY_KEYS[slot].consumeClick()) {
-                if (inWorld) PacketDistributor.sendToServer(new ActionPacket(slot));
+        boolean inWorld = mc.player != null && mc.level != null && mc.getConnection() != null
+                && mc.screen == null && !mc.isPaused() && mc.isWindowActive() && mc.player.isAlive();
+        while (LOADOUT_KEY.consumeClick()) {
+            if (inWorld && AbilityHud.isFrigby()) {
+                aiming = null;
+                mc.setScreen(new FrigbyLoadoutScreen());
+                inWorld = false;
             }
         }
+
+        for (int slot = 0; slot < ABILITY_KEYS.length; slot++) {
+            // Для обычных действий оставляем нажатие. Для конструкций запоминаем слот до отпускания.
+            while (ABILITY_KEYS[slot].consumeClick()) {
+                if (!inWorld) continue;
+                ActionType action = AbilityHud.actionForSlot(slot);
+                aiming = null;
+                if (action == null) continue;
+                if (ConstructionAim.needsAim(action)) {
+                    if (ABILITY_KEYS[slot].isDown()) aiming = new AimInput(slot, action, mc.level);
+                } else {
+                    PacketDistributor.sendToServer(new ActionPacket(slot, action.name()));
+                }
+            }
+        }
+        if (!inWorld) aiming = null;
+        else updateAim(mc);
         while (SOCIAL_KEY.consumeClick()) {
             if (!inWorld) continue;
             // С приседанием всегда открываем список, даже если перед игроком кто-то стоит.
@@ -90,5 +121,25 @@ public class ClientSetup {
                     && hit.getEntity() instanceof Player player ? player.getUUID() : mc.player.getUUID();
             PacketDistributor.sendToServer(new DuelShortcutPayload(target));
         }
+    }
+
+    private static void updateAim(Minecraft mc) {
+        if (aiming == null) return;
+        if (aiming.level() != mc.level || AbilityHud.actionForSlot(aiming.slot()) != aiming.action()) {
+            aiming = null;
+            return;
+        }
+        var target = ConstructionAim.fromLook(mc.player, aiming.action());
+        if (ABILITY_KEYS[aiming.slot()].isDown()) {
+            ConstructionPreview.draw(mc.level, mc.player, target);
+            return;
+        }
+
+        if (ConstructionPreview.canCast(mc.player, target)) {
+            PacketDistributor.sendToServer(new ActionPacket(aiming.slot(), aiming.action().name()));
+        } else {
+            mc.player.displayClientMessage(Component.literal("Конструкция недоступна"), true);
+        }
+        aiming = null;
     }
 }

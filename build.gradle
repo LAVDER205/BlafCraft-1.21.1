@@ -239,3 +239,11 @@ tasks.register('verifyRelic', JavaExec) {
     mainClass = 'net.blafteam.blafcraft.feature.frigby.RelicCheck'
 }
 tasks.named('check') { dependsOn 'verifyRelic' }
+
+tasks.register('verifyConstructions', JavaExec) {
+    group = 'verification'
+    description = 'Checks Frigby loadout validation and wall geometry.'
+    classpath = sourceSets.persistenceCheck.runtimeClasspath
+    mainClass = 'net.blafteam.blafcraft.feature.frigby.ConstructionCheck'
+}
+tasks.named('check') { dependsOn 'verifyConstructions' }

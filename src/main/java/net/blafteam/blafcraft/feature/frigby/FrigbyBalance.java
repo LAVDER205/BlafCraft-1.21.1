@@ -19,5 +19,26 @@ public final class FrigbyBalance {
     public static final int RELIC_MIN_CHARGE_RATE = 1;
     public static final int RELIC_LEVELS_PER_SLOWDOWN = 4;
 
+    public static final int LOADOUT_LOCK_TICKS = 10 * 20;
+    public static final int BUILD_RANGE = 6;
+    public static final int WALL_XP = 25;
+    public static final int WALL_COOLDOWN = 12 * 20;
+    public static final int WALL_DURATION = 6 * 20;
+
+    public static final int RAIN_XP = 35;
+    public static final int RAIN_COOLDOWN = 18 * 20;
+    public static final int RAIN_RANGE = 24;
+    public static final double RAIN_RADIUS = 3;
+    public static final int RAIN_WARNING_TICKS = 30;
+    public static final int RAIN_WAVES = 3;
+    public static final int RAIN_WAVE_INTERVAL = 12;
+    public static final int RAIN_ARROWS_PER_WAVE = 7;
+
+    public static final int CANNON_XP = 45;
+    public static final int CANNON_COOLDOWN = 25 * 20;
+    public static final int CANNON_WINDUP = 2 * 20;
+    public static final int CANNON_SHOT_TICKS = 24;
+    public static final float CANNON_POWER = 2.0F;
+
     private FrigbyBalance() {}
 }

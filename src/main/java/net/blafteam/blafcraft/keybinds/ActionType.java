@@ -17,7 +17,10 @@ public enum ActionType {
     SCULK_MARK(1200,0,0),
     MORPH(6000,0,0),
     OVERDOSE_ABILITY(1,0,0),
-    KING_CALL(FrigbyBalance.KING_CALL_COOLDOWN, 0, 0);
+    KING_CALL(FrigbyBalance.KING_CALL_COOLDOWN, 0, 0),
+    STONE_WALL(FrigbyBalance.WALL_COOLDOWN, FrigbyBalance.WALL_XP, 0),
+    ARROW_RAIN(FrigbyBalance.RAIN_COOLDOWN, FrigbyBalance.RAIN_XP, 0),
+    CANNON(FrigbyBalance.CANNON_COOLDOWN, FrigbyBalance.CANNON_XP, 0);
 
     private final int cooldownTicks;
     private final int experiencePointCost;

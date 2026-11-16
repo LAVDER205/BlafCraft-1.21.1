@@ -4,6 +4,7 @@ import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.character.CharacterHudPayload;
 import net.blafteam.blafcraft.character.CharacterKit;
 import net.blafteam.blafcraft.effect.ModEffects;
+import net.blafteam.blafcraft.feature.frigby.FrigbyLoadoutClient;
 import net.blafteam.blafcraft.feature.frynote.FrynoteClientHud;
 import net.blafteam.blafcraft.keybinds.AbilitySlots;
 import net.blafteam.blafcraft.keybinds.ActionType;
@@ -32,6 +33,14 @@ public final class AbilityHud {
         context.enqueueWork(() -> kit = CharacterKit.byId(payload.kitId()).orElse(CharacterKit.NONE));
     }
 
+    public static boolean isFrigby() {
+        return kit == CharacterKit.FRIGBY;
+    }
+
+    public static ActionType actionForSlot(int slot) {
+        return isFrigby() && slot >= 0 && slot < 3 ? FrigbyLoadoutClient.get().forSlot(slot) : kit.actionForSlot(slot);
+    }
+
     @SubscribeEvent
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         kit = CharacterKit.NONE;
@@ -44,7 +53,7 @@ public final class AbilityHud {
 
         List<String> rows = new ArrayList<>();
         for (int slot = 0; slot < AbilitySlots.COUNT; slot++) {
-            ActionType action = kit.actionForSlot(slot);
+            ActionType action = actionForSlot(slot);
             if (action == null) continue;
             rows.add("[" + ClientSetup.abilityKeyLabel(slot).getString() + "] "
                     + abilityName(action) + ": " + status(mc, action));
@@ -67,7 +76,7 @@ public final class AbilityHud {
         return ready(ClientCooldowns.getRemaining(action));
     }
 
-    private static String abilityName(ActionType action) {
+    public static String abilityName(ActionType action) {
         return switch (action) {
             case TEST -> "Тест";
             case ARROW -> "Залп стрел";
@@ -83,6 +92,9 @@ public final class AbilityHud {
             case MORPH -> "Морф";
             case OVERDOSE_ABILITY -> "Стимулятор";
             case KING_CALL -> "Зов короля";
+            case STONE_WALL -> "Каменная стена";
+            case ARROW_RAIN -> "Град стрел";
+            case CANNON -> "Одноразовая пушка";
         };
     }
 
