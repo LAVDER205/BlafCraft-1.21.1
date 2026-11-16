@@ -1,0 +1,1 @@
+{"variants":{"facing=north":{"model":"blafcraft:block/creation_cannon"},"facing=east":{"model":"blafcraft:block/creation_cannon","y":90},"facing=south":{"model":"blafcraft:block/creation_cannon","y":180},"facing=west":{"model":"blafcraft:block/creation_cannon","y":270}}}

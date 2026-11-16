@@ -3,6 +3,8 @@ package net.blafteam.blafcraft.network;
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.character.CharacterHudPayload;
 import net.blafteam.blafcraft.hud.AbilityHud;
+import net.blafteam.blafcraft.feature.frigby.FrigbyLoadoutClient;
+import net.blafteam.blafcraft.feature.frigby.FrigbyLoadoutPayload;
 import net.blafteam.blafcraft.feature.frigby.RelicChargePayload;
 import net.blafteam.blafcraft.feature.frigby.RelicClientTooltip;
 import net.blafteam.blafcraft.feature.frynote.FrynoteHudPayload;
@@ -24,6 +26,11 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 public class AbilityNetworking {
     @SubscribeEvent
     public static void register(RegisterPayloadHandlersEvent event) {
+        event.registrar("2").playBidirectional(FrigbyLoadoutPayload.TYPE, FrigbyLoadoutPayload.STREAM_CODEC,
+                (payload, context) -> {
+                    if (context.flow().isClientbound()) FrigbyLoadoutClient.handle(payload, context);
+                    else FrigbyLoadoutPayload.handleChange(payload, context);
+                });
         event.registrar("1").playToClient(RelicChargePayload.TYPE, RelicChargePayload.STREAM_CODEC,
                 (payload, context) -> RelicClientTooltip.handle(payload, context));
         event.registrar("1").playToClient(CharacterHudPayload.TYPE, CharacterHudPayload.STREAM_CODEC,
@@ -32,7 +39,7 @@ public class AbilityNetworking {
                 (payload, context) -> FrynoteClientHud.handle(payload, context));
         event.registrar("1").playToServer(DuelShortcutPayload.TYPE, DuelShortcutPayload.STREAM_CODEC, DuelShortcutPayload::handle);
         // Этот пакет нужен обеим сторонам, в том числе выделенному серверу без клиента Minecraft.
-        event.registrar("2").playToServer(ActionPacket.TYPE, ActionPacket.STREAM_CODEC, ServerHandler::handle);
+        event.registrar("3").playToServer(ActionPacket.TYPE, ActionPacket.STREAM_CODEC, ServerHandler::handle);
         event.registrar("2").playToServer(FriendUpdatePacket.TYPE, FriendUpdatePacket.STREAM_CODEC,
                 SocialInteractions::handleFriendShortcut);
         // Выделенный сервер тоже регистрирует пакет, хотя обработка выполняется на клиенте.

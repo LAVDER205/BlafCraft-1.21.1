@@ -13,6 +13,10 @@ public class ModBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
             DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, BlafCraft.MODID);
 
+    public static final Supplier<BlockEntityType<ConstructionBlockEntity>> CONSTRUCTION =
+            BLOCK_ENTITIES.register("construction", () -> BlockEntityType.Builder.of(ConstructionBlockEntity::new,
+                    ModBlocks.CREATION_WALL.get(), ModBlocks.CREATION_CANNON.get()).build(null));
+
     public static final Supplier<BlockEntityType<RealizerBlockEntity>> REALIZER_BE =
             BLOCK_ENTITIES.register("realizer_be", () -> BlockEntityType.Builder.of(
                     RealizerBlockEntity::new, ModBlocks.REALIZER.get()).build(null));

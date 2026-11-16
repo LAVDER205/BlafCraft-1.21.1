@@ -2,6 +2,10 @@ package net.blafteam.blafcraft.keybinds;
 
 import net.blafteam.blafcraft.BlafCraft;
 import net.blafteam.blafcraft.character.CharacterAssignments;
+import net.blafteam.blafcraft.character.CharacterKit;
+import net.blafteam.blafcraft.feature.frigby.FrigbyActivity;
+import net.blafteam.blafcraft.feature.frigby.FrigbyLoadout;
+import net.blafteam.blafcraft.feature.frigby.FrigbyConstructions;
 import net.blafteam.blafcraft.feature.frigby.ExperiencePoints;
 import net.blafteam.blafcraft.feature.frigby.FrigbyController;
 import net.blafteam.blafcraft.feature.frigby.KingCall;
@@ -37,9 +41,12 @@ public class ServerHandler {
 
     public static void handle(ActionPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
-            if (!(context.player() instanceof ServerPlayer player) || !player.isAlive()) return;
-            ActionType action = CharacterAssignments.get(player).actionForSlot(packet.slot());
-            if (action == null) return;
+            if (!(context.player() instanceof ServerPlayer player) || !player.isAlive() || player.isSpectator()) return;
+            CharacterKit kit = CharacterAssignments.get(player);
+            int slot = packet.slot();
+            ActionType action = kit == CharacterKit.FRIGBY && slot >= 0 && slot < 3
+                    ? FrigbyLoadout.get(player).forSlot(slot) : kit.actionForSlot(slot);
+            if (action == null || !action.name().equals(packet.expectedAction())) return;
             // Заряды и якорь имеют собственное состояние. Их правила находятся в модуле персонажа.
             if (FrynoteController.isFrynote(player) && FrynoteController.handles(action)) {
                 FrynoteController.cast(player, action);
@@ -72,6 +79,7 @@ public class ServerHandler {
             if (experienceCost > 0) player.giveExperiencePoints(-experienceCost);
             if (manaCost > 0) ManaManager.consumeMana(player, manaCost);
             playerCooldowns.put(action, now);
+            if (kit == CharacterKit.FRIGBY) FrigbyActivity.mark(player);
             ManaManager.sync(player);
             // Сетевой клиент запускает отсчёт только после подтверждения сервера.
             int cooldownTicks = action.getCooldownTicks();
@@ -79,6 +87,15 @@ public class ServerHandler {
                 PacketDistributor.sendToPlayer(player, new CooldownSyncPayload(action, cooldownTicks));
             }
         });
+    }
+
+    public static int remainingCooldown(ServerPlayer player, ActionType action) {
+        Map<ActionType, Long> playerCooldowns = cooldowns.get(player.getUUID());
+        if (playerCooldowns == null) return 0;
+        Long lastUsed = playerCooldowns.get(action);
+        if (lastUsed == null) return 0;
+        long elapsed = player.level().getGameTime() - lastUsed;
+        return (int) Math.clamp(action.getCooldownTicks() - elapsed, 0, action.getCooldownTicks());
     }
 
     /**
@@ -90,6 +107,7 @@ public class ServerHandler {
             case TELEPORT_ANCHOR, KING_CALL -> false;
             case TEST -> false;
             case ARROW, FIREBALL, CREATION_STEP -> FrigbyController.cast(player, action);
+            case STONE_WALL, ARROW_RAIN, CANNON -> FrigbyConstructions.cast(player, action);
             case TELEPORT_DASH -> {
                 Vec3 look = player.getViewVector(1.0F);
                 Vec3 origin = player.position();

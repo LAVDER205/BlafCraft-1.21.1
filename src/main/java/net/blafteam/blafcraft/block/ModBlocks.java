@@ -22,6 +22,12 @@ public class ModBlocks {
             DeferredRegister.createBlocks(BlafCraft.MODID);
 
 
+    // Без предметной формы и дропа: эти блоки существуют только во время способности.
+    public static final DeferredBlock<ConstructionBlock> CREATION_WALL = BLOCKS.register("creation_wall",
+            () -> new ConstructionBlock(BlockBehaviour.Properties.of().strength(0.7F).noLootTable().sound(SoundType.STONE)));
+    public static final DeferredBlock<ConstructionBlock> CREATION_CANNON = BLOCKS.register("creation_cannon",
+            () -> new ConstructionBlock(BlockBehaviour.Properties.of().strength(0.6F).noLootTable().sound(SoundType.STONE)));
+
     public static final DeferredBlock<Block> BISMUTH_BLOCK = registerBlock("bismuth_block",
             () -> new Block(BlockBehaviour.Properties.of()
                     .strength(4f).requiresCorrectToolForDrops().sound(SoundType.AMETHYST))); // properties etc

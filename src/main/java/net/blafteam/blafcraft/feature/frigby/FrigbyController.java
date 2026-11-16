@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
 import net.minecraft.world.entity.projectile.LargeFireball;
 import net.minecraft.world.level.block.state.BlockState;
@@ -104,14 +105,21 @@ public final class FrigbyController {
     private static boolean shootArrow(ServerPlayer player) {
         Arrow arrow = EntityType.ARROW.create(player.level());
         if (arrow == null) return false;
-        arrow.setOwner(player);
-        arrow.getPersistentData().putUUID(PROTECTED_SHOOTER, player.getUUID());
+        configureCreatedArrow(arrow, player);
         arrow.setPos(player.getEyePosition());
         Vec3 look = player.getViewVector(1.0F);
         arrow.shoot(look.x, look.y, look.z, 3.0f, 0.0f);
         if (!player.level().addFreshEntity(arrow)) return false;
         AbilitySounds.play(player, SoundEvents.ARROW_SHOOT, 0.5F, 1.25F);
         return true;
+    }
+
+    static void configureCreatedArrow(Arrow arrow, ServerPlayer owner) {
+        arrow.setOwner(owner);
+        // Отскок переназначает владельца и может снова разрешить обычный подбор.
+        // В этом режиме стрела не выдаёт предмет даже игроку в креативе.
+        arrow.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
+        arrow.getPersistentData().putUUID(PROTECTED_SHOOTER, owner.getUUID());
     }
 
     @SubscribeEvent
@@ -152,5 +160,6 @@ public final class FrigbyController {
     public static void cancelPendingArrows(UUID playerId) {
         // После завершения дуэли оставшиеся стрелы не должны вылететь.
         pendingArrows.removeIf(shot -> shot.playerId().equals(playerId));
+        FrigbyConstructions.cancelPending(playerId);
     }
 }

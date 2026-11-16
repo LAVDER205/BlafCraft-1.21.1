@@ -5,6 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.UUIDUtil;
 import net.blafteam.blafcraft.mana.ManaData;
 import net.blafteam.blafcraft.feature.frynote.FrynoteData;
+import net.blafteam.blafcraft.feature.frigby.FrigbyLoadout;
+import net.blafteam.blafcraft.feature.frigby.FrigbyActivity.QueuedLoadout;
 import java.util.Objects;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -31,6 +33,19 @@ public class ModAttachments {
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<Integer>> RELIC_CHARGE =
             ATTACHMENT_TYPES.register("relic_charge", () -> AttachmentType.builder(() -> 0)
                     .serialize(Codec.INT, charge -> charge > 0).copyOnDeath().build());
+
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<FrigbyLoadout>> FRIGBY_LOADOUT =
+            ATTACHMENT_TYPES.register("frigby_loadout", () -> AttachmentType.builder(() -> FrigbyLoadout.DEFAULT)
+                    .serialize(FrigbyLoadout.CODEC).copyOnDeath().build());
+
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<Long>> FRIGBY_EDIT_AT =
+            ATTACHMENT_TYPES.register("frigby_edit_at", () -> AttachmentType.builder(() -> 0L)
+                    .serialize(Codec.LONG, time -> time > 0).copyOnDeath().build());
+
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<QueuedLoadout>> FRIGBY_QUEUED_LOADOUT =
+            ATTACHMENT_TYPES.register("frigby_queued_loadout",
+                    () -> AttachmentType.builder(() -> new QueuedLoadout(FrigbyLoadout.DEFAULT, 0))
+                            .serialize(QueuedLoadout.CODEC, queue -> queue.readyAt() > 0).copyOnDeath().build());
 
     // Пустая строка означает старого игрока без явного назначения. "none" отключает набор.
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<String>> CHARACTER_ID =

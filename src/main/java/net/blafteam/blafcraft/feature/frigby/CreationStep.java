@@ -43,6 +43,7 @@ public final class CreationStep {
                 return;
             }
             serverPlayer.giveExperiencePoints(-cost);
+            FrigbyActivity.mark(serverPlayer);
             spawnHoverCubeParticles(serverPlayer);
         } else if (player.level().isClientSide && !player.onGround()) {
             // Клиент управляет движением, сервер проверяет ресурс и выключает эффект.
