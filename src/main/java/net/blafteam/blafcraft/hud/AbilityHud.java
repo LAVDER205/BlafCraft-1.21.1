@@ -82,6 +82,7 @@ public final class AbilityHud {
             case SCULK_MARK -> "Скалковая метка";
             case MORPH -> "Морф";
             case OVERDOSE_ABILITY -> "Стимулятор";
+            case KING_CALL -> "Зов короля";
         };
     }
 

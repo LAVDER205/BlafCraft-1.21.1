@@ -27,7 +27,14 @@ public class ClientSetup {
             KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, "key.categories.blafcraft");
 
     public static Component abilityKeyLabel(int slot) {
-        return ABILITY_KEYS[slot].getTranslatedKeyMessage();
+        var mapping = ABILITY_KEYS[slot];
+        var key = mapping.getKey();
+        // GLFW хранит код буквенной клавиши в латинице, даже если ОС сейчас печатает кириллицей.
+        int code = key.getValue();
+        if (key.getType() == InputConstants.Type.KEYSYM && code >= GLFW.GLFW_KEY_A && code <= GLFW.GLFW_KEY_Z) {
+            return Component.literal(Character.toString('A' + code - GLFW.GLFW_KEY_A));
+        }
+        return mapping.getTranslatedKeyMessage();
     }
 
     private static KeyMapping[] createAbilityKeys() {
@@ -37,6 +44,7 @@ public class ClientSetup {
                 case 0 -> GLFW.GLFW_KEY_Z;
                 case 1 -> GLFW.GLFW_KEY_X;
                 case 2 -> GLFW.GLFW_KEY_C;
+                case 3 -> GLFW.GLFW_KEY_V;
                 default -> GLFW.GLFW_KEY_UNKNOWN;
             };
             // Имя настройки и номер в пакете должны оставаться стабильными между версиями.

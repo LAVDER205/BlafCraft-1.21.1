@@ -223,3 +223,11 @@ tasks.register('verifyFrynote', JavaExec) {
     mainClass = 'net.blafteam.blafcraft.feature.frynote.FrynoteCheck'
 }
 tasks.named('check') { dependsOn 'verifyFrynote' }
+
+tasks.register('verifyKingCall', JavaExec) {
+    group = 'verification'
+    description = "Checks faction access and dimension restrictions for King's Call."
+    classpath = sourceSets.persistenceCheck.runtimeClasspath
+    mainClass = 'net.blafteam.blafcraft.feature.frigby.KingCallCheck'
+}
+tasks.named('check') { dependsOn 'verifyKingCall' }

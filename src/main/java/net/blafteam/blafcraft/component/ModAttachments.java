@@ -22,6 +22,11 @@ public class ModAttachments {
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<FrynoteData>> FRYNOTE =
             ATTACHMENT_TYPES.register("frynote", () -> AttachmentType.serializable(FrynoteData::new).copyOnDeath().build());
 
+    // Абсолютное время мира: выход из игры и смерть не сбрасывают перезарядку.
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<Long>> KING_CALL_READY_AT =
+            ATTACHMENT_TYPES.register("king_call_ready_at", () -> AttachmentType.builder(() -> 0L)
+                    .serialize(Codec.LONG, time -> time > 0).copyOnDeath().build());
+
     // Пустая строка означает старого игрока без явного назначения. "none" отключает набор.
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<String>> CHARACTER_ID =
             ATTACHMENT_TYPES.register("character_id", () -> AttachmentType.builder(() -> "")
