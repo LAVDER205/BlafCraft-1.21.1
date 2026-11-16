@@ -5,10 +5,12 @@ import net.blafteam.blafcraft.character.CharacterAssignments;
 import net.blafteam.blafcraft.character.CharacterKit;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.keybinds.ActionType;
+import net.blafteam.blafcraft.sound.AbilitySounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.Arrow;
@@ -61,10 +63,16 @@ public final class FrigbyController {
 
     private static boolean toggleCreationStep(ServerPlayer player) {
         if (player.hasEffect(ModEffects.CREATION_STEP_EFFECT)) {
-            return player.removeEffect(ModEffects.CREATION_STEP_EFFECT);
+            if (!player.removeEffect(ModEffects.CREATION_STEP_EFFECT)) return false;
+            AbilitySounds.play(player, SoundEvents.AMETHYST_BLOCK_CHIME, 0.55F, 0.7F);
+            return true;
         }
         // Включение бесплатно. Опыт списывается по мере использования опоры.
-        return player.addEffect(new MobEffectInstance(ModEffects.CREATION_STEP_EFFECT, -1, 0, false, false, false));
+        if (!player.addEffect(new MobEffectInstance(ModEffects.CREATION_STEP_EFFECT, -1, 0, false, false, false))) {
+            return false;
+        }
+        AbilitySounds.play(player, SoundEvents.AMETHYST_BLOCK_CHIME, 0.65F, 1.35F);
+        return true;
     }
 
     private static boolean castFireball(ServerPlayer player) {
@@ -84,7 +92,9 @@ public final class FrigbyController {
         if (boosting) fireball.getPersistentData().putUUID(PROTECTED_SHOOTER, player.getUUID());
         if (!player.level().addFreshEntity(fireball)) return false;
 
+        AbilitySounds.play(player, SoundEvents.BLAZE_SHOOT, 0.65F, 1.1F);
         if (boosting) {
+            AbilitySounds.play(player, SoundEvents.WIND_CHARGE_THROW, 0.6F, 1.25F);
             player.addDeltaMovement(new Vec3(0, 1, 0));
             player.connection.send(new ClientboundSetEntityMotionPacket(player));
         }
@@ -99,7 +109,9 @@ public final class FrigbyController {
         arrow.setPos(player.getEyePosition());
         Vec3 look = player.getViewVector(1.0F);
         arrow.shoot(look.x, look.y, look.z, 3.0f, 0.0f);
-        return player.level().addFreshEntity(arrow);
+        if (!player.level().addFreshEntity(arrow)) return false;
+        AbilitySounds.play(player, SoundEvents.ARROW_SHOOT, 0.5F, 1.25F);
+        return true;
     }
 
     @SubscribeEvent

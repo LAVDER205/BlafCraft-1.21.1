@@ -7,8 +7,10 @@ import net.blafteam.blafcraft.component.ModAttachments;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.keybinds.ActionType;
 import net.blafteam.blafcraft.mana.ManaManager;
+import net.blafteam.blafcraft.sound.AbilitySounds;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.particles.ParticleTypes;
@@ -58,6 +60,7 @@ public final class FrynoteController {
         ManaManager.consumeMana(player, FrynoteBalance.DASH_MANA);
         state.spendCharge();
         finishTeleport(player, state, origin);
+        AbilitySounds.play(player, SoundEvents.ENDERMAN_TELEPORT, 0.5F, 1.4F);
         return true;
     }
 
@@ -69,6 +72,7 @@ public final class FrynoteController {
         ManaManager.consumeMana(player, FrynoteBalance.GLANCE_MANA);
         state.startGlanceCooldown();
         finishTeleport(player, state, origin);
+        AbilitySounds.play(player, SoundEvents.CHORUS_FRUIT_TELEPORT, 0.65F, 1.0F);
         return true;
     }
 
@@ -79,6 +83,7 @@ public final class FrynoteController {
             state.setAnchor(player.position(), player.serverLevel().dimension());
             ManaManager.consumeMana(player, FrynoteBalance.ANCHOR_SET_MANA);
             particles(player, player.position());
+            AbilitySounds.play(player, SoundEvents.AMETHYST_BLOCK_CHIME, 0.7F, 1.15F);
             return true;
         }
         Vec3 destination = state.anchor();
@@ -91,6 +96,7 @@ public final class FrynoteController {
         ManaManager.consumeMana(player, FrynoteBalance.ANCHOR_RETURN_MANA);
         state.cancelAnchor();
         finishTeleport(player, state, origin);
+        AbilitySounds.play(player, SoundEvents.ENDERMAN_TELEPORT, 0.6F, 0.8F);
         return true;
     }
 
@@ -98,8 +104,8 @@ public final class FrynoteController {
         state.markTeleport();
         particles(player, origin);
         particles(player, player.position());
-        player.serverLevel().playSound(null, player.blockPosition(),
-                net.minecraft.sounds.SoundEvents.ENDERMAN_TELEPORT, net.minecraft.sounds.SoundSource.PLAYERS, 0.5F, 1.2F);
+        // Короткий звук в исходной точке подсказывает окружающим, откуда игрок исчез.
+        AbilitySounds.play(player.serverLevel(), origin, SoundEvents.CHORUS_FRUIT_TELEPORT, 0.35F, 1.2F);
     }
 
     private static void particles(ServerPlayer player, Vec3 position) {

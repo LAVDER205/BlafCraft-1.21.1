@@ -6,12 +6,14 @@ import net.blafteam.blafcraft.feature.frynote.SafeTeleport;
 import net.blafteam.blafcraft.keybinds.ActionType;
 import net.blafteam.blafcraft.keybinds.CooldownSyncPayload;
 import net.blafteam.blafcraft.social.SocialData;
+import net.blafteam.blafcraft.sound.AbilitySounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -84,8 +86,11 @@ public final class KingCall {
         long readyAt = server.overworld().getGameTime() + FrigbyBalance.KING_CALL_COOLDOWN;
         caller.setData(ModAttachments.KING_CALL_READY_AT.get(), readyAt);
         syncCooldown(caller);
+        AbilitySounds.play(level, exit.feet(), SoundEvents.BEACON_ACTIVATE, 0.65F, 0.9F);
         tell(caller, "Зов короля открыт");
-        for (UUID allyId : entrances.keySet()) {
+        for (var entrance : entrances.entrySet()) {
+            AbilitySounds.play(level, entrance.getValue().feet(), SoundEvents.BEACON_ACTIVATE, 0.5F, 1.1F);
+            UUID allyId = entrance.getKey();
             ServerPlayer ally = server.getPlayerList().getPlayer(allyId);
             if (ally != null) tell(ally, "Зов короля: войди в красный крест");
         }
@@ -155,6 +160,8 @@ public final class KingCall {
                 Portal portal = entrance.getValue();
                 if (portal.contains(ally) && !ally.isPassenger() && !ally.isSleeping()
                         && safeStandingPosition(ally, call.exit().feet()) && SafeTeleport.move(ally, call.exit().feet())) {
+                    AbilitySounds.play(level, portal.feet(), SoundEvents.CHORUS_FRUIT_TELEPORT, 0.5F, 1.1F);
+                    AbilitySounds.play(ally, SoundEvents.CHORUS_FRUIT_TELEPORT, 0.7F, 1.3F);
                     entrances.remove();
                     continue;
                 }

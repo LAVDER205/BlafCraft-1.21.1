@@ -9,10 +9,12 @@ import net.blafteam.blafcraft.feature.frynote.FrynoteController;
 import net.blafteam.blafcraft.effect.ModEffects;
 import net.blafteam.blafcraft.mana.ManaManager;
 import net.blafteam.blafcraft.particle.ModParticles;
+import net.blafteam.blafcraft.sound.AbilitySounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.phys.BlockHitResult;
@@ -64,6 +66,7 @@ public class ServerHandler {
             }
             if (ManaManager.getMana(player) < manaCost) return;
             if (!executeAbility(player, action)) return;
+            playAbilitySound(player, action);
 
             // Успешное действие оплачивается один раз. Отложенные стрелы входят в этот же залп.
             if (experienceCost > 0) player.giveExperiencePoints(-experienceCost);
@@ -108,6 +111,20 @@ public class ServerHandler {
             case MORPH -> player.addEffect(new MobEffectInstance(ModEffects.MORPH_EFFECT, 1200, 0, false, false, true));
             case OVERDOSE_ABILITY -> castOverdose(player);
         };
+    }
+
+    // Эти способности выполняются здесь. У Фригби и Фрайнота звуки привязаны к этапам их способностей.
+    private static void playAbilitySound(ServerPlayer player, ActionType action) {
+        switch (action) {
+            case TELEPORT_DASH, TELEPORT_GLANCE -> AbilitySounds.play(player, SoundEvents.ENDERMAN_TELEPORT, 0.55F, 1.2F);
+            case BLOODLUST -> AbilitySounds.play(player, SoundEvents.WARDEN_SONIC_CHARGE, 0.45F, 0.85F);
+            case TIME_BOMB -> AbilitySounds.play(player, SoundEvents.FIRECHARGE_USE, 0.6F, 0.85F);
+            case FLIGHT -> AbilitySounds.play(player, SoundEvents.PHANTOM_FLAP, 0.75F, 1.15F);
+            case SCULK_MARK -> AbilitySounds.play(player, SoundEvents.SCULK_BLOCK_CHARGE, 0.7F, 1.0F);
+            case MORPH -> AbilitySounds.play(player, SoundEvents.ENCHANTMENT_TABLE_USE, 0.6F, 0.95F);
+            case OVERDOSE_ABILITY -> AbilitySounds.play(player, SoundEvents.PLAYER_BREATH, 0.8F, 1.1F);
+            default -> {}
+        }
     }
 
     private static boolean castTeleportGlance(ServerPlayer player) {
